@@ -52,7 +52,7 @@ export default function Login() {
             <input
               type="text"
               className="grow input-secondary"
-              placeholder=""
+              required
               autoFocus
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
@@ -65,7 +65,7 @@ export default function Login() {
             <input
               type="password"
               className="grow input-secondary"
-              placeholder=""
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
