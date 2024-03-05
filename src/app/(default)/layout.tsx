@@ -2,7 +2,6 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 // mam api host
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 export default async function DefaultLayout({
