@@ -39,11 +39,11 @@ export default function Login() {
 
   return (
     <div className="w-full h-screen grid grid-cols-1 gap-4 justify-items-center content-center">
-      <div className="">
+      <div className="fade-in">
         <Image alt="logo" src="/logo.png" width={300} height={100} />
       </div>
       <form
-        className="grid grid-cols-4 gap-3 w-72 mt-5"
+        className="grid grid-cols-4 gap-3 w-72 mt-5 fade-in "
         onSubmit={handleSubmit}
       >
         <div className="col-span-4">
