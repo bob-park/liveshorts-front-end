@@ -1,7 +1,4 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-
 import { Inter } from 'next/font/google';
 import './globals.css';
 

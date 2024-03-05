@@ -21,5 +21,5 @@ export default async function DefaultLayout({
     redirect('/login');
   }
 
-  return <>{children}</>;
+  return <div className="w-full">{children}</div>;
 }
