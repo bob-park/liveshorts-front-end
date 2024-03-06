@@ -48,6 +48,9 @@ import { userActions } from '@/store/user';
 const { requestUpdateMe } = userActions;
 
 export default function NavBar(props: { token: string }) {
+  // router
+  const router = useRouter();
+
   // store
   const dispatch = useAppDispatch();
   const { me } = useAppSelector((state) => state.user);
@@ -58,6 +61,11 @@ export default function NavBar(props: { token: string }) {
       dispatch(requestUpdateMe(props.token));
     }
   }, [me]);
+
+  // handle
+  const handleLogout = () => {
+    router.push('/api/user/logout');
+  };
 
   return (
     <>
@@ -74,7 +82,13 @@ export default function NavBar(props: { token: string }) {
             </div>
           </Navbar.Start>
           <Navbar.End className="lg:w-full">
-            <div className="mr-5">user</div>
+            <div className="mr-7">
+              {me && (
+                <p>
+                  <strong>{me.name}</strong> (<span>{me.userId}</span>)
+                </p>
+              )}
+            </div>
             <Dropdown className="mr-10" hover end>
               <Avatar
                 src={me && `/api/user/${me.id}/avatar`}
@@ -98,7 +112,7 @@ export default function NavBar(props: { token: string }) {
                 </li>
 
                 <hr />
-                <Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>
                   <LuLogOut />
                   로그아웃
                 </Dropdown.Item>
