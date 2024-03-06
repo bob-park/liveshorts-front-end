@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 
 // nextjs
 import LoginForm from '@/app/components/user/LoginForm';
@@ -22,11 +22,18 @@ export default function LoginPage() {
 
   // store
   const dispatch = useAppDispatch();
-  const { isLoggingIn, failLoggedInMessage } = useAppSelector(
+  const { isLoggingIn, failLoggedInMessage, me } = useAppSelector(
     (state) => state.user,
   );
 
   // state
+
+  // useEffect
+  useLayoutEffect(() => {
+    if (me) {
+      router.push('/');
+    }
+  }, [me]);
 
   // handler
   const handleLogin = async (userId: string, password: string) => {
