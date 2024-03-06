@@ -10,4 +10,10 @@ type ApiResult<T> = {
   state: ApiResultState;
   data?: T;
   error?: ApiError;
+  page?: {
+    currentPage: number;
+    size: number;
+    totalCount: number;
+    totalPage: number;
+  };
 };

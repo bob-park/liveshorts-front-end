@@ -13,6 +13,7 @@ export async function get<R>(
         state: 'SUCCESS' as ApiResultState,
         status: res.status,
         data: res.data.result as R,
+        page: res.data.page,
       };
     })
     .catch((err) => {

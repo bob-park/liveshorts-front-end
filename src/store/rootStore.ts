@@ -7,8 +7,12 @@ import rootSaga from './rootSaga';
 // user
 import { userReducer } from './user';
 
+// asset
+import { assetReducer } from './asset';
+
 const rootReducer = combineReducers({
   user: userReducer,
+  asset: assetReducer,
 });
 
 function rootStore() {

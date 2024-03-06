@@ -1,6 +1,6 @@
 'use client';
 
-export default function SkeletonAsset() {
+export default function SkeletonAssetItem() {
   return (
     <div className="flex flex-col gap-4 w-52">
       <div className="skeleton h-32 w-full"></div>
