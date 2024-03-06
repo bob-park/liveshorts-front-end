@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_PREFIX = '/api';
-const UNCHECKED_URI_PATTERNS: string[] = [];
+const UNCHECKED_AUTH_URI_PATTERNS: string[] = [''];
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 function checkedAuth(url: string) {
-  if (UNCHECKED_URI_PATTERNS.some((checkedUrl) => checkedUrl == url)) {
+  if (UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url)) {
     return false;
   }
 
@@ -57,6 +57,10 @@ export async function middleware(req: NextRequest) {
       params,
       body,
     );
+
+    if (apiResponse.status === 401) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
 
     return new NextResponse(apiResponse.body, {
       status: apiResponse.status,
