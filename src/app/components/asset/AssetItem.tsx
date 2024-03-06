@@ -24,8 +24,8 @@ export default function AssetItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="flex flex-col gap-4 w-64 p-3 rounded-lg shadow-xl">
-      <div className="w-full relative h-32">
+    <div className="card w-96 bg-base-100 shadow-xl">
+      <figure className="w-full relative h-48">
         <Image
           src={`/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`}
           alt="thumbnail"
@@ -34,25 +34,26 @@ export default function AssetItem(props: AssetItemProps) {
           priority
           onError={(e) => (e.currentTarget.src = '/default_thumbnail.png')}
         />
-      </div>
-      <div className="w-full">
-        <div className="tooltip w-full" data-tip={title}>
-          <p className="w-full truncate font-bold text-start">{title}</p>
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">
+          <div className="tooltip w-full" data-tip={title}>
+            <p className="w-full truncate font-bold text-start">{title}</p>
+          </div>
+        </h2>
+        <p className="pt-4"></p>
+        <div className="card-actions justify-between">
+          {createdDate && (
+            <div className="">
+              <TimeAgo datetime={createdDate} locale="ko" />
+            </div>
+          )}
+          {category && (
+            <div className="badge badge-outline badge-lg font-semibold text-sm">
+              {category}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="h-4 w-full">
-        {category && (
-          <div className="badge badge-outline badge-lg font-semibold text-sm">
-            {category}
-          </div>
-        )}
-      </div>
-      <div className="h-4 w-full text-sm text-gray-500">
-        {createdDate && (
-          <div className="">
-            <TimeAgo datetime={createdDate} locale="ko" />
-          </div>
-        )}
       </div>
     </div>
   );

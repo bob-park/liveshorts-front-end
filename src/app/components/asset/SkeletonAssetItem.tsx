@@ -2,11 +2,20 @@
 
 export default function SkeletonAssetItem() {
   return (
-    <div className="flex flex-col gap-4 w-64 p-3 rounded-lg shadow-xl">
-      <div className="skeleton h-32 w-full"></div>
-      <div className="skeleton h-4 w-28"></div>
-      <div className="skeleton h-4 w-full"></div>
-      <div className="skeleton h-4 w-full"></div>
+    <div className="card w-96 bg-base-100 shadow-xl">
+      <figure className="w-full relative h-48">
+        <div className="skeleton h-full w-full"></div>
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">
+          <div className="skeleton w-full h-8"></div>
+        </h2>
+        <p className="pt-4"></p>
+        <div className="card-actions justify-between">
+          <div className="skeleton w-24 h-5"></div>
+          <div className="skeleton w-24 h-5"></div>
+        </div>
+      </div>
     </div>
   );
 }
