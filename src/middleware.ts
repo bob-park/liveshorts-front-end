@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_PREFIX = '/api';
@@ -29,6 +31,7 @@ async function callApi(
         ...headers,
         Authorization: `Bearer ${accessToken}`,
         'User-Agent': headers.get('User-Agent') || '',
+        Range: headers.get('Range') || '',
       },
       body,
     },
@@ -62,11 +65,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    return new NextResponse(apiResponse.body, {
-      status: apiResponse.status,
-      statusText: apiResponse.statusText,
-      headers: apiResponse.headers,
-    });
+    return apiResponse;
   }
 
   return response;
