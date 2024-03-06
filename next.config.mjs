@@ -3,6 +3,7 @@ const nextConfig = {
   experimental: {
     outputStandalone: true,
   },
+  reactStrictMode: false,
 };
 
 export default nextConfig;

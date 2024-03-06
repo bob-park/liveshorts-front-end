@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import NavBar from './NavBar';
 
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
@@ -20,5 +21,12 @@ export default async function DefaultLayout({
     redirect('/login');
   }
 
-  return <div className="w-full">{children}</div>;
+  const touchResult = await touchReponse.json();
+
+  return (
+    <div className="w-full">
+      <NavBar token={touchResult.result.accessToken} />
+      <div className="p-2">{children}</div>
+    </div>
+  );
 }

@@ -28,7 +28,7 @@ async function callApi(
         ...headers,
         Authorization: `Bearer ${accessToken}`,
         'User-Agent': headers.get('User-Agent') || '',
-        Range: headers.get('Range') || '',
+        Range: headers.get('Range') || 'bytes=0-',
       },
       body,
     },
@@ -61,7 +61,6 @@ export async function middleware(req: NextRequest) {
     );
 
     if (checkedAuth(pathname) && apiResponse.status === 401) {
-      console.log('no auth.');
       return NextResponse.redirect(new URL('/login', req.url));
     }
 

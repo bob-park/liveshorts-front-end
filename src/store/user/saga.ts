@@ -18,6 +18,10 @@ const {
   requestLoggedIn,
   successLoggedIn,
   failureLoggedIn,
+
+  // update me
+  requestUpdateMe,
+  successUpdateMe,
 } = userActions;
 
 // logged in
@@ -63,6 +67,26 @@ function* watchLoggedIn() {
   yield takeLatest(requestLoggedIn, callLoggedIn);
 }
 
+// update me
+function* updateMe(action: ReturnType<typeof requestUpdateMe>) {
+  const token = action.payload;
+
+  const jwtPayload = decodeJwt(token);
+
+  const user: User = {
+    id: jwtPayload['id'],
+    userId: jwtPayload['userId'],
+    name: jwtPayload['name'],
+    email: jwtPayload['email'],
+  };
+
+  yield put(successUpdateMe(user));
+}
+
+function* watchUpdateMe() {
+  yield takeLatest(requestUpdateMe, updateMe);
+}
+
 export default function* userSagas() {
-  yield all([fork(watchLoggedIn)]);
+  yield all([fork(watchLoggedIn), fork(watchUpdateMe)]);
 }

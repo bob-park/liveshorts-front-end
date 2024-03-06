@@ -1,6 +1,7 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 
 const reducers = {
+  // logged in
   requestLoggedIn: (
     state: UserState,
     action: PayloadAction<{
@@ -25,6 +26,13 @@ const reducers = {
     state.isLoggingIn = false;
     state.me = undefined;
     state.failLoggedInMessage = failureMessage;
+  },
+  // touch
+  requestUpdateMe: (state: UserState, action: PayloadAction<string>) => {
+    state.me = undefined;
+  },
+  successUpdateMe: (state: UserState, action: PayloadAction<User>) => {
+    state.me = action.payload;
   },
 };
 
