@@ -91,7 +91,8 @@ export default function NavBar(props: { token: string }) {
             <div className="mr-7">
               {me && (
                 <p>
-                  <strong>{me.name}</strong> (<span>{me.userId}</span>)
+                  <strong className="text-xl">{me.name}</strong> (
+                  <span>@{me.userId}</span>)
                 </p>
               )}
             </div>

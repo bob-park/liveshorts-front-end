@@ -2,7 +2,7 @@
 
 export default function SkeletonAssetItem() {
   return (
-    <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="card w-96 bg-base-100 shadow-xl hover:shadow-2xl">
       <figure className="w-full relative h-48">
         <div className="skeleton h-full w-full"></div>
       </figure>

@@ -24,7 +24,7 @@ export default function AssetItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="card w-96 bg-base-100 shadow-xl hover:shadow-2xl">
       <figure className="w-full relative h-48">
         <Image
           src={`/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`}
