@@ -77,7 +77,13 @@ export default function NavBar(props: { token: string }) {
                 className="btn btn-ghost normal-case px-2 mx-2 text-2xl font-bold"
                 href="/"
               >
-                <Image alt="logo" src="/logo.png" width={150} height={50} />
+                <Image
+                  alt="logo"
+                  src="/logo.png"
+                  width={150}
+                  height={50}
+                  priority
+                />
               </Link>
             </div>
           </Navbar.Start>

@@ -44,7 +44,7 @@ export default function SearchAsseResult() {
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 justify-items-center content-center">
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-8 justify-items-center content-center">
       {isLoading
         ? new Array(20)
             .fill('')
@@ -55,6 +55,10 @@ export default function SearchAsseResult() {
             <AssetItem
               key={`asset-item-${item.assetId}`}
               assetId={item.assetId}
+              title={item.title}
+              assetStatus={item.assetStatus}
+              category={item.category.name}
+              createdDate={item.createdDate}
             />
           ))}
     </div>

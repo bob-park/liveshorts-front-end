@@ -30,8 +30,6 @@ function* callSearchAsset(action: ReturnType<typeof requestSearchAsset>) {
     searchParams,
   );
 
-  console.log(result.data);
-
   if (result.state !== 'SUCCESS') {
     yield put(failureSearchAsset());
     return;
