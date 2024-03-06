@@ -21,6 +21,18 @@ import { assetActions } from '@/store/asset';
 
 const { requestSearchAsset } = assetActions;
 
+const LoadingAssets = (props: { size: number }) => {
+  const { size } = props;
+
+  return (
+    <>
+      {new Array(size).fill('').map((value, index) => (
+        <SkeletonAsset key={`skeleton-asset-item-${index}`} />
+      ))}
+    </>
+  );
+};
+
 export default function SearchAsseResult() {
   // store
   const dispatch = useAppDispatch();
@@ -44,14 +56,15 @@ export default function SearchAsseResult() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 justify-items-center content-center">
-      {isLoading
-        ? new Array(20)
-            .fill('')
-            .map((value, index) => (
-              <SkeletonAssetItem key={`skeleton-asset-item-${index}`} />
-            ))
-        : assets.map((item) => (
+    <div className="grid grid-cols-1 m-2">
+      {/* search form */}
+      <div className="col-span-1 grid">search form</div>
+      {/* contents */}
+      <div className="col-span-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 justify-items-center content-center mt-4">
+        {isLoading ? (
+          <LoadingAssets size={10} />
+        ) : (
+          assets.map((item) => (
             <AssetItem
               key={`asset-item-${item.assetId}`}
               assetId={item.assetId}
@@ -60,7 +73,9 @@ export default function SearchAsseResult() {
               category={item.category.name}
               createdDate={item.createdDate}
             />
-          ))}
+          ))
+        )}
+      </div>
     </div>
   );
 }

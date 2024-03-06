@@ -24,7 +24,7 @@ export default async function DefaultLayout({
   const touchResult = await touchReponse.json();
 
   return (
-    <div className="w-full min-w-[500px]">
+    <div className="w-full h-full min-w-[500px]">
       <NavBar token={touchResult.result.accessToken} />
       <div className="p-2">{children}</div>
     </div>
