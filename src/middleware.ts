@@ -1,18 +1,15 @@
 import axios from 'axios';
 
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 
 const API_PREFIX = '/api';
-const UNCHECKED_AUTH_URI_PATTERNS: string[] = [''];
+const UNCHECKED_AUTH_URI_PATTERNS: string[] = ['/api/user/login'];
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 function checkedAuth(url: string) {
-  if (UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url)) {
-    return false;
-  }
-
-  return url.startsWith(API_PREFIX);
+  return !UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url);
 }
 
 async function callApi(
@@ -45,7 +42,9 @@ export async function middleware(req: NextRequest) {
   const response = NextResponse.next();
   const cookies = req.cookies;
 
-  if (checkedAuth(pathname)) {
+  const isApi = pathname.startsWith(API_PREFIX);
+
+  if (isApi) {
     const requestUrl = pathname.substring(API_PREFIX.length);
 
     const params = req.nextUrl.searchParams;
@@ -61,7 +60,8 @@ export async function middleware(req: NextRequest) {
       body,
     );
 
-    if (apiResponse.status === 401) {
+    if (checkedAuth(pathname) && apiResponse.status === 401) {
+      console.log('no auth.');
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
