@@ -1,5 +1,3 @@
-'use client';
-
 export default function SkeletonAssetItem() {
   return (
     <div className="card w-96 bg-base-100 shadow-xl hover:shadow-2xl">

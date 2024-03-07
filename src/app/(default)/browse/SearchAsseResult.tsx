@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 import AssetViewItem from '@/app/components/asset/AssetViewItem';
 import AssetListItem from '@/app/components/asset/AssetListItem';
 import SkeletonAssetViewItem from '@/app/components/asset/SkeletonAssetViewItem';
+import SkeletonAssetListItem from '@/app/components/asset/SkeletonAssetListItem';
 
 // action
 import { assetActions } from '@/store/asset';
@@ -44,7 +45,13 @@ const LoadingThumbanilAssets = (props: { size: number }) => {
 const LoadingListAssets = (props: { size: number }) => {
   const { size } = props;
 
-  return <div className="gird grid-cols-5"></div>;
+  return (
+    <>
+      {new Array(size).fill('').map((value, index) => (
+        <SkeletonAssetListItem key={`skeleton-asset-item-${index}`} />
+      ))}
+    </>
+  );
 };
 
 const ThumbnailAssetView = (props: { assets: Asset[]; isLoading: boolean }) => {
