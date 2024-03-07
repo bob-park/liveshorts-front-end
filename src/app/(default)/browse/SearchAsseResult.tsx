@@ -4,12 +4,19 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 // nextjs
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
 // react icon
-import { HiOutlineViewGrid, HiOutlineViewList } from 'react-icons/hi';
+import {
+  HiOutlineViewGrid,
+  HiOutlineViewList,
+  HiOutlineSearch,
+} from 'react-icons/hi';
+import { GrPowerReset } from 'react-icons/gr';
+
+import Datepicker from 'react-tailwindcss-datepicker';
 
 // hooks
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
@@ -20,14 +27,29 @@ import AssetListItem from '@/app/components/asset/AssetListItem';
 import SkeletonAssetViewItem from '@/app/components/asset/SkeletonAssetViewItem';
 import SkeletonAssetListItem from '@/app/components/asset/SkeletonAssetListItem';
 
+// dayjs
+import dayjs from 'dayjs';
+
 // action
 import { assetActions } from '@/store/asset';
 import { Button } from 'react-daisyui';
 
 const { requestSearchAsset } = assetActions;
 
+const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
+
 type SearchAsseResultProps = {
   isListView: boolean;
+  searchAssetParams: SearchAssetParams;
+};
+
+type SearchAssetParams = {
+  title: string;
+  channleId?: number;
+  isShortForm: boolean;
+  broadcastDate: string;
+  page: number;
+  size: number;
 };
 
 const LoadingThumbanilAssets = (props: { size: number }) => {
@@ -114,10 +136,18 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
 
 export default function SearchAsseResult(props: SearchAsseResultProps) {
   // props
-  const { isListView } = props;
+  const { isListView, searchAssetParams: prevSearchAssetParams } = props;
+
+  // router
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // state
   const [listViewMode, setListViewMode] = useState<boolean>(isListView);
+  const [searchAssetParams, setSearchAssetParams] = useState<SearchAssetParams>(
+    prevSearchAssetParams,
+  );
 
   // store
   const dispatch = useAppDispatch();
@@ -125,17 +155,31 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // useEffect
   useLayoutEffect(() => {
-    handleSearch();
+    // handleSearch();
   }, []);
+
+  useLayoutEffect(() => {
+    handleSearch();
+  }, [searchParams]);
 
   // handle
   const handleSearch = () => {
+    const metas: string[] = [];
+
+    searchAssetParams.broadcastDate &&
+      metas.push(
+        `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
+      );
+
     dispatch(
       requestSearchAsset({
-        page: 0,
-        size: 20,
+        page: searchAssetParams.page,
+        size: searchAssetParams.size,
         isDeleted: false,
+        assetType: 'VIDEO',
         assetStatus: 'REGISTERED',
+        metas,
+        title: searchAssetParams.title,
       }),
     );
   };
@@ -146,10 +190,169 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     document.cookie = `isListView=${isListView}`;
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const urlSearchParams = new URLSearchParams();
+
+    Object.entries(searchAssetParams).forEach(([key, value]) => {
+      urlSearchParams.set(key, String(value));
+    });
+
+    router.push(`${pathname}?${urlSearchParams.toString()}`);
+  };
+
   return (
     <div className="grid grid-cols-1 m-2">
       {/* search form */}
-      <div className="col-span-1 grid"></div>
+      <div className="card bg-base-100 shadow-xl mx-10 p-6 min-w-[850px]">
+        <form className="p-4" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-7">
+            {/* 애셋 제목 */}
+            <div className="col-span-1">
+              <div className="grid grid-cols-3 gap-5 h-12">
+                <div className="col-span-1 flex justify-end items-center">
+                  <h2 className="font-extrabold">제목</h2>
+                </div>
+                <div className="col-span-2">
+                  <label className="input input-bordered flex items-center gap-2">
+                    <input
+                      type="text"
+                      className="grow"
+                      placeholder="Search"
+                      defaultValue={searchAssetParams.title}
+                      onChange={(e) =>
+                        setSearchAssetParams({
+                          ...searchAssetParams,
+                          title: e.target.value,
+                        })
+                      }
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                      className="w-4 h-4 opacity-70"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </label>
+                </div>
+              </div>
+            </div>
+            {/* 숏폼 여부 */}
+            <div className="col-span-1">
+              <div className="grid grid-cols-3 gap-5 h-12">
+                <div className="col-span-1 flex justify-end items-center">
+                  <h2 className="font-extrabold">숏폼 여부</h2>
+                </div>
+                <div className="col-span-2 flex justify-start items-center">
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-lg toggle-neutral"
+                    checked={searchAssetParams.isShortForm}
+                    onChange={(e) =>
+                      setSearchAssetParams({
+                        ...searchAssetParams,
+                        isShortForm: e.target.checked,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 채널 목록 */}
+            <div className="col-span-1">
+              <div className="grid grid-cols-3 gap-5 h-12">
+                <div className="col-span-1 flex justify-end items-center">
+                  <h2 className="font-extrabold">채널</h2>
+                </div>
+                <div className="col-span-2">
+                  <div className="join">
+                    <Button
+                      className="join-item"
+                      active={!!!searchAssetParams.channleId}
+                      color={
+                        !!!searchAssetParams.channleId ? 'neutral' : undefined
+                      }
+                    >
+                      전체
+                    </Button>
+                    <Button className="join-item">현대홈쇼핑</Button>
+                    <Button className="join-item">샵플러스</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-span-1"></div>
+
+            {/* 방송일 */}
+            <div className="col-span-1">
+              <div className="grid grid-cols-3 gap-5 h-12">
+                <div className="col-span-1 flex justify-end items-center">
+                  <h2 className="font-extrabold">방송일</h2>
+                </div>
+                <div className="col-span-2">
+                  <Datepicker
+                    placeholder="날짜 선택"
+                    inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
+                    asSingle
+                    value={{
+                      startDate: dayjs(
+                        searchAssetParams.broadcastDate,
+                        DEFAULT_DATE_FORMAT,
+                      ).toDate(),
+                      endDate: dayjs(
+                        searchAssetParams.broadcastDate,
+                        DEFAULT_DATE_FORMAT,
+                      ).toDate(),
+                    }}
+                    showFooter
+                    onChange={(value) =>
+                      setSearchAssetParams({
+                        ...searchAssetParams,
+                        broadcastDate: dayjs(value?.endDate).format(
+                          DEFAULT_DATE_FORMAT,
+                        ),
+                      })
+                    }
+                    i18n="ko"
+                    configs={{
+                      footer: {
+                        cancel: '취소',
+                        apply: '적용',
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-span-1"></div>
+            <div className="col-span-1"></div>
+            <div className="col-span-1 flex justify-end mr-10">
+              <Button className="mr-4" size="md">
+                <GrPowerReset className="w-6 h-6" />
+                초기화
+              </Button>
+              <Button
+                type="submit"
+                size="md"
+                color="neutral"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                {isLoading ? <></> : <HiOutlineSearch className="w-6 h-6" />}
+                검색
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
 
       {/* view mode */}
       <div className="col-span-1 text-right">
@@ -157,6 +360,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           <div className="tooltip w-full" data-tip="썸네일뷰">
             <Button
               className="join-item"
+              color={!listViewMode ? 'neutral' : undefined}
               active={!listViewMode}
               onClick={() => handleToggleViewMode(false)}
             >
@@ -168,7 +372,11 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
             data-tip="리스트뷰"
             onClick={() => handleToggleViewMode(true)}
           >
-            <Button className="join-item" active={listViewMode}>
+            <Button
+              className="join-item"
+              active={listViewMode}
+              color={listViewMode ? 'neutral' : undefined}
+            >
               <HiOutlineViewList />
             </Button>
           </div>

@@ -6,8 +6,20 @@ export async function get<R>(
   url: string,
   params?: { [name: string]: any },
 ): Promise<ApiResult<R>> {
+  const urlSearchParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value instanceof Array) {
+      value.forEach((item) => {
+        urlSearchParams.append(key, item);
+      });
+    } else {
+      urlSearchParams.set(key, value);
+    }
+  });
+
   return await client
-    .get(url, { params })
+    .get(url + '?' + urlSearchParams)
     .then((res) => {
       return {
         state: 'SUCCESS' as ApiResultState,

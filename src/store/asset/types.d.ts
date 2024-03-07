@@ -27,7 +27,10 @@ type SearchAssetParams = {
   page: number;
   size: number;
   isDeleted: boolean;
+  assetType?: 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';
   assetStatus: AssetStatus;
+  metas?: string[];
+  title?: string;
 };
 
 type Pagination = {
