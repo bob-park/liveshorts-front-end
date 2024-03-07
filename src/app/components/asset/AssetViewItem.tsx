@@ -25,13 +25,13 @@ export default function AssetItem(props: AssetItemProps) {
 
   return (
     <div className="card w-96 bg-base-100 shadow-xl hover:shadow-2xl">
-      <figure className="w-full relative h-48">
+      <figure className="w-full h-48">
         <Image
+          className="w-auto h-full rounded-md "
           src={`/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`}
           alt="thumbnail"
-          fill
-          sizes="(min-width: 60em) 24vw"
-          priority
+          width={400}
+          height={300}
           onError={(e) => (e.currentTarget.src = '/default_thumbnail.png')}
         />
       </figure>
