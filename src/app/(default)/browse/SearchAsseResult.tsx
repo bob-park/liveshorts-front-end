@@ -41,11 +41,14 @@ const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 type SearchAsseResultProps = {
   isListView: boolean;
   searchAssetParams: SearchAssetParams;
+  channels: SearchChannel[];
 };
+
+type SearchChannel = { channelId: number; name: string };
 
 type SearchAssetParams = {
   title: string;
-  channleId?: number;
+  channelId?: number;
   isShortForm: boolean;
   broadcastDate: string;
   page: number;
@@ -136,7 +139,11 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
 
 export default function SearchAsseResult(props: SearchAsseResultProps) {
   // props
-  const { isListView, searchAssetParams: prevSearchAssetParams } = props;
+  const {
+    isListView,
+    searchAssetParams: prevSearchAssetParams,
+    channels,
+  } = props;
 
   // router
   const pathname = usePathname();
@@ -155,10 +162,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // useEffect
   useLayoutEffect(() => {
-    // handleSearch();
-  }, []);
-
-  useLayoutEffect(() => {
     handleSearch();
   }, [searchParams]);
 
@@ -171,6 +174,15 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
       );
 
+    searchAssetParams.channelId &&
+      metas.push(
+        `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
+          channels.find(
+            (item) => item.channelId === searchAssetParams.channelId,
+          )?.name
+        }`,
+      );
+
     dispatch(
       requestSearchAsset({
         page: searchAssetParams.page,
@@ -179,7 +191,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         assetType: 'VIDEO',
         assetStatus: 'REGISTERED',
         metas,
-        title: searchAssetParams.title,
+        title: searchAssetParams.title || '',
       }),
     );
   };
@@ -196,7 +208,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     const urlSearchParams = new URLSearchParams();
 
     Object.entries(searchAssetParams).forEach(([key, value]) => {
-      urlSearchParams.set(key, String(value));
+      urlSearchParams.set(key, value ? String(value) : '');
     });
 
     router.push(`${pathname}?${urlSearchParams.toString()}`);
@@ -267,29 +279,56 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
             </div>
 
             {/* 채널 목록 */}
-            <div className="col-span-1">
-              <div className="grid grid-cols-3 gap-5 h-12">
+            <div className="col-span-2">
+              <div className="grid grid-cols-6 gap-5 h-12">
                 <div className="col-span-1 flex justify-end items-center">
                   <h2 className="font-extrabold">채널</h2>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-5">
                   <div className="join">
                     <Button
-                      className="join-item"
-                      active={!!!searchAssetParams.channleId}
+                      className="join-item w-24"
+                      type="button"
+                      active={!!!searchAssetParams.channelId}
                       color={
-                        !!!searchAssetParams.channleId ? 'neutral' : undefined
+                        !!!searchAssetParams.channelId ? 'neutral' : undefined
+                      }
+                      onClick={() =>
+                        setSearchAssetParams({
+                          ...searchAssetParams,
+                          channelId: undefined,
+                        })
                       }
                     >
                       전체
                     </Button>
-                    <Button className="join-item">현대홈쇼핑</Button>
-                    <Button className="join-item">샵플러스</Button>
+                    {channels.map((channel) => (
+                      <Button
+                        key={`channel-key-${channel.channelId}`}
+                        className="join-item"
+                        type="button"
+                        active={
+                          channel.channelId == searchAssetParams.channelId
+                        }
+                        color={
+                          channel.channelId == searchAssetParams.channelId
+                            ? 'neutral'
+                            : undefined
+                        }
+                        onClick={() =>
+                          setSearchAssetParams({
+                            ...searchAssetParams,
+                            channelId: channel.channelId,
+                          })
+                        }
+                      >
+                        {channel.name}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-span-1"></div>
 
             {/* 방송일 */}
             <div className="col-span-1">

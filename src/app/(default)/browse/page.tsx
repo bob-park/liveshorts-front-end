@@ -6,7 +6,9 @@ import dayjs from 'dayjs';
 
 const COOKIE_NAME_IS_LIST_VIEW = 'isListView';
 
-export default function Browse(props: {
+const apiHost = process.env.MAM_API_HOST;
+
+export default async function Browse(props: {
   params: { slug: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
@@ -27,11 +29,24 @@ export default function Browse(props: {
     size: Number(searchParams.size || 20),
   };
 
+  // get channel
+  const channelsResponse = await fetch(apiHost + '/api/record/channel', {
+    headers: {
+      Authorization: `Bearer ${cookieStore.get('accessToken')?.value}`,
+    },
+  });
+
+  const channelsResult = await channelsResponse.json();
+  const channels = channelsResult.result.map((item: any) => {
+    return { channelId: item.channelId, name: item.channelName };
+  });
+
   return (
     <div>
       <SearchAsseResult
         isListView={preIsListView}
         searchAssetParams={searchAssetParams}
+        channels={channels}
       />
     </div>
   );
