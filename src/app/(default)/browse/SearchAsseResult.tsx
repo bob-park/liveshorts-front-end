@@ -83,7 +83,7 @@ const ThumbnailAssetView = (props: { assets: Asset[]; isLoading: boolean }) => {
   const { assets, isLoading } = props;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 justify-items-center content-center mt-4">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
       {isLoading ? (
         <LoadingThumbanilAssets size={10} />
       ) : (
