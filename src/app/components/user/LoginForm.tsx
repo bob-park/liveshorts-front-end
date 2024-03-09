@@ -32,7 +32,7 @@ export default function LoginForm(props: LoginFormProps) {
 
   return (
     <form
-      className="grid grid-cols-4 gap-3 w-72 mt-5 fade-in "
+      className="grid grid-cols-4 gap-3 w-80 mt-5 fade-in "
       onSubmit={handleSubmit}
     >
       <div className="col-span-4">

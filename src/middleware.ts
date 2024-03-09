@@ -10,8 +10,8 @@ const REDIRECT_URI_PATTERNS = ['/api/user/logout'];
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
-function checkedAuth(url: string) {
-  return !UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url);
+function uncheckedAuth(url: string) {
+  return UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url);
 }
 
 async function callApi(
@@ -62,9 +62,12 @@ export async function middleware(req: NextRequest) {
       body,
     );
 
-    // if (checkedAuth(pathname) && apiResponse.status === 401) {
-    //   return NextResponse.redirect(new URL('/login', req.url));
-    // }
+    if (uncheckedAuth(pathname) && apiResponse.status === 401) {
+      return new NextResponse(apiResponse.body, {
+        ...apiResponse,
+        status: 400,
+      });
+    }
 
     return apiResponse;
   }
