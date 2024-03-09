@@ -30,6 +30,8 @@ function* callSearchAsset(action: ReturnType<typeof requestSearchAsset>) {
     searchParams,
   );
 
+  yield delay(500);
+
   if (result.state !== 'SUCCESS') {
     yield put(failureSearchAsset());
     return;

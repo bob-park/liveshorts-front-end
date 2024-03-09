@@ -37,9 +37,11 @@ export default async function Browse(props: {
   });
 
   const channelsResult = await channelsResponse.json();
-  const channels = channelsResult.result.map((item: any) => {
-    return { channelId: item.channelId, name: item.channelName };
-  });
+  const channels = channelsResult.result
+    ? channelsResult.result.map((item: any) => {
+        return { channelId: item.channelId, name: item.channelName };
+      })
+    : [];
 
   return (
     <div>
