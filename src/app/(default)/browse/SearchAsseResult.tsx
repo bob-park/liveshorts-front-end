@@ -109,12 +109,13 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
   return (
     <div className="grid grid-cols-1 min-w-[900px] gap-4">
       {/* header */}
-      <div className="col-span-1 grid grid-cols-5 text-center font-bold">
-        <div className="col-span-1">썸네일</div>
-        <div className="col-span-1">대분류</div>
+      <div className="col-span-1 grid grid-cols-7 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 justify-center items-center">
+        <div className="col-span-1"></div>
         <div className="col-span-2">제목</div>
+        <div className="col-span-1">대분류</div>
+        <div className="col-span-1">크기</div>
         <div className="col-span-1">생성일</div>
-        {/* <div>썸네일</div> */}
+        <div className="col-span-1">생성자</div>
       </div>
       {/* content */}
       <div className="col-span-1">
