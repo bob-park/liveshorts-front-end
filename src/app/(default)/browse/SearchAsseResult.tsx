@@ -214,6 +214,17 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     router.push(`${pathname}?${urlSearchParams.toString()}`);
   };
 
+  const handleInitializeSearchParams = () => {
+    setSearchAssetParams({
+      title: '',
+      channelId: undefined,
+      isShortForm: false,
+      broadcastDate: dayjs().format('YYYY-MM-DD'),
+      page: 0,
+      size: 20,
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 m-2">
       {/* search form */}
@@ -374,7 +385,12 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
             <div className="col-span-1"></div>
             <div className="col-span-1"></div>
             <div className="col-span-1 flex justify-end mr-10">
-              <Button className="mr-4" size="md">
+              <Button
+                className="mr-4"
+                type="button"
+                size="md"
+                onClick={handleInitializeSearchParams}
+              >
                 <GrPowerReset className="w-6 h-6" />
                 초기화
               </Button>
