@@ -158,7 +158,9 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // store
   const dispatch = useAppDispatch();
-  const { isLoading, assets } = useAppSelector((state) => state.asset);
+  const { isLoading, assets, pagination } = useAppSelector(
+    (state) => state.asset,
+  );
 
   // useEffect
   useLayoutEffect(() => {
@@ -179,7 +181,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
           channels.find(
             (item) => item.channelId === searchAssetParams.channelId,
-          )?.name
+          )?.name || ''
         }`,
       );
 
@@ -410,30 +412,43 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       </div>
 
       {/* view mode */}
-      <div className="col-span-1 text-right">
-        <div className="join m-7">
-          <div className="tooltip w-full" data-tip="썸네일뷰">
-            <Button
-              className="join-item"
-              color={!listViewMode ? 'neutral' : undefined}
-              active={!listViewMode}
-              onClick={() => handleToggleViewMode(false)}
-            >
-              <HiOutlineViewGrid />
-            </Button>
+      <div className="col-span-1">
+        <div className="grid grid-cols-2 justify-between items-center">
+          <div className="col-span-1 mx-10">
+            <h3 className="text-base text-gray-500">
+              총 <strong>{pagination.totalCount}</strong>개 중{' '}
+              <strong>
+                {pagination.size * pagination.currentPage + assets.length}
+              </strong>
+              개
+            </h3>
           </div>
-          <div
-            className="tooltip w-full"
-            data-tip="리스트뷰"
-            onClick={() => handleToggleViewMode(true)}
-          >
-            <Button
-              className="join-item"
-              active={listViewMode}
-              color={listViewMode ? 'neutral' : undefined}
-            >
-              <HiOutlineViewList />
-            </Button>
+          <div className="col-span-1 text-right">
+            <div className="join mx-10 my-5">
+              <div className="tooltip w-full" data-tip="썸네일뷰">
+                <Button
+                  className="join-item"
+                  color={!listViewMode ? 'neutral' : undefined}
+                  active={!listViewMode}
+                  onClick={() => handleToggleViewMode(false)}
+                >
+                  <HiOutlineViewGrid />
+                </Button>
+              </div>
+              <div
+                className="tooltip w-full"
+                data-tip="리스트뷰"
+                onClick={() => handleToggleViewMode(true)}
+              >
+                <Button
+                  className="join-item"
+                  active={listViewMode}
+                  color={listViewMode ? 'neutral' : undefined}
+                >
+                  <HiOutlineViewList />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

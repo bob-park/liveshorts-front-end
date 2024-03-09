@@ -19,7 +19,7 @@ export async function get<R>(
   });
 
   return await client
-    .get(url + '?' + urlSearchParams)
+    .get(url + '?' + urlSearchParams.toString().replaceAll('%2B', '+'))
     .then((res) => {
       return {
         state: 'SUCCESS' as ApiResultState,
