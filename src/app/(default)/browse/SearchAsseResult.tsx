@@ -116,13 +116,15 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
         <div className="col-span-1">생성자</div>
       </div>
       {/* content */}
-      <div className="col-span-1">
-        {isLoading ? (
+
+      {isLoading ? (
+        <div className="col-span-1 border-b-1 border-b-gray-200">
           <LoadingListAssets size={10} />
-        ) : (
-          assets.map((item) => (
+        </div>
+      ) : (
+        assets.map((item) => (
+          <div key={`asset-list-item-${item.assetId}`} className="col-span-1">
             <AssetListItem
-              key={`asset-list-item-${item.assetId}`}
               assetId={item.assetId}
               title={item.title}
               fileSize={item.fileSize}
@@ -131,9 +133,9 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
               createdDate={item.createdDate}
               createdBy={item.createdBy}
             />
-          ))
-        )}
-      </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };
