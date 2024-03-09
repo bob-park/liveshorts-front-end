@@ -9,10 +9,12 @@ type Asset = {
   assetId: number;
   assetType: AssetType;
   title: string;
+  fileSize?: number;
   description?: string;
   assetStatus: AssetStatus;
   category: Category;
   createdDate: Date;
+  createdBy: string;
 };
 
 type AssetType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';
@@ -28,7 +30,7 @@ type SearchAssetParams = {
   size: number;
   isDeleted: boolean;
   assetType?: 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';
-  assetStatus: AssetStatus;
+  assetStatus?: AssetStatus;
   metas?: string[];
   title?: string;
 };

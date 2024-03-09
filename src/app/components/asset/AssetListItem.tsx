@@ -1,8 +1,11 @@
 import Image from 'next/image';
 
+import { convertFileSize } from '@/utils/common';
+
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
+import { useState } from 'react';
 
 timeago.register('ko', ko);
 
@@ -28,21 +31,26 @@ export default function AssetListItem(props: AssetListItemProps) {
     createdBy,
   } = props;
 
+  // state
+  const [assetImageSrc, setAssetImageSrc] = useState<string>(
+    `/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`,
+  );
+
   return (
     <div className="grid grid-cols-7 gap-4 mx-10 my-2 p-1 rounded-xl hover:shadow-2xl">
       <div className="col-span-1 h-24 flex justify-center items-center ">
         <Image
           className="rounded-md w-auto h-full"
-          src={`/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`}
+          src={assetImageSrc}
           alt="thumbnail"
           width={200}
           height={150}
-          onError={(e) => (e.currentTarget.src = '/default_thumbnail.png')}
+          onError={() => setAssetImageSrc('/default_thumbnail.png')}
         />
       </div>
       <div className="col-span-2 flex justify-center items-center mx-5">
-        <div className="tooltip w-full" data-tip={title}>
-          <p className="w-full truncate font-bold text-start">{title}</p>
+        <div className="tooltip w-full text-start" data-tip={title}>
+          <p className="w-full truncate font-bold">{title}</p>
         </div>
       </div>
       <div className="col-span-1 flex justify-center items-center">
@@ -53,7 +61,7 @@ export default function AssetListItem(props: AssetListItemProps) {
         )}
       </div>
       <div className="col-span-1 flex justify-center items-center">
-        <h3 className="">{fileSize}</h3>
+        <h3 className="">{convertFileSize(fileSize)}</h3>
       </div>
       <div className="col-span-1 flex justify-center items-center">
         <div className="">

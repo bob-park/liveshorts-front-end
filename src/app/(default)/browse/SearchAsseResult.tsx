@@ -5,8 +5,6 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
 
 // react icon
 import {
@@ -127,9 +125,11 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
               key={`asset-list-item-${item.assetId}`}
               assetId={item.assetId}
               title={item.title}
+              fileSize={item.fileSize}
               assetStatus={item.assetStatus}
               category={item.category.name}
               createdDate={item.createdDate}
+              createdBy={item.createdBy}
             />
           ))
         )}

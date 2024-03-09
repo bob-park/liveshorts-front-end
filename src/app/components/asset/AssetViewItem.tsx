@@ -2,6 +2,7 @@
 
 // nextjs
 import Image from 'next/image';
+import { useState } from 'react';
 
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
@@ -21,6 +22,11 @@ export default function AssetItem(props: AssetItemProps) {
   // props
   const { assetId, title, assetStatus, category, createdDate } = props;
 
+  // state
+  const [assetImageSrc, setAssetImageSrc] = useState<string>(
+    `/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`,
+  );
+
   // handle
 
   return (
@@ -28,11 +34,11 @@ export default function AssetItem(props: AssetItemProps) {
       <figure className="w-full h-48">
         <Image
           className="w-auto h-full rounded-md "
-          src={`/api/v1/asset/${assetId}/resource?fileType=THUMBNAIL`}
+          src={assetImageSrc}
           alt="thumbnail"
           width={400}
           height={300}
-          onError={(e) => (e.currentTarget.src = '/default_thumbnail.png')}
+          onError={() => setAssetImageSrc('/default_thumbnail.png')}
         />
       </figure>
       <div className="card-body">
