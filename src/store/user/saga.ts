@@ -19,6 +19,11 @@ const {
   successLoggedIn,
   failureLoggedIn,
 
+  // logged out
+  requestLoggedOut,
+  successLoggedOut,
+  failureLoggedOut,
+
   // update me
   requestUpdateMe,
   successUpdateMe,
@@ -67,6 +72,22 @@ function* watchLoggedIn() {
   yield takeLatest(requestLoggedIn, callLoggedIn);
 }
 
+// logged out
+function* callLoggedOut(action: ReturnType<typeof requestLoggedOut>) {
+  const result: ApiResult<{}> = yield call(get, '/api/user/logout');
+
+  if (result.state !== 'SUCCESS') {
+    yield put(failureLoggedOut());
+    return;
+  }
+
+  yield put(successLoggedOut());
+}
+
+function* watchLoggedOut() {
+  yield takeLatest(requestLoggedOut, callLoggedOut);
+}
+
 // update me
 function* updateMe(action: ReturnType<typeof requestUpdateMe>) {
   const token = action.payload;
@@ -88,5 +109,5 @@ function* watchUpdateMe() {
 }
 
 export default function* userSagas() {
-  yield all([fork(watchLoggedIn), fork(watchUpdateMe)]);
+  yield all([fork(watchLoggedIn), fork(watchLoggedOut), fork(watchUpdateMe)]);
 }

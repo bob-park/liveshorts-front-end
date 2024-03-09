@@ -45,7 +45,7 @@ import {
 // action
 import { userActions } from '@/store/user';
 
-const { requestUpdateMe } = userActions;
+const { requestUpdateMe, requestLoggedOut } = userActions;
 
 export default function NavBar(props: { token: string }) {
   // router
@@ -57,14 +57,13 @@ export default function NavBar(props: { token: string }) {
 
   // useEffect
   useLayoutEffect(() => {
-    if (!me) {
-      dispatch(requestUpdateMe(props.token));
-    }
-  }, [me]);
+    dispatch(requestUpdateMe(props.token));
+  }, []);
 
   // handle
   const handleLogout = () => {
-    router.push('/api/user/logout');
+    dispatch(requestLoggedOut());
+    router.push('/logout');
   };
 
   return (
@@ -98,7 +97,9 @@ export default function NavBar(props: { token: string }) {
             </div>
             <Dropdown className="mr-10" hover end>
               <Avatar
-                src={me && `/api/user/${me.id}/avatar`}
+                src={
+                  me ? `/api/user/${me.id}/avatar` : '/default_user_avatar.webp'
+                }
                 size="sm"
                 shape="circle"
                 border

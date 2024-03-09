@@ -6,6 +6,8 @@ import path from 'path';
 const API_PREFIX = '/api';
 const UNCHECKED_AUTH_URI_PATTERNS: string[] = ['/api/user/login'];
 
+const REDIRECT_URI_PATTERNS = ['/api/user/logout'];
+
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 function checkedAuth(url: string) {
@@ -60,9 +62,9 @@ export async function middleware(req: NextRequest) {
       body,
     );
 
-    if (checkedAuth(pathname) && apiResponse.status === 401) {
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
+    // if (checkedAuth(pathname) && apiResponse.status === 401) {
+    //   return NextResponse.redirect(new URL('/login', req.url));
+    // }
 
     return apiResponse;
   }

@@ -1,6 +1,7 @@
 type UserState = {
   me?: User;
   isLoggingIn: boolean;
+  isLoggedIn: boolean;
   failLoggedInMessage?: string;
 };
 

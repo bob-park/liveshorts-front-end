@@ -1,11 +1,28 @@
 import axios from 'axios';
+import { redirect } from 'next/navigation';
 
 type FileSize = {
   size: number;
   unit: number;
 };
 
-const client = axios.create({ withCredentials: true });
+const client = axios.create({
+  withCredentials: true,
+});
+client.interceptors.response.use(
+  (res) => {
+    return Promise.resolve(res);
+  },
+  (err) => {
+    console.error(err);
+
+    if (err.response.status === 401) {
+      location.href = '/login';
+    }
+
+    return Promise.reject(err);
+  },
+);
 
 const FILE_SIZE_UNITS = ['byte', 'KB', 'MB', 'GB', 'TB'];
 
@@ -26,7 +43,11 @@ export async function get<R>(
   });
 
   return await client
-    .get(url + '?' + urlSearchParams.toString().replaceAll('%2B', '+'))
+    .get(
+      `${url}${
+        params ? `?${urlSearchParams.toString().replaceAll('%2B', '+')}` : ''
+      }`,
+    )
     .then((res) => {
       return {
         state: 'SUCCESS' as ApiResultState,
@@ -36,8 +57,6 @@ export async function get<R>(
       };
     })
     .catch((err) => {
-      console.error(err);
-
       return {
         state: 'FAILURE',
         status: err.response.status,
@@ -58,8 +77,6 @@ export async function post<B, R>(url: string, body?: B): Promise<ApiResult<R>> {
       };
     })
     .catch((err) => {
-      console.error(err);
-
       return {
         state: 'FAILURE',
         status: err.response.status,
@@ -81,8 +98,6 @@ export async function put<B, R>(url: string, body?: B): Promise<ApiResult<R>> {
       };
     })
     .catch((err) => {
-      console.error(err);
-
       return {
         state: 'FAILURE',
         status: err.response.status,
@@ -104,8 +119,6 @@ export async function del<B, R>(url: string): Promise<ApiResult<R>> {
       };
     })
     .catch((err) => {
-      console.error(err);
-
       return {
         state: 'FAILURE',
         status: err.response.status,
