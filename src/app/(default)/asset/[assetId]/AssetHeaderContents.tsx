@@ -12,7 +12,7 @@ import { Button } from 'react-daisyui';
 // react icons
 import { IoChevronBack } from 'react-icons/io5';
 
-export default function AssetHeader() {
+export default function AssetHeaderContents() {
   // router
   const router = useRouter();
 

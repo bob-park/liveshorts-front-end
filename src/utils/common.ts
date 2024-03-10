@@ -160,3 +160,17 @@ function calculateFileSize(fileSize: number, unit: number): FileSize {
 
   return { size: result, unit };
 }
+
+export function secondToTimecode(totalSeconds: number) {
+  const seconds = Math.floor(totalSeconds % 60);
+  const minutes = Math.floor(totalSeconds / 60);
+  const hour = Math.floor(minutes / 60);
+
+  return (
+    `${hour > 9 ? hour : `0${hour}`}` +
+    ':' +
+    `${minutes % 60 > 9 ? minutes % 60 : `0${minutes % 60}`}` +
+    ':' +
+    `${seconds > 9 ? seconds : `0${seconds}`}`
+  );
+}
