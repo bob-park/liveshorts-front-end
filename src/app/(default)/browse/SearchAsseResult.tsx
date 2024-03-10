@@ -77,8 +77,17 @@ const LoadingListAssets = (props: { size: number }) => {
   );
 };
 
-const ThumbnailAssetView = (props: { assets: Asset[]; isLoading: boolean }) => {
-  const { assets, isLoading } = props;
+const ThumbnailAssetView = (props: {
+  assets: Asset[];
+  isLoading: boolean;
+  onClick?: (assetId: number) => void;
+}) => {
+  const { assets, isLoading, onClick } = props;
+
+  // handler
+  const handleClick = (assetId: number) => {
+    onClick && onClick(assetId);
+  };
 
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
@@ -86,23 +95,37 @@ const ThumbnailAssetView = (props: { assets: Asset[]; isLoading: boolean }) => {
         <LoadingThumbanilAssets size={10} />
       ) : (
         assets.map((item) => (
-          <AssetViewItem
+          <div
             key={`asset-view-item-${item.assetId}`}
-            assetId={item.assetId}
-            title={item.title}
-            assetStatus={item.assetStatus}
-            category={item.category.name}
-            createdDate={item.createdDate}
-          />
+            className="col-span-1"
+            onClick={() => handleClick(item.assetId)}
+          >
+            <AssetViewItem
+              assetId={item.assetId}
+              title={item.title}
+              assetStatus={item.assetStatus}
+              category={item.category.name}
+              createdDate={item.createdDate}
+            />
+          </div>
         ))
       )}
     </div>
   );
 };
 
-const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
+const ListAssetView = (props: {
+  isLoading: boolean;
+  assets: Asset[];
+  onClick?: (assetId: number) => void;
+}) => {
   // props
-  const { isLoading, assets } = props;
+  const { isLoading, assets, onClick } = props;
+
+  // handler
+  const handleClick = (assetId: number) => {
+    onClick && onClick(assetId);
+  };
 
   return (
     <div className="grid grid-cols-1 min-w-[900px] gap-4">
@@ -123,7 +146,11 @@ const ListAssetView = (props: { isLoading: boolean; assets: Asset[] }) => {
         </div>
       ) : (
         assets.map((item) => (
-          <div key={`asset-list-item-${item.assetId}`} className="col-span-1">
+          <div
+            key={`asset-list-item-${item.assetId}`}
+            className="col-span-1"
+            onClick={() => handleClick(item.assetId)}
+          >
             <AssetListItem
               assetId={item.assetId}
               title={item.title}
@@ -228,6 +255,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       page: 0,
       size: 20,
     });
+  };
+
+  const handleMoveAsset = (assetId: number) => {
+    router.push(`/asset/${assetId}`);
   };
 
   return (
@@ -459,9 +490,17 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       {/* contents */}
       <div className="col-span-1">
         {listViewMode ? (
-          <ListAssetView isLoading={isLoading} assets={assets} />
+          <ListAssetView
+            isLoading={isLoading}
+            assets={assets}
+            onClick={handleMoveAsset}
+          />
         ) : (
-          <ThumbnailAssetView isLoading={isLoading} assets={assets} />
+          <ThumbnailAssetView
+            isLoading={isLoading}
+            assets={assets}
+            onClick={handleMoveAsset}
+          />
         )}
       </div>
     </div>
