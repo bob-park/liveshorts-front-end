@@ -15,9 +15,8 @@ export default function AssetPlayeContents(props: { assetId: number }) {
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="col-span-1">
-        {/* <video src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES`} /> */}
         <AssetPlayer
-          src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES`}
+          src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${Date.now()}`}
         />
       </div>
     </div>
