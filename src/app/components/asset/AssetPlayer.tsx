@@ -140,19 +140,25 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       id="asset_video_player"
       className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl relative"
     >
-      <div className="col-span-1"></div>
-      <video
-        id=""
-        className="w-full max-h-screen rounded-xl"
-        ref={videoRef}
-        src={src}
-        onLoadedMetadataCapture={handleLoadedMetadata}
-        onTimeUpdate={(e) =>
-          setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)
-        }
-        onPause={(e) => setIsPlay(false)}
-        onPlay={(e) => setIsPlay(true)}
-      />
+      <div className="col-span-1">
+        <div className="flex justify-center items-center">
+          <video
+            id=""
+            className="max-h-[calc(100lvh-30rem)] rounded-xl"
+            ref={videoRef}
+            src={src}
+            onLoadedMetadataCapture={handleLoadedMetadata}
+            onTimeUpdate={(e) =>
+              setVideoProgress(
+                (e.currentTarget.currentTime / videoDuration) * 100,
+              )
+            }
+            onPause={(e) => setIsPlay(false)}
+            onPlay={(e) => setIsPlay(true)}
+          />
+        </div>
+      </div>
+
       <div className="col-span-1">
         <div className="grid grid-cols-1">
           <div className="col-span-1 py-3 relative">

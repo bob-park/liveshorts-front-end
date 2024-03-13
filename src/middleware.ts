@@ -40,7 +40,7 @@ async function callApi(
   apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
 
   if (isIncludeRange) {
-    apiHeaders.append('Range', headers.get('Range') || 'byte=0-');
+    apiHeaders.append('Range', headers.get('Range') || 'bytes=0-');
   }
 
   const response = await fetch(
