@@ -20,12 +20,13 @@ export default function AssetPlayeContents(props: { assetId: number }) {
         />
       </div>
 
-      <a
+      {/* 엽구리 뒤졋다 */}
+      {/* <a
         href="/api/v1/shorts/task/2024-204f72a0-32aa-43c3-80ef-ec5f2a48f581/resource/download"
         download
       >
         download
-      </a>
+      </a> */}
     </div>
   );
 }
