@@ -21,6 +21,10 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <meta
+          httpEquiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate"
+        />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className}>

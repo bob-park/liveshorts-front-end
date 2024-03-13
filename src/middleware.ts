@@ -34,16 +34,6 @@ async function callApi(
     replaceUrl = url.substring(0, url.lastIndexOf('download') - 1);
   }
 
-  // let newHeader = {
-  //   ...headers,
-  //   Authorization: `Bearer ${accessToken}`,
-  //   'User-Agent': headers.get('User-Agent') || '',
-  // };
-
-  // if (headers.get('Range')) {
-  //   newHeader.append('Range', headers.get('Range') || 'byte=0-');
-  // }
-
   let apiHeaders = new Headers();
 
   apiHeaders.append('Authorization', `Bearer ${accessToken}`);
@@ -76,7 +66,6 @@ export async function middleware(req: NextRequest) {
     const requestUrl = pathname.substring(API_PREFIX.length);
 
     const params = req.nextUrl.searchParams;
-
     const body = req.body;
 
     const apiResponse = await callApi(
