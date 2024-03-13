@@ -1,10 +1,10 @@
 'use client';
 
 // react
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // daisy ui
-import { Button, Progress } from 'react-daisyui';
+import { Button } from 'react-daisyui';
 
 // react icons
 import {
@@ -17,6 +17,7 @@ import {
   IoVolumeMute,
 } from 'react-icons/io5';
 import { RxLoop } from 'react-icons/rx';
+import { MdOutlineFullscreen, MdOutlineFullscreenExit } from 'react-icons/md';
 
 import { secondToTimecode } from '@/utils/common';
 
@@ -59,6 +60,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const [videoPlayBackRate, setVideoPlayBackRate] = useState<number>(50);
   const [volume, setVolume] = useState<number>(100);
   const [mute, setMute] = useState<boolean>(false);
+  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   // useEffect
   useEffect(() => {}, [videoRef.current]);
@@ -123,11 +125,24 @@ export default function AssetPlayer(props: AssetPlayerProps) {
     }
   };
 
+  const handleFullScreen = (fullScreen: boolean) => {
+    setIsFullScreen(fullScreen);
+
+    const player = document.getElementById('asset_video_player');
+
+    if (player) {
+      fullScreen ? player.requestFullscreen() : document.exitFullscreen();
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl relative">
+    <div
+      id="asset_video_player"
+      className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl relative"
+    >
       <div className="col-span-1"></div>
       <video
-        id="asset_video_player"
+        id=""
         className="w-full max-h-screen rounded-xl"
         ref={videoRef}
         src={src}
@@ -281,7 +296,28 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                   {secondToTimecode(videoDuration)}
                 </span>
               </div>
-              <div className="col-span-1 text-right">화질 비디오 크기 등등</div>
+              <div className="col-span-1 text-right">
+                <div className="flex justify-end gap-3">
+                  <div>
+                    <div
+                      className="tooltip"
+                      data-tip={isFullScreen ? '전체화면 종료' : '전체화면'}
+                    >
+                      <Button
+                        className=""
+                        type="button"
+                        onClick={() => handleFullScreen(!isFullScreen)}
+                      >
+                        {isFullScreen ? (
+                          <MdOutlineFullscreenExit className="w-5 h-5" />
+                        ) : (
+                          <MdOutlineFullscreen className="w-5 h-5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
