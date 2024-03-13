@@ -1,82 +1,55 @@
 'use client';
 
+// react
+import { useState, useLayoutEffect } from 'react';
+
 // nextjs
+import LoginForm from '@/app/components/user/LoginForm';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
 
-// daisyui
-import { Button } from 'react-daisyui';
+// hooks
+import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
-// react icons
-import { RiUserFill, RiLock2Fill } from 'react-icons/ri';
+// action
+import { userActions } from '@/store/user';
 
-export default function Login() {
+const { requestLoggedIn } = userActions;
+
+export default function LoginPage() {
   // router
   const router = useRouter();
 
+  // store
+  const dispatch = useAppDispatch();
+  const { isLoggingIn, failLoggedInMessage, me } = useAppSelector(
+    (state) => state.user,
+  );
+
   // state
-  const [userId, setUserId] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
 
-  // handler
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const response = await fetch('/api/user/login', {
-      method: 'post',
-      body: JSON.stringify({
-        clientType: 'CLIP',
-        userId,
-        password,
-      }),
-    });
-
-    if (response.ok) {
+  // useEffect
+  useLayoutEffect(() => {
+    if (me) {
       router.push('/');
     }
+  }, [me]);
+
+  // handler
+  const handleLogin = async (userId: string, password: string) => {
+    dispatch(requestLoggedIn({ userId, password }));
   };
 
   return (
     <div className="w-full h-screen grid grid-cols-1 gap-4 justify-items-center content-center">
-      <div className="">
+      <div className="fade-in">
         <Image alt="logo" src="/logo.png" width={300} height={100} />
       </div>
-      <form
-        className="grid grid-cols-4 gap-3 w-72 mt-5"
-        onSubmit={handleSubmit}
-      >
-        <div className="col-span-4">
-          <label className="input input-bordered flex items-center gap-2">
-            <RiUserFill />
-            <input
-              type="text"
-              className="grow input-secondary"
-              placeholder=""
-              autoFocus
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-          </label>
-        </div>
-        <div className="col-span-4">
-          <label className="input input-bordered flex items-center gap-2">
-            <RiLock2Fill />
-            <input
-              type="password"
-              className="grow input-secondary"
-              placeholder=""
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        </div>
-        <div className="col-span-4">
-          <Button className="w-full" type="submit" animation color="neutral">
-            로그인
-          </Button>
-        </div>
-      </form>
+      <LoginForm
+        isLoggingIn={isLoggingIn}
+        msg={failLoggedInMessage}
+        onLogin={handleLogin}
+      />
     </div>
   );
 }

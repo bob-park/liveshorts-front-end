@@ -1,16 +1,21 @@
+import axios from 'axios';
+
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 
 const API_PREFIX = '/api';
-const UNCHECKED_URI_PATTERNS: string[] = [];
+const UNCHECKED_AUTH_URI_PATTERNS: string[] = ['/api/user/login'];
+
+const REDIRECT_URI_PATTERNS = ['/api/user/logout'];
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
-function checkedAuth(url: string) {
-  if (UNCHECKED_URI_PATTERNS.some((checkedUrl) => checkedUrl == url)) {
-    return false;
-  }
+function uncheckedAuth(url: string) {
+  return UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url);
+}
 
-  return url.startsWith(API_PREFIX);
+function checkInCludeRangeHeader(url: string) {
+  return url.endsWith('resource');
 }
 
 async function callApi(
@@ -21,15 +26,38 @@ async function callApi(
   params?: URLSearchParams,
   body?: any,
 ) {
+  const isIncludeRange = checkInCludeRangeHeader(url);
+
+  let replaceUrl = url;
+
+  if (replaceUrl.endsWith('download')) {
+    replaceUrl = url.substring(0, url.lastIndexOf('download') - 1);
+  }
+
+  // let newHeader = {
+  //   ...headers,
+  //   Authorization: `Bearer ${accessToken}`,
+  //   'User-Agent': headers.get('User-Agent') || '',
+  // };
+
+  // if (headers.get('Range')) {
+  //   newHeader.append('Range', headers.get('Range') || 'byte=0-');
+  // }
+
+  let apiHeaders = new Headers();
+
+  apiHeaders.append('Authorization', `Bearer ${accessToken}`);
+  apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
+
+  if (isIncludeRange) {
+    apiHeaders.append('Range', headers.get('Range') || 'byte=0-');
+  }
+
   const response = await fetch(
-    `${MAM_API_HOST + API_PREFIX + url}${params ? `?${params}` : ''}`,
+    `${MAM_API_HOST + API_PREFIX + replaceUrl}${params ? `?${params}` : ''}`,
     {
       method,
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${accessToken}`,
-        'User-Agent': headers.get('User-Agent') || '',
-      },
+      headers: apiHeaders,
       body,
     },
   );
@@ -42,7 +70,9 @@ export async function middleware(req: NextRequest) {
   const response = NextResponse.next();
   const cookies = req.cookies;
 
-  if (checkedAuth(pathname)) {
+  const isApi = pathname.startsWith(API_PREFIX);
+
+  if (isApi) {
     const requestUrl = pathname.substring(API_PREFIX.length);
 
     const params = req.nextUrl.searchParams;
@@ -58,11 +88,14 @@ export async function middleware(req: NextRequest) {
       body,
     );
 
-    return new NextResponse(apiResponse.body, {
-      status: apiResponse.status,
-      statusText: apiResponse.statusText,
-      headers: apiResponse.headers,
-    });
+    if (uncheckedAuth(pathname) && apiResponse.status === 401) {
+      return new NextResponse(apiResponse.body, {
+        ...apiResponse,
+        status: 400,
+      });
+    }
+
+    return apiResponse;
   }
 
   return response;

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import './globals.css';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const MAM_API_HOST = process.env.MAM_API_HOST;
