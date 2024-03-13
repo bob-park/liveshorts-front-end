@@ -19,6 +19,13 @@ export default function AssetPlayeContents(props: { assetId: number }) {
           src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${Date.now()}`}
         />
       </div>
+
+      <a
+        href="/api/v1/shorts/task/2024-204f72a0-32aa-43c3-80ef-ec5f2a48f581/resource/download"
+        download
+      >
+        download
+      </a>
     </div>
   );
 }

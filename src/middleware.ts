@@ -14,6 +14,10 @@ function uncheckedAuth(url: string) {
   return UNCHECKED_AUTH_URI_PATTERNS.some((checkedUrl) => checkedUrl == url);
 }
 
+function checkInCludeRangeHeader(url: string) {
+  return url.endsWith('resource');
+}
+
 async function callApi(
   url: string,
   method: string,
@@ -22,15 +26,23 @@ async function callApi(
   params?: URLSearchParams,
   body?: any,
 ) {
+  const isIncludeRange = checkInCludeRangeHeader(url);
+
+  let replaceUrl = url;
+
+  if (replaceUrl.endsWith('download')) {
+    replaceUrl = url.substring(0, url.lastIndexOf('download') - 1);
+  }
+
   const response = await fetch(
-    `${MAM_API_HOST + API_PREFIX + url}${params ? `?${params}` : ''}`,
+    `${MAM_API_HOST + API_PREFIX + replaceUrl}${params ? `?${params}` : ''}`,
     {
       method,
       headers: {
         ...headers,
         Authorization: `Bearer ${accessToken}`,
         'User-Agent': headers.get('User-Agent') || '',
-        Range: headers.get('Range') || 'bytes=0-',
+        Range: isIncludeRange ? headers.get('Range') || 'bytes=0-' : '',
       },
       body,
     },

@@ -6,6 +6,9 @@ import AssetPlayeContents from './AssetPlayerContents';
 export default function AssetPage({ params }: { params: { assetId: number } }) {
   const { assetId } = params;
 
+
+  
+
   return (
     <div className="grid grid-cols-1 gap-4 px-5 py-2">
       {/* back drop */}
