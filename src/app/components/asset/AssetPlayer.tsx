@@ -14,13 +14,33 @@ import {
   IoVolumeMedium,
   IoVolumeLow,
   IoVolumeOff,
+  IoVolumeMute,
 } from 'react-icons/io5';
 import { RxLoop } from 'react-icons/rx';
+
 import { secondToTimecode } from '@/utils/common';
 
 type AssetPlayerProps = {
   src: string;
 };
+
+function VolumeIcon(props: { volumeSize: number; mute: boolean }) {
+  const { volumeSize, mute } = props;
+
+  if (mute) {
+    return <IoVolumeMute className="w-5 h-5" />;
+  }
+
+  if (volumeSize > 90) {
+    return <IoVolumeHigh className="w-5 h-5" />;
+  } else if (volumeSize > 50) {
+    return <IoVolumeMedium className="w-5 h-5" />;
+  } else if (volumeSize > 20) {
+    return <IoVolumeLow className="w-5 h-5" />;
+  } else {
+    return <IoVolumeOff className="w-5 h-5" />;
+  }
+}
 
 export default function AssetPlayer(props: AssetPlayerProps) {
   // props
@@ -37,6 +57,8 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const [showVideoPlayBackRate, setShowVideoPlayBackRate] =
     useState<boolean>(false);
   const [videoPlayBackRate, setVideoPlayBackRate] = useState<number>(50);
+  const [volume, setVolume] = useState<number>(100);
+  const [mute, setMute] = useState<boolean>(false);
 
   // useEffect
   useEffect(() => {}, [videoRef.current]);
@@ -80,6 +102,24 @@ export default function AssetPlayer(props: AssetPlayerProps) {
 
     if (videoRef.current) {
       videoRef.current.playbackRate = playbackRate;
+    }
+  };
+
+  const handleChangeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const volumeSize = Number(e.target.value);
+
+    setVolume(volumeSize);
+
+    if (videoRef.current) {
+      videoRef.current.volume = volumeSize / 100;
+    }
+  };
+
+  const handleMute = (muted: boolean) => {
+    setMute(muted);
+
+    if (videoRef.current) {
+      videoRef.current.muted = muted;
     }
   };
 
@@ -205,17 +245,27 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                     </div>
                   </div>
                   <div className="col-span-2">
-                    <div className="flex items-center">
-                      <Button type="button" color="ghost">
-                        <IoVolumeHigh className="" />
-                      </Button>
-                      <div className="w-16">
+                    <div className="flex h-full items-center">
+                      <div
+                        className="tooltip"
+                        data-tip={mute ? '음소거 해제' : '음소거'}
+                      >
+                        <Button
+                          className=""
+                          type="button"
+                          onClick={() => handleMute(!mute)}
+                        >
+                          <VolumeIcon mute={mute} volumeSize={volume} />
+                        </Button>
+                      </div>
+                      <div className="w-20 mt-[4px] ">
                         <input
                           className="range range-xs"
                           type="range"
                           min={0}
                           max="100"
-                          defaultValue="100"
+                          value={mute ? 0 : volume}
+                          onChange={handleChangeVolume}
                         />
                       </div>
                     </div>

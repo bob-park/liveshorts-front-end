@@ -198,19 +198,22 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   }, [searchParams]);
 
   useLayoutEffect(() => {
-    const observer = new IntersectionObserver((entries:IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        handleSearchPage();
-      }
-    }, {threshold: 0.5})
+    const observer = new IntersectionObserver(
+      (entries: IntersectionObserverEntry[]) => {
+        const target = entries[0];
+        if (target.isIntersecting) {
+          handleSearchPage();
+        }
+      },
+      { threshold: 0.5 },
+    );
 
     const observerTarget = document.getElementById('observer');
 
     if (observerTarget) {
-      observer.observe(observerTarget)
+      observer.observe(observerTarget);
     }
-  }, [])
+  }, []);
 
   // handle
   const handleSearch = () => {
@@ -259,8 +262,9 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         }`,
       );
 
-    const addedSize = searchAssetParams.size + searchAssetParams.size
-    const newSize = addedSize >= pagination.totalCount ? pagination.totalCount : addedSize
+    const addedSize = searchAssetParams.size + searchAssetParams.size;
+    const newSize =
+      addedSize >= pagination.totalCount ? pagination.totalCount : addedSize;
 
     dispatch(
       requestSearchAsset({
@@ -272,7 +276,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         metas,
         title: searchAssetParams.title || '',
       }),
-    );}
+    );
+  };
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
@@ -549,10 +554,12 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           />
         )}
       </div>
-      <div id="observer" className='h-2'></div>
-      {isLoading && <div className='w-full flex justify-center items-center h-60'>
-        <Loading variant='dots' size='lg'/>
-      </div>}
+      <div id="observer" className="h-2"></div>
+      {isLoading && (
+        <div className="w-full flex justify-center items-center h-60">
+          <Loading variant="dots" size="lg" />
+        </div>
+      )}
     </div>
   );
 }
