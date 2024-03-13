@@ -34,16 +34,30 @@ async function callApi(
     replaceUrl = url.substring(0, url.lastIndexOf('download') - 1);
   }
 
+  // let newHeader = {
+  //   ...headers,
+  //   Authorization: `Bearer ${accessToken}`,
+  //   'User-Agent': headers.get('User-Agent') || '',
+  // };
+
+  // if (headers.get('Range')) {
+  //   newHeader.append('Range', headers.get('Range') || 'byte=0-');
+  // }
+
+  let apiHeaders = new Headers();
+
+  apiHeaders.append('Authorization', `Bearer ${accessToken}`);
+  apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
+
+  if (isIncludeRange) {
+    apiHeaders.append('Range', headers.get('Range') || 'byte=0-');
+  }
+
   const response = await fetch(
     `${MAM_API_HOST + API_PREFIX + replaceUrl}${params ? `?${params}` : ''}`,
     {
       method,
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${accessToken}`,
-        'User-Agent': headers.get('User-Agent') || '',
-        Range: isIncludeRange ? headers.get('Range') || 'bytes=0-' : '',
-      },
+      headers: apiHeaders,
       body,
     },
   );

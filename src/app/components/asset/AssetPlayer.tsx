@@ -72,14 +72,13 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl">
+    <div className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl ">
       <div className="col-span-1"></div>
       <video
         id="asset_video_player"
-        className="w-full h-full"
+        className="w-full max-h-[600px]"
         ref={videoRef}
         src={src}
-        // onCanPlay={(e) => setVideoDuration(e.currentTarget.duration)}
         onLoadedMetadataCapture={handleLoadedMetadata}
         onTimeUpdate={(e) =>
           setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)
