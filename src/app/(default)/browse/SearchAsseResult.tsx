@@ -30,7 +30,7 @@ import dayjs from 'dayjs';
 
 // action
 import { assetActions } from '@/store/asset';
-import { Button } from 'react-daisyui';
+import { Button, Loading } from 'react-daisyui';
 
 const { requestSearchAsset } = assetActions;
 
@@ -197,6 +197,21 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     handleSearch();
   }, [searchParams]);
 
+  useLayoutEffect(() => {
+    const observer = new IntersectionObserver((entries:IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        handleSearchPage();
+      }
+    }, {threshold: 0.5})
+
+    const observerTarget = document.getElementById('observer');
+
+    if (observerTarget) {
+      observer.observe(observerTarget)
+    }
+  }, [])
+
   // handle
   const handleSearch = () => {
     const metas: string[] = [];
@@ -227,6 +242,37 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       }),
     );
   };
+
+  const handleSearchPage = () => {
+    const metas: string[] = [];
+    searchAssetParams.broadcastDate &&
+      metas.push(
+        `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
+      );
+
+    searchAssetParams.channelId &&
+      metas.push(
+        `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
+          channels.find(
+            (item) => item.channelId === searchAssetParams.channelId,
+          )?.name || ''
+        }`,
+      );
+
+    const addedSize = searchAssetParams.size + searchAssetParams.size
+    const newSize = addedSize >= pagination.totalCount ? pagination.totalCount : addedSize
+
+    dispatch(
+      requestSearchAsset({
+        page: searchAssetParams.page,
+        size: newSize,
+        isDeleted: false,
+        assetType: 'VIDEO',
+        assetStatus: 'REGISTERED',
+        metas,
+        title: searchAssetParams.title || '',
+      }),
+    );}
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
@@ -503,6 +549,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           />
         )}
       </div>
+      <div id="observer" className='h-2'></div>
+      {isLoading && <div className='w-full flex justify-center items-center h-60'>
+        <Loading variant='dots' size='lg'/>
+      </div>}
     </div>
   );
 }
