@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -193,30 +193,30 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   );
 
   // useEffect
+  useEffect(() => {
+    console.log(assets);
+  }, [assets]);
+
   useLayoutEffect(() => {
-    handleSearch();
+    handleSearch(0, false);
   }, [searchParams]);
 
   useLayoutEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries: IntersectionObserverEntry[]) => {
-        const target = entries[0];
-        if (target.isIntersecting) {
-          handleSearchPage();
-        }
-      },
-      { threshold: 0.5 },
-    );
+    const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
 
     const observerTarget = document.getElementById('observer');
 
     if (observerTarget) {
       observer.observe(observerTarget);
     }
-  }, []);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [pagination]);
 
   // handle
-  const handleSearch = () => {
+  const handleSearch = (page: number, isAppend: boolean) => {
     const metas: string[] = [];
 
     searchAssetParams.broadcastDate &&
@@ -235,49 +235,52 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
     dispatch(
       requestSearchAsset({
-        page: searchAssetParams.page,
-        size: searchAssetParams.size,
-        isDeleted: false,
-        assetType: 'VIDEO',
-        assetStatus: 'REGISTERED',
-        metas,
-        title: searchAssetParams.title || '',
+        params: {
+          page,
+          size: searchAssetParams.size,
+          isDeleted: false,
+          assetType: 'VIDEO',
+          assetStatus: 'REGISTERED',
+          metas,
+          title: searchAssetParams.title || '',
+        },
+        isAppend,
       }),
     );
   };
 
-  const handleSearchPage = () => {
-    const metas: string[] = [];
-    searchAssetParams.broadcastDate &&
-      metas.push(
-        `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
-      );
+  // const handleSearchPage = () => {
+  //   const metas: string[] = [];
+  //   searchAssetParams.broadcastDate &&
+  //     metas.push(
+  //       `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
+  //     );
 
-    searchAssetParams.channelId &&
-      metas.push(
-        `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
-          channels.find(
-            (item) => item.channelId === searchAssetParams.channelId,
-          )?.name || ''
-        }`,
-      );
+  //   searchAssetParams.channelId &&
+  //     metas.push(
+  //       `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
+  //         channels.find(
+  //           (item) => item.channelId === searchAssetParams.channelId,
+  //         )?.name || ''
+  //       }`,
+  //     );
 
-    const addedSize = searchAssetParams.size + searchAssetParams.size;
-    const newSize =
-      addedSize >= pagination.totalCount ? pagination.totalCount : addedSize;
+  //   const addedSize = searchAssetParams.size + searchAssetParams.size;
+  //   const newSize =
+  //     addedSize >= pagination.totalCount ? pagination.totalCount : addedSize;
 
-    dispatch(
-      requestSearchAsset({
-        page: searchAssetParams.page,
-        size: newSize,
-        isDeleted: false,
-        assetType: 'VIDEO',
-        assetStatus: 'REGISTERED',
-        metas,
-        title: searchAssetParams.title || '',
-      }),
-    );
-  };
+  //   dispatch(
+  //     requestSearchAsset({
+  //       page: searchAssetParams.page,
+  //       size: newSize,
+  //       isDeleted: false,
+  //       assetType: 'VIDEO',
+  //       assetStatus: 'REGISTERED',
+  //       metas,
+  //       title: searchAssetParams.title || '',
+  //     }),
+  //   );
+  // };
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
@@ -310,6 +313,17 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleMoveAsset = (assetId: number) => {
     router.push(`/asset/${assetId}`);
+  };
+
+  const handleObserver = (entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (
+      target.isIntersecting &&
+      !isLoading &&
+      pagination.currentPage + 1 < pagination.totalPage
+    ) {
+      handleSearch(pagination.currentPage + 1, true);
+    }
   };
 
   return (
@@ -502,10 +516,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
               총 <strong>{pagination.totalCount}</strong>개 중{' '}
-              <strong>
-                {pagination.size * pagination.currentPage + assets.length}
-              </strong>
-              개
+              <strong>{assets.length}</strong>개
             </h3>
           </div>
           <div className="col-span-1 text-right">
@@ -542,23 +553,25 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={isLoading}
+            isLoading={isLoading && assets.length === 0}
             assets={assets}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={isLoading}
+            isLoading={isLoading && assets.length === 0}
             assets={assets}
             onClick={handleMoveAsset}
           />
         )}
       </div>
-      <div id="observer" className="h-2"></div>
-      {isLoading && (
+
+      {isLoading ? (
         <div className="w-full flex justify-center items-center h-60">
           <Loading variant="dots" size="lg" />
         </div>
+      ) : (
+        <div id="observer" className="h-2"></div>
       )}
     </div>
   );

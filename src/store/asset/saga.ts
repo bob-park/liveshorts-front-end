@@ -22,12 +22,12 @@ const {
 
 // search asset
 function* callSearchAsset(action: ReturnType<typeof requestSearchAsset>) {
-  const searchParams = action.payload;
+  const { params, isAppend } = action.payload;
 
   const result: ApiResult<Asset[]> = yield call(
     get,
     '/api/asset/search',
-    searchParams,
+    params,
   );
 
   yield delay(500);
@@ -46,6 +46,7 @@ function* callSearchAsset(action: ReturnType<typeof requestSearchAsset>) {
         totalCount: 0,
         totalPage: 0,
       },
+      isAppend,
     }),
   );
 }
