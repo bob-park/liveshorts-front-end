@@ -47,8 +47,12 @@ export default function AssetPlayeContents(props: AssetPlayeContentsProps) {
         <h2 className="text-xl font-bold">{title}</h2>
       </div>
       <div className="col-span-1">
-        <h4 className="text-md text-gray-500">
-          <TimeAgo datetime={createdDate} locale="ko" />
+        <h4 className="text-md ">
+          <span className="font-bold">{createdBy}</span>
+          <span> - </span>
+          <span className="text-gray-500">
+            <TimeAgo datetime={createdDate} locale="ko" />
+          </span>
         </h4>
       </div>
       <div className="col-span-1">
