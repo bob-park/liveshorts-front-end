@@ -10,9 +10,13 @@ import { userReducer } from './user';
 // asset
 import { assetReducer } from './asset';
 
+// shortForm
+import { shortFormReducer } from './shortform';
+
 const rootReducer = combineReducers({
   user: userReducer,
   asset: assetReducer,
+  shortForm: shortFormReducer,
 });
 
 function rootStore() {
