@@ -26,7 +26,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
   );
 
   return (
-    <div className="flex gap-5 rounded-xl shadow-lg hover:shadow-2xl mb-2">
+    <div className="flex gap-5 rounded-box shadow-lg hover:shadow-2xl mb-2">
       <div className="">
         <Image
           className="w-auto h-full rounded-md "

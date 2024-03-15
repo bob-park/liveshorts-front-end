@@ -1,4 +1,5 @@
 // nextjs
+import { Metadata, ResolvingMetadata } from 'next';
 import { cookies } from 'next/headers';
 
 import AssetHeaderContents from './AssetHeaderContents';
@@ -25,11 +26,33 @@ type Category = {
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
-export default async function AssetPage({
-  params,
-}: {
+type Props = {
   params: { assetId: number };
-}) {
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const { assetId } = params;
+
+  const response = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {
+    method: 'get',
+    headers: {
+      Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+    },
+  });
+
+  const asset: Asset = await response.json().then((res) => res.result);
+
+  console.log(asset);
+
+  return {
+    title: `LiveShorts - ${asset.title}`,
+  };
+}
+
+export default async function AssetPage({ params }: Props) {
   const { assetId } = params;
 
   const response = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {

@@ -32,6 +32,8 @@ function* callSearchShortFormTask(
     { assetId },
   );
 
+  yield delay(500);
+
   if (result.state === 'FAILURE') {
     yield put(failureSearchShortFormTask());
     return;
