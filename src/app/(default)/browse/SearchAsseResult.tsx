@@ -249,39 +249,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     );
   };
 
-  // const handleSearchPage = () => {
-  //   const metas: string[] = [];
-  //   searchAssetParams.broadcastDate &&
-  //     metas.push(
-  //       `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
-  //     );
-
-  //   searchAssetParams.channelId &&
-  //     metas.push(
-  //       `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
-  //         channels.find(
-  //           (item) => item.channelId === searchAssetParams.channelId,
-  //         )?.name || ''
-  //       }`,
-  //     );
-
-  //   const addedSize = searchAssetParams.size + searchAssetParams.size;
-  //   const newSize =
-  //     addedSize >= pagination.totalCount ? pagination.totalCount : addedSize;
-
-  //   dispatch(
-  //     requestSearchAsset({
-  //       page: searchAssetParams.page,
-  //       size: newSize,
-  //       isDeleted: false,
-  //       assetType: 'VIDEO',
-  //       assetStatus: 'REGISTERED',
-  //       metas,
-  //       title: searchAssetParams.title || '',
-  //     }),
-  //   );
-  // };
-
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
 
