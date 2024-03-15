@@ -146,6 +146,8 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   };
 
   const handlePlayerKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    e.preventDefault();
+
     if (videoRef.current) {
       if (e.key === 'ArrowRight') {
         videoRef.current.currentTime += 10;
@@ -201,12 +203,12 @@ export default function AssetPlayer(props: AssetPlayerProps) {
               className="range w-full transition opacity-0 hover:opacity-100 absolute top-3 left-0"
               type="range"
               max="100"
+              min="0"
               value={videoProgress}
               onChange={handleChangeProgress}
-              onKeyDown={(e) => e.preventDefault()}
             />
           </div>
-          <div className="col-span-1 ">
+          <div className="col-span-1">
             <div className="grid grid-cols-3 gap-3 justify-center items-center">
               <div className="col-span-1 text-start">
                 <div className="flex gap-2">
