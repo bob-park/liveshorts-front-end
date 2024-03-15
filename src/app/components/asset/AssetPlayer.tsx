@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // daisy ui
 import { Button } from 'react-daisyui';
@@ -63,7 +63,17 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   // useEffect
-  useEffect(() => {}, [videoRef.current]);
+  useEffect(() => {
+    const player = document.getElementById('asset_video_player');
+
+    player?.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        setIsFullScreen(true);
+      } else {
+        setIsFullScreen(false);
+      }
+    });
+  }, []);
 
   // handle
   const handlePlay = () => {
@@ -144,7 +154,11 @@ export default function AssetPlayer(props: AssetPlayerProps) {
         <div className="flex justify-center items-center">
           <video
             id=""
-            className="max-h-[calc(100lvh-30rem)] rounded-xl"
+            className={`${
+              isFullScreen
+                ? 'max-h-[calc(100lvh-10rem)]'
+                : 'max-h-[calc(100lvh-30rem)]'
+            } rounded-xl`}
             ref={videoRef}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}
