@@ -261,7 +261,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     const urlSearchParams = new URLSearchParams();
 
     Object.entries(searchAssetParams).forEach(([key, value]) => {
-      console.log(`${key}=${value}`);
       urlSearchParams.set(key, value != undefined ? String(value) : '');
     });
 

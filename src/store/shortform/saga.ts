@@ -45,5 +45,5 @@ function* watchSearchShortFormTask() {
 }
 
 export default function* shortFormSagas() {
-  yield all([]);
+  yield all([fork(watchSearchShortFormTask)]);
 }

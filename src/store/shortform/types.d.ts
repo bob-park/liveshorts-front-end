@@ -10,6 +10,9 @@ type ShortFormTask = {
   template: ShortFormTemplate;
   status: TaskStatus;
   fitToTemplate: boolean;
+  asset: { assetId: number };
+  createdDate: Date;
+  createdBy: string;
 };
 
 type ShortFormTemplate = {

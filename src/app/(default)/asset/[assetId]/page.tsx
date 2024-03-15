@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 
 import AssetHeaderContents from './AssetHeaderContents';
 import AssetPlayeContents from './AssetPlayerContents';
+import ShortFormTaskContents from './ShortFormTaskContents';
 
 type Asset = {
   assetId: number;
@@ -47,7 +48,7 @@ export default async function AssetPage({
         <AssetHeaderContents />
       </div>
       <div className="col-span-1">
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-10 justify-center items-center">
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-10 justify-center items-start">
           <div className="col-span-2">
             <AssetPlayeContents
               assetId={assetId}
@@ -58,7 +59,9 @@ export default async function AssetPage({
             />
           </div>
           {/* shortfrom task list */}
-          <div className="col-span-1">shortform task list</div>
+          <div className="col-span-2 xl:col-span-1 ">
+            <ShortFormTaskContents assetId={assetId} />
+          </div>
         </div>
       </div>
     </div>
