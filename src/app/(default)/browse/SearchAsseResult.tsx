@@ -13,6 +13,7 @@ import {
   HiOutlineSearch,
 } from 'react-icons/hi';
 import { GrPowerReset } from 'react-icons/gr';
+import { CgPlayListRemove } from 'react-icons/cg';
 
 import Datepicker from 'react-tailwindcss-datepicker';
 
@@ -90,27 +91,30 @@ const ThumbnailAssetView = (props: {
   };
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
-      {isLoading ? (
-        <LoadingThumbanilAssets size={10} />
-      ) : (
-        assets.map((item) => (
-          <div
-            key={`asset-view-item-${item.assetId}`}
-            className="col-span-1"
-            onClick={() => handleClick(item.assetId)}
-          >
-            <AssetViewItem
-              assetId={item.assetId}
-              title={item.title}
-              assetStatus={item.assetStatus}
-              category={item.category.name}
-              createdDate={item.createdDate}
-            />
-          </div>
-        ))
-      )}
-    </div>
+    <>
+      {!isLoading && assets.length === 0 && <EmptyAssetList />}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
+        {isLoading ? (
+          <LoadingThumbanilAssets size={10} />
+        ) : (
+          assets.map((item) => (
+            <div
+              key={`asset-view-item-${item.assetId}`}
+              className="col-span-1"
+              onClick={() => handleClick(item.assetId)}
+            >
+              <AssetViewItem
+                assetId={item.assetId}
+                title={item.title}
+                assetStatus={item.assetStatus}
+                category={item.category.name}
+                createdDate={item.createdDate}
+              />
+            </div>
+          ))
+        )}
+      </div>
+    </>
   );
 };
 
@@ -138,8 +142,9 @@ const ListAssetView = (props: {
         <div className="col-span-1">생성일</div>
         <div className="col-span-1">생성자</div>
       </div>
-      {/* content */}
 
+      {/* content */}
+      {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
           <LoadingListAssets size={10} />
@@ -163,6 +168,19 @@ const ListAssetView = (props: {
           </div>
         ))
       )}
+    </div>
+  );
+};
+
+const EmptyAssetList = () => {
+  return (
+    <div className="flex flex-col justify-center items-center w-full h-40">
+      <div className="">
+        <CgPlayListRemove className="w-24 h-24 text-gray-500" />
+      </div>
+      <div className="mt-2 text-md font-bold">
+        <h3>영상이 없습니다.</h3>
+      </div>
     </div>
   );
 };
