@@ -45,8 +45,6 @@ export async function generateMetadata(
 
   const asset: Asset = await response.json().then((res) => res.result);
 
-  console.log(asset);
-
   return {
     title: `LiveShorts - ${asset.title}`,
   };
