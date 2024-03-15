@@ -146,10 +146,6 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   };
 
   const handlePlayerKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    e.preventDefault();
-
-    console.log(e.key);
-
     if (videoRef.current) {
       if (e.key === 'ArrowRight') {
         videoRef.current.currentTime += 10;
@@ -207,6 +203,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
               max="100"
               value={videoProgress}
               onChange={handleChangeProgress}
+              onKeyDown={(e) => e.preventDefault()}
             />
           </div>
           <div className="col-span-1 ">

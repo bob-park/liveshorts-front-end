@@ -29,7 +29,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
     <div className="flex gap-5 rounded-box shadow-lg hover:shadow-2xl mb-2 p-2">
       <div className="">
         <Image
-          className="max-w-[200px] max-h-[100px] object-contain rounded-md "
+          className="max-w-[200px] max-h-[100px] object-contain rounded-xl "
           src={thumbSrc}
           alt="thumbnail"
           width={200}
