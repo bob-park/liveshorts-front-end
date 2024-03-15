@@ -145,10 +145,30 @@ export default function AssetPlayer(props: AssetPlayerProps) {
     }
   };
 
+  const handlePlayerKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    e.preventDefault();
+
+    console.log(e.key);
+
+    if (videoRef.current) {
+      if (e.key === 'ArrowRight') {
+        videoRef.current.currentTime += 10;
+      } else if (e.key === 'ArrowLeft') {
+        videoRef.current.currentTime -= 10;
+      } else if (e.key === ' ') {
+        const paused = videoRef.current.paused;
+
+        paused ? videoRef.current.play() : videoRef.current.pause();
+      }
+    }
+  };
+
   return (
     <div
       id="asset_video_player"
       className={`grid grid-cols-1 h-full rounded-xl bg-base-200 p-6 shadow-xl relative`}
+      tabIndex={-1}
+      onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 h-full">
         <div className="flex justify-center items-center">
