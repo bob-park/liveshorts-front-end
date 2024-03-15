@@ -148,17 +148,17 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   return (
     <div
       id="asset_video_player"
-      className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl relative"
+      className={`grid grid-cols-1 h-full rounded-xl bg-base-200 p-6 shadow-xl relative`}
     >
-      <div className="col-span-1">
+      <div className="col-span-1 h-full">
         <div className="flex justify-center items-center">
           <video
             id=""
-            className={`${
+            className={`w-full min-h-max ${
               isFullScreen
                 ? 'max-h-[calc(100lvh-10rem)]'
-                : 'max-h-[calc(100lvh-30rem)]'
-            } rounded-xl`}
+                : 'max-h-[calc(100lvh-25rem)]'
+            } object-contain rounded-xl`}
             ref={videoRef}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}
