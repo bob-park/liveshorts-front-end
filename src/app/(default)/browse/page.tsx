@@ -19,9 +19,13 @@ export default async function Browse(props: {
 
   const isListViewCookie = cookieStore.get(COOKIE_NAME_IS_LIST_VIEW);
   const preIsListView = isListViewCookie?.value == 'true';
+
   const searchAssetParams = {
     title: searchParams.title as string,
-    isShortForm: searchParams.isShortForm == 'true',
+    isShortForm:
+      searchParams.isShortForm == undefined || searchParams.isShortForm === ''
+        ? undefined
+        : searchParams.isShortForm == 'true',
     broadcastDate:
       (searchParams.broadcastDate as string) || dayjs().format('YYYY-MM-DD'),
     channelId: Number(searchParams.channelId),

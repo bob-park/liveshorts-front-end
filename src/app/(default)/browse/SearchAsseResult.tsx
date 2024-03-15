@@ -47,7 +47,7 @@ type SearchChannel = { channelId: number; name: string };
 type SearchAssetParams = {
   title: string;
   channelId?: number;
-  isShortForm: boolean;
+  isShortForm?: boolean;
   broadcastDate: string;
   page: number;
   size: number;
@@ -193,10 +193,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   );
 
   // useEffect
-  useEffect(() => {
-    console.log(assets);
-  }, [assets]);
-
   useLayoutEffect(() => {
     handleSearch(0, false);
   }, [searchParams]);
@@ -243,6 +239,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           assetStatus: 'REGISTERED',
           metas,
           title: searchAssetParams.title || '',
+          existShortForm:
+            searchAssetParams.isShortForm == undefined
+              ? ''
+              : searchAssetParams.isShortForm,
         },
         isAppend,
       }),
@@ -261,7 +261,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     const urlSearchParams = new URLSearchParams();
 
     Object.entries(searchAssetParams).forEach(([key, value]) => {
-      urlSearchParams.set(key, value ? String(value) : '');
+      console.log(`${key}=${value}`);
+      urlSearchParams.set(key, value != undefined ? String(value) : '');
     });
 
     router.push(`${pathname}?${urlSearchParams.toString()}`);
@@ -271,7 +272,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     setSearchAssetParams({
       title: '',
       channelId: undefined,
-      isShortForm: false,
+      isShortForm: undefined,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
       size: 20,
@@ -342,17 +343,62 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                   <h2 className="font-extrabold">숏폼 여부</h2>
                 </div>
                 <div className="col-span-2 flex justify-start items-center">
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-lg toggle-neutral"
-                    checked={searchAssetParams.isShortForm}
-                    onChange={(e) =>
-                      setSearchAssetParams({
-                        ...searchAssetParams,
-                        isShortForm: e.target.checked,
-                      })
-                    }
-                  />
+                  <div className="flex justify-start items-center">
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm == undefined}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: undefined,
+                            })
+                          }
+                        />
+                        <span className="ml-2">전체</span>
+                      </label>
+                    </div>
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm === false}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: false,
+                            })
+                          }
+                        />
+                        <span className="ml-2">없음</span>
+                      </label>
+                    </div>
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: true,
+                            })
+                          }
+                        />
+                        <span className="ml-2">있음</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

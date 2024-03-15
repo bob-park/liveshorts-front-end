@@ -26,7 +26,7 @@ function* callSearchAsset(action: ReturnType<typeof requestSearchAsset>) {
 
   const result: ApiResult<Asset[]> = yield call(
     get,
-    '/api/asset/search',
+    '/api/v1/asset/search',
     params,
   );
 

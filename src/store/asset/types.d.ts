@@ -33,6 +33,7 @@ type SearchAssetParams = {
   assetStatus?: AssetStatus;
   metas?: string[];
   title?: string;
+  existShortForm: boolean | string;
 };
 
 type Pagination = {
