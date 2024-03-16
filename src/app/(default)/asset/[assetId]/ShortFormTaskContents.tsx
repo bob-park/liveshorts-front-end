@@ -72,7 +72,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
           <div className="absolute left-0">
             <button
-              className="btn btn-neutral transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-blue-950 duration-300"
+              className="btn btn-sm btn-neutral transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-blue-950 duration-300"
               type="button"
             >
               <IoAddCircleSharp className="w-6 h-6" />

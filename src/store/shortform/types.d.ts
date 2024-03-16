@@ -11,6 +11,8 @@ type ShortFormTask = {
   status: TaskStatus;
   fitToTemplate: boolean;
   asset: { assetId: number };
+  uploadInstances?: ShortFormUploadInstance[];
+  taskExtras?: ShortFormExtra[];
   createdDate: Date;
   createdBy: string;
 };
@@ -35,4 +37,12 @@ type Pagination = {
   size: number;
   totalCount: number;
   totalPage: number;
+};
+
+type ShortFormUploadInstance = {
+  id: string;
+};
+
+type ShortFormExtra = {
+  id: string;
 };

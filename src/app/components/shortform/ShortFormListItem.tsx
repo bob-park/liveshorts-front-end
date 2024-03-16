@@ -2,6 +2,10 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 
+// react icon
+import { TbTransferIn } from 'react-icons/tb';
+import { SiYoutube } from 'react-icons/si';
+
 // timeago
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
@@ -37,7 +41,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
           onError={() => setThumbSrc('/default_thumbnail.png')}
         />
       </div>
-      <div className="">
+      <div className="flex-auto">
         <div className="grid grid-cols-4 gap-4">
           <div className="col-span-4">
             <div className="tooltip w-full" data-tip={task.title}>
@@ -47,12 +51,29 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
             </div>
           </div>
           <div className="col-span-4 text-gray-500">
-            <div
-              className={`badge badge-lg badge-${parseStatusColor(
-                task.status,
-              )}`}
-            >
-              {parseStatus(task.status)}
+            <div className="flex gap-4">
+              <div
+                className={`badge badge-lg badge-${parseStatusColor(
+                  task.status,
+                )}`}
+              >
+                {parseStatus(task.status)}
+              </div>
+              {task.taskExtras && task.taskExtras.length > 0 && (
+                <div className="">
+                  <div className="tooltip w-full" data-tip="입수 영상 작업됨">
+                    <TbTransferIn className="w-6 h-6 font-extrabold transition ease-in-out delay-150 hover:scale-110 duration-300" />
+                  </div>
+                </div>
+              )}
+
+              {task.uploadInstances && task.uploadInstances.length > 0 && (
+                <div className="">
+                  <div className="tooltip w-full" data-tip="업로드 됨">
+                    <SiYoutube className="w-6 h-6 text-red-600 font-extrabold transition ease-in-out delay-150 hover:scale-110 duration-300" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="col-span-4 text-gray-500 text-sm">
