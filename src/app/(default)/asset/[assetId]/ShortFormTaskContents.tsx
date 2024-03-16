@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 import { shortFormActions } from '@/store/shortform';
 import ShortFormList from '@/app/components/shortform/ShortFormList';
+import ShortFormPreview from '@/app/components/shortform/ShortFormPreview';
 
 // action
 const { requestSearchShortFormTask } = shortFormActions;
@@ -46,10 +47,21 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   const dispatch = useAppDispatch();
   const { isLoading, tasks } = useAppSelector((state) => state.shortForm);
 
+  // state
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [previewTask, setPreivewTask] = useState<ShortFormTask | undefined>();
+
   //useEffect
   useLayoutEffect(() => {
     dispatch(requestSearchShortFormTask({ assetId }));
   }, []);
+
+  // handle
+  const handleShowPreview = (taskId: string) => {
+    setShowPreview(true);
+
+    setPreivewTask(tasks.find((item) => item.id === taskId));
+  };
 
   return (
     <div className="gird grid-cols-1 gap-2 w-full h-full rounded-box shadow-2xl p-5">
@@ -72,8 +84,15 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       <div className="col-span-1 mt-4">
         {isLoading && <ShortFormLoading />}
         {!isLoading && tasks.length === 0 && <EmptyShortFormList />}
-        {!isLoading && tasks && <ShortFormList tasks={tasks} />}
+        {!isLoading && tasks && (
+          <ShortFormList tasks={tasks} onRowClick={handleShowPreview} />
+        )}
       </div>
+      <ShortFormPreview
+        show={showPreview}
+        task={previewTask}
+        onBackdrop={() => setShowPreview(false)}
+      />
     </div>
   );
 }
