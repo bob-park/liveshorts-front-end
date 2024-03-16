@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import NavBar from './NavBar';
+import './globals.css';
 
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;

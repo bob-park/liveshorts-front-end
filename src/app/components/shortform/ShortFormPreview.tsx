@@ -46,7 +46,9 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
           <div className="col-span-3">
             {task && (
               <video
-                src={`/api/v1/shorts/task/${task.id}/resource?t=${new Date()}`}
+                src={`/api/v1/shorts/task/${
+                  task.id
+                }/resource?t=${new Date().getTime()}`}
                 controls
               />
             )}

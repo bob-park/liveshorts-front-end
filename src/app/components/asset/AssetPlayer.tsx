@@ -16,10 +16,13 @@ import {
   IoVolumeOff,
   IoVolumeMute,
 } from 'react-icons/io5';
+import { FaForward, FaBackward } from 'react-icons/fa6';
 import { RxLoop } from 'react-icons/rx';
 import { MdOutlineFullscreen, MdOutlineFullscreenExit } from 'react-icons/md';
 
 import { secondToTimecode } from '@/utils/common';
+
+type PlayerStatus = 'PLAY' | 'STOP' | 'FORWARD' | 'BACKWARD';
 
 type AssetPlayerProps = {
   src: string;
@@ -43,6 +46,84 @@ function VolumeIcon(props: { volumeSize: number; mute: boolean }) {
   }
 }
 
+const PlayerStatusView = (props: {
+  status: PlayerStatus;
+  currentTime: number;
+}) => {
+  // props
+  const { status, currentTime } = props;
+
+  // state
+  const [prevTime, setPrevTime] = useState<number>(0);
+  const [show, setShow] = useState<boolean>(true);
+
+  // useEffect
+  useEffect(() => {
+    return () => {
+      setPrevTime(currentTime);
+      setShow(false);
+    };
+  }, [currentTime]);
+
+  useEffect(() => {
+    setShow(true);
+  }, [prevTime]);
+
+  useEffect(() => {
+    console.log(show);
+  }, [show]);
+
+  return (
+    <div
+      className="grid grid-cols-3 w-full h-full justify-center items-center"
+      onTransitionEnd={() => console.log('end')}
+    >
+      {status === 'PLAY' && (
+        <>
+          <div></div>
+          <div className="flex justify-center items-center fade-out">
+            <IoPlay className="w-48 h-48" />
+          </div>
+          <div></div>
+        </>
+      )}
+      {status === 'STOP' && (
+        <>
+          <div></div>
+          <div className="flex justify-center items-center fade-out">
+            <IoStop className="w-48 h-48" />
+          </div>
+          <div></div>
+        </>
+      )}
+      {status === 'FORWARD' && (
+        <>
+          <div></div>
+          <div></div>
+          <div
+            className={`flex flex-col justify-center items-center ${
+              show ? 'fade-out' : 'opacity-100'
+            }`}
+          >
+            <FaForward className="w-48 h-48" />
+            <div className="text-center text-xl font-bold">10 seconds</div>
+          </div>
+        </>
+      )}
+      {status === 'BACKWARD' && (
+        <>
+          <div className="flex flex-col justify-center items-center fade-out">
+            <FaBackward className="w-48 h-48" />
+            <div className="text-center text-xl font-bold">10 seconds</div>
+          </div>
+          <div></div>
+          <div></div>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default function AssetPlayer(props: AssetPlayerProps) {
   // props
   const { src } = props;
@@ -61,6 +142,9 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const [volume, setVolume] = useState<number>(100);
   const [mute, setMute] = useState<boolean>(false);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
+  const [playerStatus, setPlayerStatus] = useState<PlayerStatus>('STOP');
+  const [updatePlayerStatusTime, setUpdatePlayerStatusTime] =
+    useState<number>(0);
 
   // useEffect
   useEffect(() => {
@@ -151,13 +235,17 @@ export default function AssetPlayer(props: AssetPlayerProps) {
     if (videoRef.current) {
       if (e.key === 'ArrowRight') {
         videoRef.current.currentTime += 10;
+        setPlayerStatus('FORWARD');
       } else if (e.key === 'ArrowLeft') {
         videoRef.current.currentTime -= 10;
+        setPlayerStatus('BACKWARD');
       } else if (e.key === ' ') {
         const paused = videoRef.current.paused;
 
         paused ? videoRef.current.play() : videoRef.current.pause();
       }
+
+      setUpdatePlayerStatusTime(new Date().getTime());
     }
   };
 
@@ -185,9 +273,21 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                 (e.currentTarget.currentTime / videoDuration) * 100,
               )
             }
-            onPause={(e) => setIsPlay(false)}
-            onPlay={(e) => setIsPlay(true)}
+            onPause={(e) => {
+              setIsPlay(false);
+              setPlayerStatus('STOP');
+            }}
+            onPlay={(e) => {
+              setIsPlay(true);
+              setPlayerStatus('PLAY');
+            }}
           />
+          <div className="w-full h-full absolute">
+            {/* <PlayerStatusView
+              status={playerStatus}
+              currentTime={updatePlayerStatusTime}
+            /> */}
+          </div>
         </div>
       </div>
 
