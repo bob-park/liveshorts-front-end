@@ -5,6 +5,7 @@ import Image from 'next/image';
 // react icon
 import { TbTransferIn } from 'react-icons/tb';
 import { SiYoutube } from 'react-icons/si';
+import { FiDownload } from 'react-icons/fi';
 
 // timeago
 import TimeAgo from 'timeago-react';
@@ -51,7 +52,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
             </div>
           </div>
           <div className="col-span-4 text-gray-500">
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <div
                 className={`badge badge-lg badge-${parseStatusColor(
                   task.status,
@@ -71,6 +72,24 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                 <div className="">
                   <div className="tooltip w-full" data-tip="업로드 됨">
                     <SiYoutube className="w-6 h-6 text-red-600 font-extrabold transition ease-in-out delay-150 hover:scale-110 duration-300" />
+                  </div>
+                </div>
+              )}
+              {task.status === 'SUCCESS' && (
+                <div
+                  className="flex-1 text-end"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <div className="tooltip" data-tip="다운로드">
+                    <a
+                      className="btn btn-sm btn-neutral"
+                      href={`/api/v1/shorts/task/${task.id}/resource/download`}
+                      download
+                    >
+                      <FiDownload className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
               )}
