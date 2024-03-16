@@ -15,6 +15,8 @@ type Asset = {
   category: Category;
   createdDate: Date;
   createdBy: string;
+  shortFormCount: number;
+  uploadSnsCount: number;
 };
 
 type AssetType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';

@@ -109,6 +109,11 @@ const ThumbnailAssetView = (props: {
                 assetStatus={item.assetStatus}
                 category={item.category.name}
                 createdDate={item.createdDate}
+                existShortForm={item.shortFormCount > 0}
+                isUploadSns={
+                  item.uploadSnsCount > 0 &&
+                  item.shortFormCount === item.uploadSnsCount
+                }
               />
             </div>
           ))
@@ -328,7 +333,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                     <input
                       type="text"
                       className="grow"
-                      placeholder="Search"
+                      placeholder="키워드"
                       defaultValue={searchAssetParams.title}
                       onChange={(e) =>
                         setSearchAssetParams({
@@ -403,7 +408,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                           type="radio"
                           name="radio-10"
                           className="radio"
-                          checked={searchAssetParams.isShortForm}
+                          checked={searchAssetParams.isShortForm === true}
                           onChange={(e) =>
                             e.target.checked &&
                             setSearchAssetParams({
