@@ -26,7 +26,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
   );
 
   return (
-    <div className="flex gap-5 rounded-box shadow-lg hover:shadow-2xl mb-2 p-2">
+    <div className="flex gap-5 rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300">
       <div className="">
         <Image
           className="max-w-[200px] max-h-[100px] object-contain rounded-xl "
@@ -40,7 +40,11 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
       <div className="">
         <div className="grid grid-cols-4 gap-4">
           <div className="col-span-4">
-            <h2 className="font-bold font-xl">{task.title}</h2>
+            <div className="tooltip w-full" data-tip={task.title}>
+              <h2 className="font-bold font-xl truncate text-start">
+                {task.title}
+              </h2>
+            </div>
           </div>
           <div className="col-span-4 text-gray-500">
             <div
