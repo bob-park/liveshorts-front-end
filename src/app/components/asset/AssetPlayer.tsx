@@ -58,31 +58,17 @@ const PlayerStatusView = (props: {
   const [show, setShow] = useState<boolean>(true);
 
   // useEffect
-  useEffect(() => {
-    return () => {
-      setPrevTime(currentTime);
-      setShow(false);
-    };
-  }, [currentTime]);
-
-  useEffect(() => {
-    setShow(true);
-  }, [prevTime]);
-
-  useEffect(() => {
-    console.log(show);
-  }, [show]);
 
   return (
     <div
-      className="grid grid-cols-3 w-full h-full justify-center items-center"
+      className="grid grid-cols-3 w-full h-full opacity-70 bg-black rounded-xl justify-center items-center fade-out"
       onTransitionEnd={() => console.log('end')}
     >
       {status === 'PLAY' && (
         <>
           <div></div>
-          <div className="flex justify-center items-center fade-out">
-            <IoPlay className="w-48 h-48" />
+          <div className="flex justify-center items-center text-gray-400 opacity-100">
+            <IoPlay className="w-48 h-48 " />
           </div>
           <div></div>
         </>
@@ -90,7 +76,7 @@ const PlayerStatusView = (props: {
       {status === 'STOP' && (
         <>
           <div></div>
-          <div className="flex justify-center items-center fade-out">
+          <div className="flex justify-center items-center text-gray-400 opacity-100">
             <IoStop className="w-48 h-48" />
           </div>
           <div></div>
@@ -100,11 +86,7 @@ const PlayerStatusView = (props: {
         <>
           <div></div>
           <div></div>
-          <div
-            className={`flex flex-col justify-center items-center ${
-              show ? 'fade-out' : 'opacity-100'
-            }`}
-          >
+          <div className="flex flex-col justify-center items-center text-gray-400 opacity-100">
             <FaForward className="w-48 h-48" />
             <div className="text-center text-xl font-bold">10 seconds</div>
           </div>
@@ -112,7 +94,7 @@ const PlayerStatusView = (props: {
       )}
       {status === 'BACKWARD' && (
         <>
-          <div className="flex flex-col justify-center items-center fade-out">
+          <div className="flex flex-col justify-center items-center text-gray-400 opacity-100">
             <FaBackward className="w-48 h-48" />
             <div className="text-center text-xl font-bold">10 seconds</div>
           </div>
@@ -257,7 +239,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 h-full">
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center relative">
           <video
             id=""
             className={`w-full min-h-max ${
@@ -276,18 +258,15 @@ export default function AssetPlayer(props: AssetPlayerProps) {
             onPause={(e) => {
               setIsPlay(false);
               setPlayerStatus('STOP');
+              setUpdatePlayerStatusTime(new Date().getTime());
             }}
             onPlay={(e) => {
               setIsPlay(true);
               setPlayerStatus('PLAY');
+              setUpdatePlayerStatusTime(new Date().getTime());
             }}
           />
-          <div className="w-full h-full absolute">
-            {/* <PlayerStatusView
-              status={playerStatus}
-              currentTime={updatePlayerStatusTime}
-            /> */}
-          </div>
+          <div className="w-full h-full absolute"></div>
         </div>
       </div>
 

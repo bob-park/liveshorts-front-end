@@ -1,5 +1,5 @@
 .fade-out {
-  animation: fadeOut 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+  animation: fadeOut 1s cubic-bezier(0.2, 1, 0.2, 1);
   animation-fill-mode: forwards;
 }
 
