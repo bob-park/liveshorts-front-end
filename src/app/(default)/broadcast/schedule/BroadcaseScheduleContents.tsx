@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import { scheduleActions } from '@/store/schedule';
 
 import ScheduleDateSelector from '@/app/components/schedule/ScheduleDateSelector';
+import ScheduleList from '@/app/components/schedule/ScheduleList';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -105,6 +106,10 @@ export default function BroadcastScheduleContent(
             onPrev={() => handleMoveScheduleDate(false)}
             onNext={() => handleMoveScheduleDate(true)}
           />
+        </div>
+        {/* 스케쥴 목록 */}
+        <div className="col-span-1 mt-3">
+          <ScheduleList schedules={schedules} />
         </div>
       </div>
     </div>

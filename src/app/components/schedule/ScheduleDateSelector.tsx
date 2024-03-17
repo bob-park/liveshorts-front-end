@@ -59,7 +59,7 @@ export default function ScheduleDateSelector(props: ScheduleDateSelectorProps) {
   return (
     <div className="grid grid-cols-9 gap-10 w-full h-full">
       {/* prev */}
-      <button className="btn btn-ghost btn-neutral" onClick={handlePrev}>
+      <button className="btn btn-ghost btn-neutral h-full" onClick={handlePrev}>
         <IoIosArrowBack className="w-5 h-5" />
       </button>
       {/* date list */}
@@ -73,8 +73,8 @@ export default function ScheduleDateSelector(props: ScheduleDateSelectorProps) {
             } hover:text-blue-600`}
             onClick={() => handleSelectDate(date)}
           >
-            <span className={`text-xl`}>{dayjs(date).format('MM.DD')}</span>
-            <span className="text-sm">
+            <span className="text-xl block">{dayjs(date).format('MM.DD')}</span>
+            <span className="text-sm block">
               {date.getDate() === new Date().getDate()
                 ? '오늘'
                 : getDayOfWeek(dayjs(date).day())}
