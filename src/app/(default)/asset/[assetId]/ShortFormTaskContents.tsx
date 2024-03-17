@@ -7,6 +7,7 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { SiYoutubeshorts } from 'react-icons/si';
 import { CgPlayListRemove } from 'react-icons/cg';
 import { IoAddCircleSharp } from 'react-icons/io5';
+import { TbReload } from 'react-icons/tb';
 
 // hooks
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
@@ -53,7 +54,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   //useEffect
   useLayoutEffect(() => {
-    dispatch(requestSearchShortFormTask({ assetId }));
+    handleGetShortFormTask();
   }, []);
 
   // handle
@@ -61,6 +62,10 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     setShowPreview(true);
 
     setPreivewTask(tasks.find((item) => item.id === taskId));
+  };
+
+  const handleGetShortFormTask = () => {
+    dispatch(requestSearchShortFormTask({ assetId }));
   };
 
   return (
@@ -78,6 +83,17 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
               <IoAddCircleSharp className="w-6 h-6" />
               숏폼 생성
             </button>
+          </div>
+          <div className="absolute right-2">
+            <div className="tooltip w-full" data-tip="새로고침">
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost"
+                onClick={handleGetShortFormTask}
+              >
+                <TbReload className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
