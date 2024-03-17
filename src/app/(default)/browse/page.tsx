@@ -28,7 +28,9 @@ export default async function Browse(props: {
         : searchParams.isShortForm == 'true',
     broadcastDate:
       (searchParams.broadcastDate as string) || dayjs().format('YYYY-MM-DD'),
-    channelId: Number(searchParams.channelId),
+    channelId: searchParams.channelId
+      ? Number(searchParams.channelId)
+      : undefined,
     page: Number(searchParams.page || 0),
     size: Number(searchParams.size || 20),
   };
