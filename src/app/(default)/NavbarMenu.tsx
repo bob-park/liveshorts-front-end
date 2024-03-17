@@ -22,11 +22,14 @@ import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 // action
 import { userActions } from '@/store/user';
 
+import routes from './routes';
+
 const { requestUpdateMe, requestLoggedOut } = userActions;
 
 export default function NavbarMenu(props: { token: string }) {
   // router
   const router = useRouter();
+  const pathname = usePathname();
 
   // store
   const dispatch = useAppDispatch();
@@ -41,6 +44,14 @@ export default function NavbarMenu(props: { token: string }) {
   const handleLogout = () => {
     dispatch(requestLoggedOut());
     router.push('/logout');
+  };
+
+  const activeMenuItem = (menuPath: string) => {
+    if (pathname.startsWith(menuPath)) {
+      return 'active';
+    }
+
+    return '';
   };
 
   return (
@@ -63,9 +74,16 @@ export default function NavbarMenu(props: { token: string }) {
               </Link>
             </div>
             <Menu horizontal className="px-1 text-lg">
-              <Menu.Item>
-                <a>채널 편성표</a>
-              </Menu.Item>
+              {routes.map((route) => (
+                <Menu.Item key={`route-menu-item-${route.id}`}>
+                  <Link
+                    className={activeMenuItem(route.route)}
+                    href={route.route}
+                  >
+                    {route.name}
+                  </Link>
+                </Menu.Item>
+              ))}
             </Menu>
           </Navbar.Start>
           <Navbar.Center className="flex justify-end items-center"></Navbar.Center>
