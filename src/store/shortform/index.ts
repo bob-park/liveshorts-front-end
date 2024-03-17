@@ -7,7 +7,7 @@ const selectorAllState = createSelector(
   (tasks) => ({ tasks }),
 );
 
-export const userSelector = {
+export const shortFormSelector = {
   all: (state: RootState) => selectorAllState(state[SHORT_FORM]),
 };
 

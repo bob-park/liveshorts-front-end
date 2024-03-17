@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import BackwardButton from '@/app/components/common/BackwardButton';
 
-export default function BroadcastScheduleHeaderContents() {
+export default function BroadcastScheduleHeader() {
   // router
   const router = useRouter();
 
