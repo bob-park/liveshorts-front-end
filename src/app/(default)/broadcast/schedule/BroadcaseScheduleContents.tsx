@@ -15,6 +15,8 @@ import dayjs from 'dayjs';
 // store
 import { scheduleActions } from '@/store/schedule';
 
+import ScheduleDateSelector from '@/app/components/schedule/ScheduleDateSelector';
+
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
 };
@@ -57,26 +59,53 @@ export default function BroadcastScheduleContent(
     );
   };
 
+  const handleMoveScheduleDate = (isNext: boolean) => {
+    const prevDate = dayjs(selectDate)
+      .day(0)
+      .add(7 * (isNext ? 1 : -1), 'day')
+      .toDate();
+
+    setSelectDate(prevDate);
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="col-span-1">
-        <Menu horizontal className="px-10 text-lg">
-          {channels.map((channel) => (
-            <Menu.Item key={`channel-id-${channel.channelId}`} className="mx-3">
-              <button
-                className={`btn btn-lg   ${
-                  selectChannelId === channel.channelId
-                    ? 'btn-neutral'
-                    : 'btn-ghost'
-                }`}
-                type="button"
-                onClick={() => setSelectChannelId(channel.channelId)}
+        {/* 채널 목록 */}
+        <div className="flex gap-2 justify-start items-center">
+          <div className="w-16 text-right">
+            <h2 className="text-xl font-bold">채널</h2>
+          </div>
+          <Menu horizontal className="px-5 text-lg">
+            {channels.map((channel) => (
+              <Menu.Item
+                key={`channel-id-${channel.channelId}`}
+                className="mx-3"
               >
-                {channel.channelName}
-              </button>
-            </Menu.Item>
-          ))}
-        </Menu>
+                <button
+                  className={`btn btn-lg   ${
+                    selectChannelId === channel.channelId
+                      ? 'btn-neutral'
+                      : 'btn-ghost'
+                  }`}
+                  type="button"
+                  onClick={() => setSelectChannelId(channel.channelId)}
+                >
+                  {channel.channelName}
+                </button>
+              </Menu.Item>
+            ))}
+          </Menu>
+        </div>
+        {/* 날짜 목록 */}
+        <div className="col-span-1 mt-3">
+          <ScheduleDateSelector
+            selectDate={selectDate}
+            onSelectDate={(date) => setSelectDate(date)}
+            onPrev={() => handleMoveScheduleDate(false)}
+            onNext={() => handleMoveScheduleDate(true)}
+          />
+        </div>
       </div>
     </div>
   );
