@@ -6,10 +6,14 @@ const reducers = {
     state: AssetState,
     action: PayloadAction<{ params: SearchAssetParams; isAppend: boolean }>,
   ) => {
-    const { params } = action.payload;
+    const { params, isAppend } = action.payload;
 
     state.isLoading = true;
     state.searchParams = params;
+
+    if (!isAppend) {
+      state.assets = [];
+    }
   },
   successSearchAsset: (
     state: AssetState,

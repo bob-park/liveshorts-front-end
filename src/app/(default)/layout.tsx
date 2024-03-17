@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import NavBar from './NavBar';
+import NavbarMenu from './NavbarMenu';
 import './globals.css';
 
 // mam api host
@@ -26,7 +26,7 @@ export default async function DefaultLayout({
 
   return (
     <div className="w-full h-full min-w-[900px]">
-      <NavBar token={touchResult.result.accessToken} />
+      <NavbarMenu token={touchResult.result.accessToken} />
       <div className="p-2 ">{children}</div>
     </div>
   );
