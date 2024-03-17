@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import BackwardButton from '@/app/components/common/BackwardButton';
 
-export default function AssetHeaderContents() {
+export default function BroadcastScheduleHeaderContents() {
   // router
   const router = useRouter();
 
@@ -20,7 +20,7 @@ export default function AssetHeaderContents() {
   return (
     <div className="grid grid-cols-2 gap-4 justify-start items-center">
       <div className="col-span-1">
-        <BackwardButton title="Browse" onBackward={handleBackdrop} />
+        <BackwardButton title="뒤로" onBackward={handleBackdrop} />
       </div>
     </div>
   );
