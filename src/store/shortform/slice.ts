@@ -2,26 +2,19 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import reducers from './reducers';
 
-const initialState: AssetState = {
+const initialState: ShortFormState = {
   isLoading: false,
-  assets: [],
-  pagination: {
+  tasks: [],
+  page: {
     currentPage: 0,
     size: 20,
     totalCount: 0,
     totalPage: 0,
   },
-  searchParams: {
-    page: 0,
-    size: 20,
-    isDeleted: false,
-    assetStatus: 'REGISTERED',
-    existShortForm: '',
-  },
 };
 
 export default createSlice({
-  name: 'asset',
+  name: 'shortForm',
   initialState,
   reducers,
 });

@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -13,6 +13,7 @@ import {
   HiOutlineSearch,
 } from 'react-icons/hi';
 import { GrPowerReset } from 'react-icons/gr';
+import { CgPlayListRemove } from 'react-icons/cg';
 
 import Datepicker from 'react-tailwindcss-datepicker';
 
@@ -47,7 +48,7 @@ type SearchChannel = { channelId: number; name: string };
 type SearchAssetParams = {
   title: string;
   channelId?: number;
-  isShortForm: boolean;
+  isShortForm?: boolean;
   broadcastDate: string;
   page: number;
   size: number;
@@ -90,27 +91,35 @@ const ThumbnailAssetView = (props: {
   };
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
-      {isLoading ? (
-        <LoadingThumbanilAssets size={10} />
-      ) : (
-        assets.map((item) => (
-          <div
-            key={`asset-view-item-${item.assetId}`}
-            className="col-span-1"
-            onClick={() => handleClick(item.assetId)}
-          >
-            <AssetViewItem
-              assetId={item.assetId}
-              title={item.title}
-              assetStatus={item.assetStatus}
-              category={item.category.name}
-              createdDate={item.createdDate}
-            />
-          </div>
-        ))
-      )}
-    </div>
+    <>
+      {!isLoading && assets.length === 0 && <EmptyAssetList />}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
+        {isLoading ? (
+          <LoadingThumbanilAssets size={10} />
+        ) : (
+          assets.map((item) => (
+            <div
+              key={`asset-view-item-${item.assetId}`}
+              className="col-span-1"
+              onClick={() => handleClick(item.assetId)}
+            >
+              <AssetViewItem
+                assetId={item.assetId}
+                title={item.title}
+                assetStatus={item.assetStatus}
+                category={item.category.name}
+                createdDate={item.createdDate}
+                existShortForm={item.shortFormCount > 0}
+                isUploadSns={
+                  item.uploadSnsCount > 0 &&
+                  item.shortFormCount === item.uploadSnsCount
+                }
+              />
+            </div>
+          ))
+        )}
+      </div>
+    </>
   );
 };
 
@@ -138,8 +147,9 @@ const ListAssetView = (props: {
         <div className="col-span-1">생성일</div>
         <div className="col-span-1">생성자</div>
       </div>
-      {/* content */}
 
+      {/* content */}
+      {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
           <LoadingListAssets size={10} />
@@ -163,6 +173,19 @@ const ListAssetView = (props: {
           </div>
         ))
       )}
+    </div>
+  );
+};
+
+const EmptyAssetList = () => {
+  return (
+    <div className="flex flex-col justify-center items-center w-full h-40">
+      <div className="">
+        <CgPlayListRemove className="w-24 h-24 text-gray-500" />
+      </div>
+      <div className="mt-2 text-md font-bold">
+        <h3>영상이 없습니다.</h3>
+      </div>
     </div>
   );
 };
@@ -194,26 +217,25 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // useEffect
   useLayoutEffect(() => {
-    handleSearch();
+    handleSearch(0, false);
   }, [searchParams]);
 
   useLayoutEffect(() => {
-    const observer = new IntersectionObserver((entries:IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        handleSearchPage();
-      }
-    }, {threshold: 0.5})
+    const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
 
     const observerTarget = document.getElementById('observer');
 
     if (observerTarget) {
-      observer.observe(observerTarget)
+      observer.observe(observerTarget);
     }
-  }, [])
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [pagination]);
 
   // handle
-  const handleSearch = () => {
+  const handleSearch = (page: number, isAppend: boolean) => {
     const metas: string[] = [];
 
     searchAssetParams.broadcastDate &&
@@ -232,47 +254,23 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
     dispatch(
       requestSearchAsset({
-        page: searchAssetParams.page,
-        size: searchAssetParams.size,
-        isDeleted: false,
-        assetType: 'VIDEO',
-        assetStatus: 'REGISTERED',
-        metas,
-        title: searchAssetParams.title || '',
+        params: {
+          page,
+          size: searchAssetParams.size,
+          isDeleted: false,
+          assetType: 'VIDEO',
+          assetStatus: 'REGISTERED',
+          metas,
+          title: searchAssetParams.title || '',
+          existShortForm:
+            searchAssetParams.isShortForm == undefined
+              ? ''
+              : searchAssetParams.isShortForm,
+        },
+        isAppend,
       }),
     );
   };
-
-  const handleSearchPage = () => {
-    const metas: string[] = [];
-    searchAssetParams.broadcastDate &&
-      metas.push(
-        `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
-      );
-
-    searchAssetParams.channelId &&
-      metas.push(
-        `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
-          channels.find(
-            (item) => item.channelId === searchAssetParams.channelId,
-          )?.name || ''
-        }`,
-      );
-
-    const addedSize = searchAssetParams.size + searchAssetParams.size
-    const newSize = addedSize >= pagination.totalCount ? pagination.totalCount : addedSize
-
-    dispatch(
-      requestSearchAsset({
-        page: searchAssetParams.page,
-        size: newSize,
-        isDeleted: false,
-        assetType: 'VIDEO',
-        assetStatus: 'REGISTERED',
-        metas,
-        title: searchAssetParams.title || '',
-      }),
-    );}
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
@@ -286,7 +284,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     const urlSearchParams = new URLSearchParams();
 
     Object.entries(searchAssetParams).forEach(([key, value]) => {
-      urlSearchParams.set(key, value ? String(value) : '');
+      urlSearchParams.set(key, value != undefined ? String(value) : '');
     });
 
     router.push(`${pathname}?${urlSearchParams.toString()}`);
@@ -296,7 +294,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     setSearchAssetParams({
       title: '',
       channelId: undefined,
-      isShortForm: false,
+      isShortForm: undefined,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
       size: 20,
@@ -305,6 +303,17 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleMoveAsset = (assetId: number) => {
     router.push(`/asset/${assetId}`);
+  };
+
+  const handleObserver = (entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (
+      target.isIntersecting &&
+      !isLoading &&
+      pagination.currentPage + 1 < pagination.totalPage
+    ) {
+      handleSearch(pagination.currentPage + 1, true);
+    }
   };
 
   return (
@@ -324,7 +333,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                     <input
                       type="text"
                       className="grow"
-                      placeholder="Search"
+                      placeholder="키워드"
                       defaultValue={searchAssetParams.title}
                       onChange={(e) =>
                         setSearchAssetParams({
@@ -356,17 +365,62 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                   <h2 className="font-extrabold">숏폼 여부</h2>
                 </div>
                 <div className="col-span-2 flex justify-start items-center">
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-lg toggle-neutral"
-                    checked={searchAssetParams.isShortForm}
-                    onChange={(e) =>
-                      setSearchAssetParams({
-                        ...searchAssetParams,
-                        isShortForm: e.target.checked,
-                      })
-                    }
-                  />
+                  <div className="flex justify-start items-center">
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm == undefined}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: undefined,
+                            })
+                          }
+                        />
+                        <span className="ml-2">전체</span>
+                      </label>
+                    </div>
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm === false}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: false,
+                            })
+                          }
+                        />
+                        <span className="ml-2">없음</span>
+                      </label>
+                    </div>
+                    <div className="form-control mr-2">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="radio"
+                          name="radio-10"
+                          className="radio"
+                          checked={searchAssetParams.isShortForm === true}
+                          onChange={(e) =>
+                            e.target.checked &&
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              isShortForm: true,
+                            })
+                          }
+                        />
+                        <span className="ml-2">있음</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -497,10 +551,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
               총 <strong>{pagination.totalCount}</strong>개 중{' '}
-              <strong>
-                {pagination.size * pagination.currentPage + assets.length}
-              </strong>
-              개
+              <strong>{assets.length}</strong>개
             </h3>
           </div>
           <div className="col-span-1 text-right">
@@ -537,22 +588,26 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={isLoading}
+            isLoading={isLoading && assets.length === 0}
             assets={assets}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={isLoading}
+            isLoading={isLoading && assets.length === 0}
             assets={assets}
             onClick={handleMoveAsset}
           />
         )}
       </div>
-      <div id="observer" className='h-2'></div>
-      {isLoading && <div className='w-full flex justify-center items-center h-60'>
-        <Loading variant='dots' size='lg'/>
-      </div>}
+
+      {isLoading ? (
+        <div className="w-full flex justify-center items-center h-60">
+          <Loading variant="dots" size="lg" />
+        </div>
+      ) : (
+        <div id="observer" className="h-2"></div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,10 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
+// react icons
+import { SiYoutubeshorts, SiYoutube } from 'react-icons/si';
+
+// timeago
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
@@ -16,11 +20,21 @@ type AssetItemProps = {
   assetStatus: AssetStatus;
   category?: string;
   createdDate?: Date;
+  existShortForm?: boolean;
+  isUploadSns?: boolean;
 };
 
-export default function AssetItem(props: AssetItemProps) {
+export default function AssetViewItem(props: AssetItemProps) {
   // props
-  const { assetId, title, assetStatus, category, createdDate } = props;
+  const {
+    assetId,
+    title,
+    assetStatus,
+    category,
+    createdDate,
+    existShortForm,
+    isUploadSns,
+  } = props;
 
   // state
   const [assetImageSrc, setAssetImageSrc] = useState<string>(
@@ -30,7 +44,7 @@ export default function AssetItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl hover:shadow-2xl">
+    <div className="card w-96 bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-110 duration-300">
       <figure className="w-full h-48">
         <Image
           className="w-auto h-full rounded-md "
@@ -54,11 +68,23 @@ export default function AssetItem(props: AssetItemProps) {
               <TimeAgo datetime={createdDate} locale="ko" />
             </div>
           )}
-          {category && (
-            <div className="badge badge-outline badge-lg font-semibold text-sm">
-              {category}
-            </div>
-          )}
+          <div className="flex gap-3 justify-end items-center">
+            {existShortForm && (
+              <div className="tooltip" data-tip="숏폼">
+                <SiYoutubeshorts className="w-5 h-5 text-red-600" />
+              </div>
+            )}
+            {isUploadSns && (
+              <div className="tooltip" data-tip="업로드">
+                <SiYoutube className="w-5 h-5 text-red-600" />
+              </div>
+            )}
+            {category && (
+              <div className="badge badge-outline badge-lg font-semibold text-sm">
+                {category}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

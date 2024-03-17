@@ -12,44 +12,24 @@ import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 // react-icon
-import { LuLayoutDashboard, LuLogOut } from 'react-icons/lu';
-import {
-  GrDocumentTime,
-  GrDocumentUpdate,
-  GrNotification,
-} from 'react-icons/gr';
-import { MdOutlineHolidayVillage } from 'react-icons/md';
-import {
-  AiOutlineUnorderedList,
-  AiOutlineSetting,
-  AiFillNotification,
-} from 'react-icons/ai';
+import { LuLogOut } from 'react-icons/lu';
+import { AiOutlineSetting } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
-import { BsInfoCircle } from 'react-icons/bs';
-import { VscError } from 'react-icons/vsc';
-import { IoNotificationsOutline } from 'react-icons/io5';
 
 // daisyui
-import {
-  Navbar,
-  Dropdown,
-  Button,
-  Badge,
-  Menu,
-  Avatar,
-  Drawer,
-  Tooltip,
-  Toast,
-} from 'react-daisyui';
+import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 
 // action
 import { userActions } from '@/store/user';
 
+import routes from './routes';
+
 const { requestUpdateMe, requestLoggedOut } = userActions;
 
-export default function NavBar(props: { token: string }) {
+export default function NavbarMenu(props: { token: string }) {
   // router
   const router = useRouter();
+  const pathname = usePathname();
 
   // store
   const dispatch = useAppDispatch();
@@ -66,12 +46,20 @@ export default function NavBar(props: { token: string }) {
     router.push('/logout');
   };
 
+  const activeMenuItem = (menuPath: string) => {
+    if (pathname.startsWith(menuPath)) {
+      return 'active';
+    }
+
+    return '';
+  };
+
   return (
     <>
       <div className="sticky top-0 z-30 flex h-20 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm">
         <Navbar className="">
           <Navbar.Start className="flex-none">
-            <div className="flex-1 px-2 mx-2 text-2xl font-bold">
+            <div className="px-2 mx-2 text-2xl font-bold">
               <Link
                 className="btn btn-ghost normal-case px-2 mx-2 text-2xl font-bold"
                 href="/"
@@ -85,7 +73,20 @@ export default function NavBar(props: { token: string }) {
                 />
               </Link>
             </div>
+            <Menu horizontal className="px-1 text-lg">
+              {routes.map((route) => (
+                <Menu.Item key={`route-menu-item-${route.id}`}>
+                  <Link
+                    className={activeMenuItem(route.route)}
+                    href={route.route}
+                  >
+                    {route.name}
+                  </Link>
+                </Menu.Item>
+              ))}
+            </Menu>
           </Navbar.Start>
+          <Navbar.Center className="flex justify-end items-center"></Navbar.Center>
           <Navbar.End className="lg:w-full">
             <div className="mr-7">
               {me && (

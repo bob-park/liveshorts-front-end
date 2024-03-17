@@ -1,13 +1,66 @@
-// day
+// nextjs
+import { Metadata, ResolvingMetadata } from 'next';
+import { cookies } from 'next/headers';
 
 import AssetHeaderContents from './AssetHeaderContents';
 import AssetPlayeContents from './AssetPlayerContents';
+import ShortFormTaskContents from './ShortFormTaskContents';
 
-export default function AssetPage({ params }: { params: { assetId: number } }) {
+type Asset = {
+  assetId: number;
+  title: string;
+  description?: string;
+  assetStatus: string;
+  category: Category;
+  createdDate: Date;
+  createdBy: string;
+  lastModifiedDate?: Date;
+  lastModifiedBy?: string;
+};
+
+type Category = {
+  categoryId: number;
+  name: string;
+};
+
+// mam api host
+const MAM_API_HOST = process.env.MAM_API_HOST;
+
+type Props = {
+  params: { assetId: number };
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { assetId } = params;
 
+  const response = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {
+    method: 'get',
+    headers: {
+      Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+    },
+  });
 
-  
+  const asset: Asset = await response.json().then((res) => res.result);
+
+  return {
+    title: `LiveShorts - ${asset.title}`,
+  };
+}
+
+export default async function AssetPage({ params }: Props) {
+  const { assetId } = params;
+
+  const response = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {
+    method: 'get',
+    headers: {
+      Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+    },
+  });
+
+  const asset: Asset = await response.json().then((res) => res.result);
 
   return (
     <div className="grid grid-cols-1 gap-4 px-5 py-2">
@@ -16,12 +69,20 @@ export default function AssetPage({ params }: { params: { assetId: number } }) {
         <AssetHeaderContents />
       </div>
       <div className="col-span-1">
-        <div className="grid grid-cols-2 xl:grid-cols-3  gap-3 justify-center items-center">
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-10 justify-center items-start">
           <div className="col-span-2">
-            <AssetPlayeContents assetId={assetId} />
+            <AssetPlayeContents
+              assetId={assetId}
+              title={asset.title}
+              description={asset.description}
+              createdDate={asset.createdDate}
+              createdBy={asset.createdBy}
+            />
           </div>
           {/* shortfrom task list */}
-          <div className="col-span-1">shortform task list</div>
+          <div className="col-span-2 xl:col-span-1 ">
+            <ShortFormTaskContents assetId={assetId} />
+          </div>
         </div>
       </div>
     </div>

@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   // store
   const dispatch = useAppDispatch();
-  const { isLoggingIn, failLoggedInMessage, me } = useAppSelector(
+  const { isLoggingIn, isLoggedIn, failLoggedInMessage, me } = useAppSelector(
     (state) => state.user,
   );
 
@@ -47,6 +47,7 @@ export default function LoginPage() {
       </div>
       <LoginForm
         isLoggingIn={isLoggingIn}
+        isLoggedIn={isLoggedIn}
         msg={failLoggedInMessage}
         onLogin={handleLogin}
       />
