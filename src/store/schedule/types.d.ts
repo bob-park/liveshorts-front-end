@@ -8,7 +8,7 @@ type ScheduleOptions = {
   shopItems?: ShopItem[];
 };
 type ShortFormRecordScheduleStatus =
-  | 'ABORD'
+  | 'ABORT'
   | 'WAITING'
   | 'PROCEEDING'
   | 'SUCCESS'
