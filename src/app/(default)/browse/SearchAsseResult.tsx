@@ -248,7 +248,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
           channels.find(
             (item) => item.channelId === searchAssetParams.channelId,
-          )?.name || ''
+          )?.channelId || ''
         }`,
       );
 

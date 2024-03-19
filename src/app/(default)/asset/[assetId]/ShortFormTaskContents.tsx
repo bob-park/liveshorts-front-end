@@ -59,9 +59,14 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // handle
   const handleShowPreview = (taskId: string) => {
-    setShowPreview(true);
+    const previewTask = tasks.find((item) => item.id === taskId);
 
-    setPreivewTask(tasks.find((item) => item.id === taskId));
+    if (previewTask?.status !== 'SUCCESS') {
+      return;
+    }
+
+    setShowPreview(true);
+    setPreivewTask(previewTask);
   };
 
   const handleGetShortFormTask = () => {

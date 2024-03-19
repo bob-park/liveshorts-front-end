@@ -9,7 +9,7 @@ import { Button } from 'react-daisyui';
 // react icons
 import {
   IoPlay,
-  IoStop,
+  IoPause,
   IoVolumeHigh,
   IoVolumeMedium,
   IoVolumeLow,
@@ -77,7 +77,7 @@ const PlayerStatusView = (props: {
         <>
           <div></div>
           <div className="flex justify-center items-center text-gray-400 opacity-100">
-            <IoStop className="w-48 h-48" />
+            <IoPause className="w-48 h-48" />
           </div>
           <div></div>
         </>
@@ -139,6 +139,8 @@ export default function AssetPlayer(props: AssetPlayerProps) {
         setIsFullScreen(false);
       }
     });
+
+    videoRef.current?.load();
   }, []);
 
   // handle
@@ -147,8 +149,9 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   };
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    e.currentTarget.play();
+    // e.currentTarget.load();
     setVideoDuration(e.currentTarget.duration);
+    setVideoProgress(0);
   };
 
   const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -301,7 +304,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                       active={isPlay}
                     >
                       {isPlay ? (
-                        <IoStop className="w-5" />
+                        <IoPause className="w-5" />
                       ) : (
                         <IoPlay className="w-5" />
                       )}
