@@ -3,6 +3,9 @@
 // react
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
+// nextjs
+import { useParams } from 'next/navigation';
+
 // react icons
 import { SiYoutubeshorts } from 'react-icons/si';
 import { CgPlayListRemove } from 'react-icons/cg';

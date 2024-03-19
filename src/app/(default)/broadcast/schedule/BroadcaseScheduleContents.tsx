@@ -70,7 +70,7 @@ export default function BroadcastScheduleContent(
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4 px-10">
       <div className="col-span-1">
         {/* 채널 목록 */}
         <div className="flex gap-2 justify-start items-center">

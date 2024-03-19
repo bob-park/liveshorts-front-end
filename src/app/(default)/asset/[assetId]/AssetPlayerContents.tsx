@@ -11,11 +11,12 @@ import {} from 'react';
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
+import ShortFormTaskContents from './ShortFormTaskContents';
 
 timeago.register('ko', ko);
 
 type AssetPlayeContentsProps = {
-  assetId: Number;
+  assetId: number;
   title: string;
   description?: string;
   createdDate: Date;

@@ -66,8 +66,8 @@ const ScheduleListItem = ({ schedule }: { schedule: RecordSchedule }) => {
         </div>
       </div>
       {/* thumbnail */}
-      <div className="flex-none text-center">
-        <figure className="w-48 h-32">
+      <div className="flex-none ">
+        <figure className="w-48 h-32 flex justify-center">
           <Image
             className="w-auto h-full rounded-md object-contain"
             src={assetImageSrc}
