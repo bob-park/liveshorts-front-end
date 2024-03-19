@@ -141,6 +141,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
     });
 
     videoRef.current?.load();
+    // videoRef.current?.play();
   }, []);
 
   // handle

@@ -76,6 +76,11 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     dispatch(requestSearchShortFormTask({ assetId }));
   };
 
+  const handleClosePreview = () => {
+    setShowPreview(false);
+    setPreivewTask(undefined);
+  };
+
   return (
     <div className="gird grid-cols-1 gap-2 w-full h-full rounded-box shadow-2xl p-5">
       <div className="col-span-1">
@@ -115,7 +120,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       <ShortFormPreview
         show={showPreview}
         task={previewTask}
-        onBackdrop={() => setShowPreview(false)}
+        onBackdrop={handleClosePreview}
       />
     </div>
   );

@@ -3,6 +3,9 @@
 // react
 import { useState, useLayoutEffect } from 'react';
 
+// nextjs
+import { useRouter } from 'next/navigation';
+
 // daisyui
 import { Menu } from 'react-daisyui';
 
@@ -30,6 +33,9 @@ export default function BroadcastScheduleContent(
 ) {
   // props
   const { channels } = props;
+
+  // nextjs
+  const router = useRouter();
 
   // state
   const [selectChannelId, setSelectChannelId] = useState<number>(
@@ -67,6 +73,16 @@ export default function BroadcastScheduleContent(
       .toDate();
 
     setSelectDate(prevDate);
+  };
+
+  const handleMoveAssetPage = (scheduleId: number) => {
+    const schedule = schedules.find((item) => item.scheduleId === scheduleId);
+
+    if (!schedule || schedule.status !== 'SUCCESS') {
+      return;
+    }
+
+    router.push(`/asset/${schedule.asset.assetId}`);
   };
 
   return (
@@ -109,7 +125,10 @@ export default function BroadcastScheduleContent(
         </div>
         {/* 스케쥴 목록 */}
         <div className="col-span-1 mt-3">
-          <ScheduleList schedules={schedules} />
+          <ScheduleList
+            schedules={schedules}
+            onRowClick={handleMoveAssetPage}
+          />
         </div>
       </div>
     </div>

@@ -44,10 +44,10 @@ export default function AssetPlayeContents(props: AssetPlayeContentsProps) {
           src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&${Date.now()}`}
         />
       </div>
-      <div className="col-span-1 mt-2">
+      <div className="col-span-1 mt-2 p-5">
         <h2 className="text-xl font-bold">{title}</h2>
       </div>
-      <div className="col-span-1">
+      <div className="col-span-1 h-32 mx-4 px-5 py-1 rounded-xl shadow-xl">
         <h4 className="text-md ">
           <span className="font-bold">{createdBy}</span>
           <span> - </span>

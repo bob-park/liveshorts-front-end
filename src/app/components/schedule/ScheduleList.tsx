@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 
 type ScheduleListProps = {
   schedules: RecordSchedule[];
+  onRowClick?: (scheduleId: number) => void;
 };
 
 function parseStatus(status: ScheduleStauts) {
@@ -118,7 +119,7 @@ const ScheduleListItem = ({ schedule }: { schedule: RecordSchedule }) => {
 
 export default function ScheduleList(props: ScheduleListProps) {
   // props
-  const { schedules } = props;
+  const { schedules, onRowClick } = props;
 
   // useLayoutEffect
   useLayoutEffect(() => {
@@ -143,6 +144,11 @@ export default function ScheduleList(props: ScheduleListProps) {
     scrollTo({ top: scrollTop, behavior: 'smooth' });
   }, [schedules]);
 
+  // handle
+  const handleRowClick = (scheduleId: number) => {
+    onRowClick && onRowClick(scheduleId);
+  };
+
   return (
     <div className="grid grid-cols-1 gap-1">
       {schedules.map((schedule) => (
@@ -150,6 +156,7 @@ export default function ScheduleList(props: ScheduleListProps) {
           key={`schedule-item-${schedule.scheduleId}`}
           id={`schedule-item-${schedule.scheduleId}`}
           className="mx-10 my-1"
+          onClick={() => handleRowClick(schedule.scheduleId)}
         >
           <ScheduleListItem schedule={schedule} />
         </div>

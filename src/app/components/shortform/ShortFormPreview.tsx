@@ -37,6 +37,8 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
       );
       setShortFormProgress(0);
       setIsPlay(false);
+
+      // shortFormRef.current?.load();
     }
   }, [show, task]);
 
@@ -46,6 +48,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
 
     if (shortFormRef.current) {
       shortFormRef.current.pause();
+      onBackdrop && onBackdrop();
     }
   };
 
@@ -53,12 +56,19 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
     !isPlay ? shortFormRef.current?.play() : shortFormRef.current?.pause();
   };
 
+  const handleKeyboardDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Escape') {
+      handleBackdrop();
+    }
+  };
+
   return (
     <dialog
       id="short_form_preview_modal"
       className="modal modal-bottom sm:modal-middle"
+      onKeyDownCapture={handleKeyboardDown}
     >
-      <div className="modal-box">
+      <div className="modal-box h-full">
         <form method="dialog">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -69,7 +79,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
         </form>
         <h3 className="font-bold text-lg">숏폼 미리보기</h3>
         <div
-          className="grid grid-cols-1 size-full mt-5 relative"
+          className="grid grid-cols-1 w-full h-fit mt-5 relative"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
@@ -89,19 +99,23 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
                 }}
                 onPlay={() => setIsPlay(true)}
                 onPause={() => setIsPlay(false)}
+                onLoadedMetadata={(e) => e.currentTarget.play()}
               />
             )}
           </div>
-          <div className="absolute top-3 left-0 w-full px-4 ">
-            <div className="relative w-full h-1 bg-gray-400">
-              <div
-                className={`absolute top-0 left-0 bg-white h-1 ${
-                  isPlay ? 'transition-all duration-[1000ms]' : ''
-                }`}
-                style={{ width: `${shortFormProgress}%` }}
-              ></div>
+
+          {task && (
+            <div className="absolute top-3 left-0 w-full px-4 ">
+              <div className="relative w-full h-1 bg-gray-400">
+                <div
+                  className={`absolute top-0 left-0 bg-white h-1 ${
+                    isPlay ? 'transition-all duration-500' : ''
+                  }`}
+                  style={{ width: `${shortFormProgress}%` }}
+                ></div>
+              </div>
             </div>
-          </div>
+          )}
           <div
             className={`absolute top-0 left-0 size-full rounded-2xl transition-opacity duration-300 ${
               hover
