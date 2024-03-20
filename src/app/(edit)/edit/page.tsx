@@ -1,9 +1,9 @@
-import CreateShorts from "./CreateShorts";
+import EditShorts from "./EditShorts";
 
 export default async function Create() {
   return (
     <div className="h-full">
-      <CreateShorts />
+      <EditShorts />
     </div>
   );
 }

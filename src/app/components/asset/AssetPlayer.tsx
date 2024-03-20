@@ -1,22 +1,15 @@
-'use client';
+"use client";
 
 // react
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // daisy ui
-import { Button, Progress } from 'react-daisyui';
+import { Button, Progress } from "react-daisyui";
 
 // react icons
-import {
-  IoPlay,
-  IoStop,
-  IoVolumeHigh,
-  IoVolumeMedium,
-  IoVolumeLow,
-  IoVolumeOff,
-} from 'react-icons/io5';
-import { RxLoop } from 'react-icons/rx';
-import { secondToTimecode } from '@/utils/common';
+import { IoPlay, IoStop, IoVolumeHigh, IoVolumeMedium, IoVolumeLow, IoVolumeOff } from "react-icons/io5";
+import { RxLoop } from "react-icons/rx";
+import { secondToTimecode } from "@/utils/common";
 
 type AssetPlayerProps = {
   src: string;
@@ -34,8 +27,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const [isLoop, setIsLoop] = useState<boolean>(false);
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [videoDuration, setVideoDuration] = useState<number>(0);
-  const [showVideoPlayBackRate, setShowVideoPlayBackRate] =
-    useState<boolean>(false);
+  const [showVideoPlayBackRate, setShowVideoPlayBackRate] = useState<boolean>(false);
   const [videoPlayBackRate, setVideoPlayBackRate] = useState<number>(50);
 
   // useEffect
@@ -92,20 +84,14 @@ export default function AssetPlayer(props: AssetPlayerProps) {
         ref={videoRef}
         src={src}
         onLoadedMetadataCapture={handleLoadedMetadata}
-        onTimeUpdate={(e) =>
-          setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)
-        }
+        onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
         onPause={(e) => setIsPlay(false)}
         onPlay={(e) => setIsPlay(true)}
       />
       <div className="col-span-1">
         <div className="grid grid-cols-1">
           <div className="col-span-1 py-3 relative">
-            <progress
-              className="progress w-full"
-              max={100}
-              value={videoProgress}
-            />
+            <progress className="progress w-full" max={100} value={videoProgress} />
             <input
               className="range w-full transition opacity-0 hover:opacity-100 absolute top-3 left-0"
               type="range"
@@ -119,30 +105,14 @@ export default function AssetPlayer(props: AssetPlayerProps) {
               <div className="col-span-1 text-start">
                 <div className="flex gap-2">
                   {/* 재생 버튼 */}
-                  <div className="tooltip" data-tip={isPlay ? '정지' : '재생'}>
-                    <Button
-                      className=""
-                      type="button"
-                      shape="square"
-                      onClick={handlePlay}
-                      active={isPlay}
-                    >
-                      {isPlay ? (
-                        <IoStop className="w-5" />
-                      ) : (
-                        <IoPlay className="w-5" />
-                      )}
+                  <div className="tooltip" data-tip={isPlay ? "정지" : "재생"}>
+                    <Button className="" type="button" shape="square" onClick={handlePlay} active={isPlay}>
+                      {isPlay ? <IoStop className="w-5" /> : <IoPlay className="w-5" />}
                     </Button>
                   </div>
                   {/* 루프 버튼 */}
                   <div className="tooltip" data-tip="반복">
-                    <Button
-                      className=""
-                      type="button"
-                      shape="square"
-                      active={isLoop}
-                      onClick={handleToggleLoop}
-                    >
+                    <Button className="" type="button" shape="square" active={isLoop} onClick={handleToggleLoop}>
                       <RxLoop className="" />
                     </Button>
                   </div>
@@ -152,9 +122,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                       <Button
                         type="button"
                         shape="square"
-                        onClick={() =>
-                          setShowVideoPlayBackRate(!showVideoPlayBackRate)
-                        }
+                        onClick={() => setShowVideoPlayBackRate(!showVideoPlayBackRate)}
                         active={showVideoPlayBackRate}
                       >
                         {`${0.5 + videoPlayBackRate / 100}x`}
@@ -162,9 +130,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                     </div>
                     <div
                       className={`w-96 h-20 px-2 bg-slate-900 absolute bottom-20 left-3 z-10 transition-opacity duration-300 rounded-xl shadow-lg ${
-                        showVideoPlayBackRate
-                          ? 'opacity-100'
-                          : 'opacity-0 invisible'
+                        showVideoPlayBackRate ? "opacity-100" : "opacity-0 invisible"
                       }`}
                     >
                       <div className="grid grid-cols-1 justify-center items-center w-full h-full">
@@ -210,26 +176,16 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                         <IoVolumeHigh className="" />
                       </Button>
                       <div className="w-16">
-                        <input
-                          className="range range-xs"
-                          type="range"
-                          min={0}
-                          max="100"
-                          defaultValue="100"
-                        />
+                        <input className="range range-xs" type="range" min={0} max="100" defaultValue="100" />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="col-span-1 text-center">
-                <span className="font-semibold text-black">
-                  {secondToTimecode(videoRef.current?.currentTime || 0)}
-                </span>
+                <span className="font-semibold text-black">{secondToTimecode(videoRef.current?.currentTime || 0)}</span>
                 <span> / </span>
-                <span className="font-semibold text-gray-500">
-                  {secondToTimecode(videoDuration)}
-                </span>
+                <span className="font-semibold text-gray-500">{secondToTimecode(videoDuration)}</span>
               </div>
               <div className="col-span-1 text-right">화질 비디오 크기 등등</div>
             </div>
