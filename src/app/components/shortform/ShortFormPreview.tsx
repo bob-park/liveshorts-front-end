@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 // react icons
-import { IoPlay, IoPause } from 'react-icons/io5';
+import { IoPlay, IoPause, IoVolumeMute, IoVolumeHigh } from 'react-icons/io5';
 
 type ShortFormViewProps = {
   show: boolean;
@@ -16,8 +16,11 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
 
   // state
   const [isPlay, setIsPlay] = useState<boolean>(false);
+  const [isMute, setIsMute] = useState<boolean>(false);
   const [shortFormSrc, setShortFormSrc] = useState<string>('');
   const [shortFormProgress, setShortFormProgress] = useState<number>(0);
+  const [loadedShortFormVideo, setLoadedShortFormVideo] =
+    useState<boolean>(false);
   const [hover, setHover] = useState<boolean>(false);
 
   // ref
@@ -37,7 +40,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
       );
       setShortFormProgress(0);
       setIsPlay(false);
-
+      setIsMute(false);
       // shortFormRef.current?.load();
     }
   }, [show, task]);
@@ -45,6 +48,8 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
   // handle
   const handleBackdrop = () => {
     onBackdrop && onBackdrop();
+
+    setLoadedShortFormVideo(false);
 
     if (shortFormRef.current) {
       shortFormRef.current.pause();
@@ -54,6 +59,14 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
 
   const handlePlay = () => {
     !isPlay ? shortFormRef.current?.play() : shortFormRef.current?.pause();
+  };
+
+  const handleMute = () => {
+    if (shortFormRef.current) {
+      shortFormRef.current.muted = !isMute;
+    }
+
+    setIsMute(!isMute);
   };
 
   const handleKeyboardDown = (e: React.KeyboardEvent<HTMLElement>) => {
@@ -68,7 +81,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
       className="modal modal-bottom sm:modal-middle"
       onKeyDownCapture={handleKeyboardDown}
     >
-      <div className="modal-box h-full">
+      <div className="modal-box min-h-[920px]">
         <form method="dialog">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -79,7 +92,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
         </form>
         <h3 className="font-bold text-lg">숏폼 미리보기</h3>
         <div
-          className="grid grid-cols-1 w-full h-fit mt-5 relative"
+          className="grid grid-cols-1 w-full size-full mt-5 relative"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
@@ -99,12 +112,15 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
                 }}
                 onPlay={() => setIsPlay(true)}
                 onPause={() => setIsPlay(false)}
-                onLoadedMetadata={(e) => e.currentTarget.play()}
+                onLoadedMetadata={(e) => {
+                  setLoadedShortFormVideo(true);
+                  e.currentTarget.play();
+                }}
               />
             )}
           </div>
 
-          {task && (
+          {loadedShortFormVideo && (
             <div className="absolute top-3 left-0 w-full px-4 ">
               <div className="relative w-full h-1 bg-gray-400">
                 <div
@@ -116,8 +132,9 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
               </div>
             </div>
           )}
+
           <div
-            className={`absolute top-0 left-0 size-full rounded-2xl transition-opacity duration-300 ${
+            className={`absolute flex justify-between top-0 left-0 size-full rounded-2xl transition-opacity duration-300 ${
               hover
                 ? 'opacity-100 bg-gradient-to-b from-black via-transparent to-black'
                 : 'opacity-0'
@@ -132,6 +149,18 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
                 <IoPause className="w-5 h-5" />
               ) : (
                 <IoPlay className="w-5 h-5" />
+              )}
+            </button>
+
+            <button
+              className="btn btn-sm btn-ghost text-white mt-5 mr-2"
+              type="button"
+              onClick={handleMute}
+            >
+              {isMute ? (
+                <IoVolumeMute className="w-5 h-5" />
+              ) : (
+                <IoVolumeHigh className="w-5 h-5" />
               )}
             </button>
           </div>

@@ -246,10 +246,10 @@ export default function AssetPlayer(props: AssetPlayerProps) {
         <div className="flex justify-center items-center relative">
           <video
             id=""
-            className={`w-full min-h-max ${
+            className={`min-h-max ${
               isFullScreen
-                ? 'max-h-[calc(100lvh-10rem)]'
-                : 'max-h-[calc(100lvh-25rem)]'
+                ? 'w-full max-h-[calc(100lvh-10rem)]'
+                : 'w-max max-h-[calc(100lvh-25rem)]'
             } object-contain rounded-xl`}
             ref={videoRef}
             src={src}
