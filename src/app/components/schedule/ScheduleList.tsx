@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 type ScheduleListProps = {
   schedules: RecordSchedule[];
   onRowClick?: (scheduleId: number) => void;
+  onReverveShortForm?: (scheduleId: number) => void;
 };
 
 function parseStatus(status: ScheduleStauts) {
@@ -43,13 +44,26 @@ function parseShortsStatus(status: ShortFormRecordScheduleStatus) {
   }
 }
 
-const ScheduleListItem = ({ schedule }: { schedule: RecordSchedule }) => {
+const ScheduleListItem = ({
+  schedule,
+  onReverveShortForm,
+}: {
+  schedule: RecordSchedule;
+  onReverveShortForm?: (scheduleId: number) => void;
+}) => {
   // state
   const [assetImageSrc, setAssetImageSrc] = useState<string>(
     `/api/v1/asset/${schedule.asset.assetId}/resource?fileType=THUMBNAIL`,
   );
 
   const [itemsHover, setItemsHover] = useState<boolean>(false);
+
+  // handle
+  const handleReverveShortForm = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    onReverveShortForm && onReverveShortForm(schedule.scheduleId);
+  };
 
   return (
     <div className="flex w-full gap-5 h-44 items-center px-5 py-2 transition ease-in-out delay-150 rounded-2xl shadow-xl hover:scale-105 hover:-translate-y-1 duration-300">
@@ -110,7 +124,16 @@ const ScheduleListItem = ({ schedule }: { schedule: RecordSchedule }) => {
             )}
           </div>
 
-          {/* 상품목록 */}
+          <div className="flex justify-start gap-4">
+            <button
+              className="btn btn-sm hover:scale-110"
+              type="button"
+              onClick={handleReverveShortForm}
+            >
+              <SiYoutubeshorts />
+              숏폼 예약
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -119,7 +142,7 @@ const ScheduleListItem = ({ schedule }: { schedule: RecordSchedule }) => {
 
 export default function ScheduleList(props: ScheduleListProps) {
   // props
-  const { schedules, onRowClick } = props;
+  const { schedules, onRowClick, onReverveShortForm } = props;
 
   // useLayoutEffect
   useLayoutEffect(() => {
@@ -158,7 +181,10 @@ export default function ScheduleList(props: ScheduleListProps) {
           className="mx-10 my-1"
           onClick={() => handleRowClick(schedule.scheduleId)}
         >
-          <ScheduleListItem schedule={schedule} />
+          <ScheduleListItem
+            schedule={schedule}
+            onReverveShortForm={onReverveShortForm}
+          />
         </div>
       ))}
     </div>

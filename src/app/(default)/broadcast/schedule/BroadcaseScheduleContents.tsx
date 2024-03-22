@@ -23,6 +23,7 @@ import { scheduleActions } from '@/store/schedule';
 
 import ScheduleDateSelector from '@/app/components/schedule/ScheduleDateSelector';
 import ScheduleList from '@/app/components/schedule/ScheduleList';
+import ReservShortFormView from '@/app/components/schedule/ReserveShortFormView';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -46,6 +47,10 @@ export default function BroadcastScheduleContent(
   );
   const [selectDate, setSelectDate] = useState<Date>(new Date());
   const [showMoveTop, setShowMoveTop] = useState<boolean>(false);
+  const [showReserveShortForm, setShowReserveShortForm] =
+    useState<boolean>(false);
+  const [reserveRecordSchedule, setReserveRecordSchedule] =
+    useState<RecordSchedule>();
 
   // store
   const dispatch = useAppDispatch();
@@ -100,69 +105,81 @@ export default function BroadcastScheduleContent(
   };
 
   return (
-    <div className="relative">
-      <div className="grid grid-cols-1 gap-4 px-10">
-        <div className="col-span-1">
-          {/* 채널 목록 */}
-          <div className="flex gap-2 justify-start items-center">
-            <div className="w-16 text-right">
-              <h2 className="text-xl font-bold">채널</h2>
-            </div>
-            <Menu horizontal className="px-5 text-lg">
-              {channels.map((channel) => (
-                <Menu.Item
-                  key={`channel-id-${channel.channelId}`}
-                  className="mx-3"
-                >
-                  <button
-                    className={`btn btn-lg   ${
-                      selectChannelId === channel.channelId
-                        ? 'btn-neutral'
-                        : 'btn-ghost'
-                    }`}
-                    type="button"
-                    onClick={() => setSelectChannelId(channel.channelId)}
+    <>
+      <div className="relative">
+        <div className="grid grid-cols-1 gap-4 px-10">
+          <div className="col-span-1">
+            {/* 채널 목록 */}
+            <div className="flex gap-2 justify-start items-center">
+              <div className="w-16 text-right">
+                <h2 className="text-xl font-bold">채널</h2>
+              </div>
+              <Menu horizontal className="px-5 text-lg">
+                {channels.map((channel) => (
+                  <Menu.Item
+                    key={`channel-id-${channel.channelId}`}
+                    className="mx-3"
                   >
-                    {channel.channelName}
-                  </button>
-                </Menu.Item>
-              ))}
-            </Menu>
-          </div>
-          {/* 날짜 목록 */}
-          <div className="col-span-1 mt-3">
-            <ScheduleDateSelector
-              selectDate={selectDate}
-              onSelectDate={(date) => setSelectDate(date)}
-              onPrev={() => handleMoveScheduleDate(false)}
-              onNext={() => handleMoveScheduleDate(true)}
-            />
-          </div>
-          {/* 스케쥴 목록 */}
-          <div className="col-span-1 mt-3">
-            <ScheduleList
-              schedules={schedules}
-              onRowClick={handleMoveAssetPage}
-            />
-          </div>
-        </div>
-      </div>
-
-      {showMoveTop && (
-        <div className="sticky bottom-5">
-          <div className="flex justify-end">
-            <div className="tooltip" data-tip="맨 위로">
-              <button
-                className="btn btn-circle btn-neutral"
-                type="button"
-                onClick={handleScrollTop}
-              >
-                <FaArrowUp className="w-5 h-5" />
-              </button>
+                    <button
+                      className={`btn btn-lg   ${
+                        selectChannelId === channel.channelId
+                          ? 'btn-neutral'
+                          : 'btn-ghost'
+                      }`}
+                      type="button"
+                      onClick={() => setSelectChannelId(channel.channelId)}
+                    >
+                      {channel.channelName}
+                    </button>
+                  </Menu.Item>
+                ))}
+              </Menu>
+            </div>
+            {/* 날짜 목록 */}
+            <div className="col-span-1 mt-3">
+              <ScheduleDateSelector
+                selectDate={selectDate}
+                onSelectDate={(date) => setSelectDate(date)}
+                onPrev={() => handleMoveScheduleDate(false)}
+                onNext={() => handleMoveScheduleDate(true)}
+              />
+            </div>
+            {/* 스케쥴 목록 */}
+            <div className="col-span-1 mt-3">
+              <ScheduleList
+                schedules={schedules}
+                onRowClick={handleMoveAssetPage}
+                onReverveShortForm={(scheduleId) => {
+                  setReserveRecordSchedule(
+                    schedules.find((item) => item.scheduleId === scheduleId),
+                  );
+                  setShowReserveShortForm(true);
+                }}
+              />
             </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {showMoveTop && (
+          <div className="sticky bottom-5">
+            <div className="flex justify-end">
+              <div className="tooltip" data-tip="맨 위로">
+                <button
+                  className="btn btn-circle btn-neutral"
+                  type="button"
+                  onClick={handleScrollTop}
+                >
+                  <FaArrowUp className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <ReservShortFormView
+        show={showReserveShortForm}
+        onBackdrop={() => setShowReserveShortForm(false)}
+      />
+    </>
   );
 }
