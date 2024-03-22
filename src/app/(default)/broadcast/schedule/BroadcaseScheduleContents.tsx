@@ -45,6 +45,7 @@ export default function BroadcastScheduleContent(
     channels[0].channelId,
   );
   const [selectDate, setSelectDate] = useState<Date>(new Date());
+  const [showMoveTop, setShowMoveTop] = useState<boolean>(false);
 
   // store
   const dispatch = useAppDispatch();
@@ -54,6 +55,12 @@ export default function BroadcastScheduleContent(
   useLayoutEffect(() => {
     handleGetSchedule();
   }, [selectChannelId, selectDate]);
+
+  useLayoutEffect(() => {
+    screen.height;
+
+    setShowMoveTop(document.body.offsetHeight > screen.availHeight);
+  }, [schedules]);
 
   // handle
   const handleGetSchedule = () => {
@@ -140,17 +147,20 @@ export default function BroadcastScheduleContent(
           </div>
         </div>
       </div>
-      <div className="sticky bottom-5">
-        <div className="flex justify-end">
-          <button
-            className="btn btn-circle btn-neutral"
-            type="button"
-            onClick={handleScrollTop}
-          >
-            <FaArrowUp className="w-5 h-5" />
-          </button>
+
+      {showMoveTop && (
+        <div className="sticky bottom-5">
+          <div className="flex justify-end">
+            <button
+              className="btn btn-circle btn-neutral"
+              type="button"
+              onClick={handleScrollTop}
+            >
+              <FaArrowUp className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
