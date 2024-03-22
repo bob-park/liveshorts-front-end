@@ -297,7 +297,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       isShortForm: undefined,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 20,
+      size: 30,
     });
   };
 

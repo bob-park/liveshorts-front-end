@@ -139,7 +139,7 @@ export default function ScheduleList(props: ScheduleListProps) {
       return;
     }
 
-    const scrollTop = scheduleTag.offsetTop;
+    const scrollTop = scheduleTag.offsetTop - 100;
 
     scrollTo({ top: scrollTop, behavior: 'smooth' });
   }, [schedules]);
