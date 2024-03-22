@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import AssetPlayer from "@/app/components/asset/AssetPlayer";
 
 const TEST_ASSET_ID = "20";
 
@@ -29,14 +28,15 @@ export default function EditShorts() {
   };
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    // e.currentTarget.play();
     setVideoDuration(e.currentTarget.duration);
+    setVideoProgress(0);
   };
 
   return (
     <div className="grid grid-rows-[1fr,300px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
+
         <div className="">
           <video
             controls
@@ -44,24 +44,24 @@ export default function EditShorts() {
             src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
             onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
             onLoadedMetadataCapture={handleLoadedMetadata}
-            onPause={(e) => setIsPlay(false)}
-            onPlay={(e) => setIsPlay(true)}
+            onPause={() => setIsPlay(false)}
+            onPlay={() => setIsPlay(true)}
             className="w-full"
           ></video>
         </div>
       </div>
 
-      <div className="relative">
-        {/* <progress className="progress w-full" max={100} value={videoProgress} /> */}
-
-        <input className="w-full" type="range" max="100" value={videoProgress} onChange={handleChangeProgress} />
-        {/* <input
-          className="range w-full rounded-none transition opacity-0 hover:opacity-100 absolute top-3 left-0"
+      <div className="relative h-full">
+        <input
+          className="w-full progress bg-neutral-100 h-full rounded-none"
           type="range"
-          max="100"
+          min={0}
+          max={100}
           value={videoProgress}
+          defaultValue={0}
           onChange={handleChangeProgress}
-        /> */}
+        />
+        <div className="w-full"></div>
       </div>
     </div>
   );

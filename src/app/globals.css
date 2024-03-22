@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.progress {
+  -webkit-appearance: none;
+}
+
+.progress:focus {
+  outline: none;
+}
+
+.progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #000000;
+  cursor: pointer;
+  height: 100%;
+  width: 2px;
+  border-radius: 0;
+}
