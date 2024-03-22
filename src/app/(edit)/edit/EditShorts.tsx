@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 
 const TEST_ASSET_ID = "20";
 
@@ -18,6 +19,7 @@ export default function EditShorts() {
   const [section, setSection] = useState({ startTime: 0, endTime: 60 });
   const [isDragging, setIsDragging] = useState(false);
   const [positionX, setPositionX] = useState<number>(0);
+  const [progressWidthPercent, setProgressWidthPercent] = useState(100);
 
   // useEffect
   useEffect(() => {
@@ -58,9 +60,9 @@ export default function EditShorts() {
 
     const handleWindowResize = () => {
       if (progressRef.current && sectionBoxRef.current) {
-        const parentWidth = progressRef.current.clientWidth;
-        const divWidth = sectionBoxRef.current.clientWidth;
-        const maxX = parentWidth - divWidth;
+        const ProgressWidth = progressRef.current.clientWidth;
+        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+        const maxX = ProgressWidth - sectionBoxWidth;
 
         setPositionX((prevX) => Math.min(prevX, maxX));
       }
@@ -91,7 +93,7 @@ export default function EditShorts() {
   };
 
   return (
-    <div className="grid grid-rows-[1fr,300px] h-full">
+    <div className="grid grid-rows-[1fr,300px] h-full overflow-hidden">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
@@ -109,31 +111,59 @@ export default function EditShorts() {
         </div>
       </div>
 
-      <div ref={progressRef} className="w-full relative bg-neutral-50 bg-opacity-25">
-        <div className="w-full h-1/4 bg-neutral-50 absolute top-1/4 border-t border-neutral-500">bgm</div>
-        <div className="w-full h-1/4 bg-neutral-50 absolute top-2/4 border-t border-neutral-500">title</div>
-        <div className="w-full h-1/4 bg-neutral-50 absolute top-3/4 border-t border-neutral-500">subtitle</div>
-        <input
-          className="w-full progress h-full rounded-none"
-          type="range"
-          min={0}
-          max={100}
-          value={videoProgress}
-          defaultValue={0}
-          onChange={handleChangeProgress}
-        />
+      <div className="grid grid-rows-[50px,50px,250px] overflow-scroll">
+        <div>도구</div>
+        <div className="flex">
+          <button
+            onClick={() => {
+              setProgressWidthPercent(progressWidthPercent * 0.1);
+            }}
+            className="w-10"
+          >
+            <FaMagnifyingGlassPlus className="w-8" />
+          </button>
+          <button
+            onClick={() => {
+              setProgressWidthPercent(progressWidthPercent * 0.1);
+            }}
+          >
+            <FaMagnifyingGlassMinus />
+          </button>
+        </div>
         <div
-          ref={sectionBoxRef}
-          style={{
-            width: `${((section.endTime - section.startTime) / videoDuration) * 100}%`,
-            height: "25%",
-            position: "absolute",
-            left: `${(positionX / (progressRef.current?.clientWidth || 1)) * 100}%`,
-            cursor: "grab",
-          }}
-          onMouseDown={handleMouseDown}
-          className="absolute top-0 bg-neutral-400 cursor-pointer opacity-30 hover:opacity-60"
-        ></div>
+          ref={progressRef}
+          style={{ width: `${progressWidthPercent}%` }}
+          className="relative bg-neutral-50 bg-opacity-25"
+        >
+          <div className="w-full h-1/4 bg-neutral-50 absolute top-1/4 border-t border-neutral-500">bgm</div>
+          <div className="w-full h-1/4 bg-neutral-50 absolute top-2/4 border-t border-neutral-500">title</div>
+          <div className="w-full h-1/4 bg-neutral-50 absolute top-3/4 border-t border-neutral-500">subtitle</div>
+          <input
+            className="w-full progress h-full rounded-none"
+            type="range"
+            min={0}
+            max={100}
+            value={videoProgress}
+            defaultValue={0}
+            onChange={handleChangeProgress}
+          />
+
+          <div
+            ref={sectionBoxRef}
+            style={{
+              width: `${((section.endTime - section.startTime) / videoDuration) * 100}%`,
+              height: "25%",
+              position: "absolute",
+              left: `${(positionX / (progressRef.current?.clientWidth || 1)) * 100}%`,
+              cursor: "grab",
+            }}
+            onMouseDown={handleMouseDown}
+            className="absolute top-0 bg-neutral-400 cursor-pointer opacity-30 hover:opacity-60"
+          >
+            <div className="absolute top-0 -left-10">왼쪽</div>
+            <div className="absolute top-0 left-10">오른쪽</div>
+          </div>
+        </div>
       </div>
     </div>
   );
