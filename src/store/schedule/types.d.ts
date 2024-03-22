@@ -34,6 +34,7 @@ type ShortFormItemRange = {
 
 type ShortFormRecordSchedule = {
   id: string;
+  schedule?: RecordSchedule;
   status: ShortFormRecordScheduleStatus;
   ranges: ShortFormItemRange[];
   createdDate: Date;

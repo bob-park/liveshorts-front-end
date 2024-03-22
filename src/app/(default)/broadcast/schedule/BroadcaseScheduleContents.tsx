@@ -30,7 +30,7 @@ type BroadcastScheduleContentProps = {
 };
 
 // action
-const { requestGetSchedule } = scheduleActions;
+const { requestGetSchedule, requestAddShortFormSchedule } = scheduleActions;
 
 export default function BroadcastScheduleContent(
   props: BroadcastScheduleContentProps,
@@ -102,6 +102,32 @@ export default function BroadcastScheduleContent(
 
   const handleScrollTop = () => {
     scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleReserveShortFormSchedule = (
+    items: { itemId: string; startTime: string; endTime: string }[],
+  ) => {
+    if (!reserveRecordSchedule) {
+      return;
+    }
+
+    dispatch(
+      requestAddShortFormSchedule({
+        request: {
+          channelId: selectChannelId,
+          scheduleId: reserveRecordSchedule.scheduleId,
+          ranges: items.map((item) => {
+            return {
+              itemId: item.itemId,
+              time: {
+                startTime: item.startTime,
+                endTime: item.endTime,
+              },
+            };
+          }),
+        },
+      }),
+    );
   };
 
   return (
@@ -180,6 +206,7 @@ export default function BroadcastScheduleContent(
         show={showReserveShortForm}
         schedule={reserveRecordSchedule}
         onBackdrop={() => setShowReserveShortForm(false)}
+        onRequest={handleReserveShortFormSchedule}
       />
     </>
   );

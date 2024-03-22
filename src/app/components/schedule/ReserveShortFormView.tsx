@@ -17,6 +17,7 @@ type ReservShortFormViewProps = {
   show: boolean;
   schedule?: RecordSchedule;
   onBackdrop?: () => void;
+  onRequest?: (items: ReserveItem[]) => void;
 };
 
 type ReserveItem = {
@@ -27,7 +28,7 @@ type ReserveItem = {
 
 export default function ReservShortFormView(props: ReservShortFormViewProps) {
   // props;
-  const { show, schedule, onBackdrop } = props;
+  const { show, schedule, onBackdrop, onRequest } = props;
 
   // state
   const [reserveItems, setReserveItems] = useState<ReserveItem[]>([]);
@@ -115,6 +116,16 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
 
       return newReserveItems;
     });
+  };
+
+  const handleRequest = () => {
+    if (reserveItems.length === 0) {
+      return;
+    }
+
+    onRequest && onRequest(reserveItems);
+
+    handleBackdrop();
   };
 
   return (
@@ -224,15 +235,15 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
           </div>
 
           {/* 예약 추가된 목록 */}
-          <div className="col-span-3 mt-2 h-72 overflow-auto shadow-xl rounded-xl">
+          <div className="col-span-3 mt-2 w-full h-72 overflow-auto shadow-xl rounded-xl">
             {reserveItems.map((reserveItem) => (
               <div
                 key={`reserve-list-item-${reserveItem.itemId}`}
-                className="flex gap-2 justify-start items-center m-2 p-2 relative rounded-xl bg-slate-300"
+                className="grid grid-cols-1 gap-2 justify-start items-center m-2 p-2 relative rounded-xl bg-slate-300"
               >
-                <div className="flex-none">
+                <div className="mr-10">
                   <div
-                    className="tooltip"
+                    className="tooltip w-full"
                     data-tip={
                       schedule?.options?.shopItems?.find(
                         (item) => item.itemId === reserveItem.itemId,
@@ -274,6 +285,7 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
               className="btn btn-neutral hover:scale-105"
               type="button"
               disabled={reserveItems.length === 0}
+              onClick={handleRequest}
             >
               <SiYoutubeshorts
                 className={`w-6 h-6 ${
