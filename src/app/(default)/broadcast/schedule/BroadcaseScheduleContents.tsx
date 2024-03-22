@@ -151,13 +151,15 @@ export default function BroadcastScheduleContent(
       {showMoveTop && (
         <div className="sticky bottom-5">
           <div className="flex justify-end">
-            <button
-              className="btn btn-circle btn-neutral"
-              type="button"
-              onClick={handleScrollTop}
-            >
-              <FaArrowUp className="w-5 h-5" />
-            </button>
+            <div className="tooltip" data-tip="맨 위로">
+              <button
+                className="btn btn-circle btn-neutral"
+                type="button"
+                onClick={handleScrollTop}
+              >
+                <FaArrowUp className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       )}
