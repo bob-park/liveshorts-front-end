@@ -178,6 +178,7 @@ export default function BroadcastScheduleContent(
       </div>
       <ReservShortFormView
         show={showReserveShortForm}
+        schedule={reserveRecordSchedule}
         onBackdrop={() => setShowReserveShortForm(false)}
       />
     </>

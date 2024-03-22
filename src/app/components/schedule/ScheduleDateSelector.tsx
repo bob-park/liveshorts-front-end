@@ -7,18 +7,15 @@ import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 // dayjs
 import dayjs from 'dayjs';
 
+// common
+import { getDayOfWeek } from '@/utils/common';
+
 type ScheduleDateSelectorProps = {
   selectDate: Date;
   onPrev?: () => void;
   onNext?: () => void;
   onSelectDate?: (date: Date) => void;
 };
-
-const DAY_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토'];
-
-function getDayOfWeek(dayOfWeek: number) {
-  return DAY_OF_WEEK[dayOfWeek];
-}
 
 export default function ScheduleDateSelector(props: ScheduleDateSelectorProps) {
   // props
