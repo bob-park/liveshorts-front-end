@@ -1,5 +1,4 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { TbSatellite } from 'react-icons/tb';
 
 const reducers = {
   // logged in

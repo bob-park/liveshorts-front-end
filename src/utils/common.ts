@@ -5,6 +5,12 @@ type FileSize = {
   unit: number;
 };
 
+type Status = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 const client = axios.create({
   withCredentials: true,
 });
@@ -24,6 +30,29 @@ client.interceptors.response.use(
 );
 
 const FILE_SIZE_UNITS = ['byte', 'KB', 'MB', 'GB', 'TB'];
+
+const statusList: Status[] = [
+  {
+    id: 'WAITING',
+    name: '대기',
+    color: 'neutral',
+  },
+  {
+    id: 'PROCEEDING',
+    name: '진행',
+    color: 'secondary',
+  },
+  {
+    id: 'SUCCESS',
+    name: '성공',
+    color: 'primary',
+  },
+  {
+    id: 'FAILURE',
+    name: '실패',
+    color: 'error',
+  },
+];
 
 export async function get<R>(
   url: string,
@@ -173,4 +202,16 @@ export function secondToTimecode(totalSeconds: number) {
     ':' +
     `${seconds > 9 ? seconds : `0${seconds}`}`
   );
+}
+
+export function parseStatus(status: string) {
+  const result = statusList.find((item) => item.id === status);
+
+  return result?.name;
+}
+
+export function parseStatusColor(status: string) {
+  const result = statusList.find((item) => item.id === status);
+
+  return result?.color;
 }

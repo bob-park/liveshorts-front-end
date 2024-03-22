@@ -12,12 +12,13 @@ import { RiUserFill, RiLock2Fill } from 'react-icons/ri';
 type LoginFormProps = {
   msg?: string;
   isLoggingIn: boolean;
+  isLoggedIn: boolean;
   onLogin?: (userId: string, password: string) => void;
 };
 
 export default function LoginForm(props: LoginFormProps) {
   // props
-  const { onLogin, isLoggingIn, msg } = props;
+  const { onLogin, isLoggingIn, isLoggedIn, msg } = props;
 
   // state
   const [userId, setUserId] = useState<string>('');
@@ -67,9 +68,11 @@ export default function LoginForm(props: LoginFormProps) {
           animation
           color="neutral"
           loading={isLoggingIn}
-          disabled={isLoggingIn}
+          disabled={isLoggingIn || isLoggedIn}
         >
-          {isLoggingIn ? '로그인 중' : '로그인'}
+          {!isLoggedIn && isLoggingIn && '로그인 중'}
+          {!isLoggedIn && !isLoggingIn && '로그인'}
+          {isLoggedIn && !isLoggingIn && '로그인 완료'}
         </Button>
       </div>
 
