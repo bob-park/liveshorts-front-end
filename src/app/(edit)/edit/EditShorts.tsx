@@ -112,11 +112,10 @@ export default function EditShorts() {
       </div>
 
       <div className="grid grid-rows-[50px,50px,250px] overflow-scroll">
-        <div>도구</div>
         <div className="flex">
           <button
             onClick={() => {
-              setProgressWidthPercent(progressWidthPercent * 0.1);
+              setProgressWidthPercent(progressWidthPercent * 1.5);
             }}
             className="w-10"
           >
@@ -124,12 +123,15 @@ export default function EditShorts() {
           </button>
           <button
             onClick={() => {
-              setProgressWidthPercent(progressWidthPercent * 0.1);
+              setProgressWidthPercent(progressWidthPercent * 0.5);
             }}
           >
             <FaMagnifyingGlassMinus />
           </button>
         </div>
+
+        <div>도구</div>
+
         <div
           ref={progressRef}
           style={{ width: `${progressWidthPercent}%` }}
