@@ -1,5 +1,5 @@
 type MetadataSchema = {
-  scheamId: string;
+  schemaId: string;
   dataType: 'STRING' | 'DATE' | 'NUMBER';
   name: string;
 };
@@ -29,6 +29,7 @@ type Asset = {
   createdBy: string;
   shortFormCount: number;
   uploadSnsCount: number;
+  assetMetadataList: AssetMeta[];
 };
 
 type AssetType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';
