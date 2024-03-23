@@ -3,6 +3,9 @@
 // react
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
+// nextjs
+import { useParams } from 'next/navigation';
+
 // react icons
 import { SiYoutubeshorts } from 'react-icons/si';
 import { CgPlayListRemove } from 'react-icons/cg';
@@ -13,8 +16,8 @@ import { TbReload } from 'react-icons/tb';
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 import { shortFormActions } from '@/store/shortform';
-import ShortFormList from '@/app/components/shortform/ShortFormList';
-import ShortFormPreview from '@/app/components/shortform/ShortFormPreview';
+import ShortFormList from '@/components/shortform/ShortFormList';
+import ShortFormPreview from '@/components/shortform/ShortFormPreview';
 
 // action
 const { requestSearchShortFormTask } = shortFormActions;
@@ -59,13 +62,23 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // handle
   const handleShowPreview = (taskId: string) => {
-    setShowPreview(true);
+    const previewTask = tasks.find((item) => item.id === taskId);
 
-    setPreivewTask(tasks.find((item) => item.id === taskId));
+    if (previewTask?.status !== 'SUCCESS') {
+      return;
+    }
+
+    setShowPreview(true);
+    setPreivewTask(previewTask);
   };
 
   const handleGetShortFormTask = () => {
     dispatch(requestSearchShortFormTask({ assetId }));
+  };
+
+  const handleClosePreview = () => {
+    setShowPreview(false);
+    setPreivewTask(undefined);
   };
 
   return (
@@ -107,7 +120,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       <ShortFormPreview
         show={showPreview}
         task={previewTask}
-        onBackdrop={() => setShowPreview(false)}
+        onBackdrop={handleClosePreview}
       />
     </div>
   );

@@ -21,10 +21,10 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 // componets
-import AssetViewItem from '@/app/components/asset/AssetViewItem';
-import AssetListItem from '@/app/components/asset/AssetListItem';
-import SkeletonAssetViewItem from '@/app/components/asset/SkeletonAssetViewItem';
-import SkeletonAssetListItem from '@/app/components/asset/SkeletonAssetListItem';
+import AssetViewItem from '@/components/asset/AssetViewItem';
+import AssetListItem from '@/components/asset/AssetListItem';
+import SkeletonAssetViewItem from '@/components/asset/SkeletonAssetViewItem';
+import SkeletonAssetListItem from '@/components/asset/SkeletonAssetListItem';
 
 // dayjs
 import dayjs from 'dayjs';
@@ -248,7 +248,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
           channels.find(
             (item) => item.channelId === searchAssetParams.channelId,
-          )?.name || ''
+          )?.channelId || ''
         }`,
       );
 
@@ -297,7 +297,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       isShortForm: undefined,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 20,
+      size: 30,
     });
   };
 
@@ -334,7 +334,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                       type="text"
                       className="grow"
                       placeholder="키워드"
-                      defaultValue={searchAssetParams.title}
+                      value={searchAssetParams.title}
                       onChange={(e) =>
                         setSearchAssetParams({
                           ...searchAssetParams,
@@ -486,6 +486,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                 <div className="col-span-2">
                   <Datepicker
                     placeholder="날짜 선택"
+                    useRange={false}
                     inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
                     asSingle
                     value={{

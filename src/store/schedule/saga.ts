@@ -18,6 +18,10 @@ const {
   requestGetSchedule,
   successGetSchedule,
   failureGetSchedule,
+  // add short form schedule
+  requestAddShortFormSchedule,
+  successAddShortFormSchedule,
+  failureAddShortFormSchedule,
 } = scheduleActions;
 
 // get scheudle
@@ -44,6 +48,30 @@ function* watchGetSchedule() {
   yield takeLatest(requestGetSchedule, callGetSchedule);
 }
 
+// add short form  schedule
+function* callAddShortFormSchedule(
+  action: ReturnType<typeof requestAddShortFormSchedule>,
+) {
+  const { request } = action.payload;
+
+  const result: ApiResult<ShortFormRecordSchedule> = yield call(
+    post,
+    '/api/v1/shorts/task/record/schedule',
+    request,
+  );
+
+  if (result.state === 'FAILURE') {
+    yield put(failureAddShortFormSchedule());
+    return;
+  }
+
+  yield put(successAddShortFormSchedule({ result: result.data || undefined }));
+}
+
+function* watchAddShortFormSchedule() {
+  yield takeLatest(requestAddShortFormSchedule, callAddShortFormSchedule);
+}
+
 export default function* shortFormSagas() {
-  yield all([fork(watchGetSchedule)]);
+  yield all([fork(watchGetSchedule), fork(watchAddShortFormSchedule)]);
 }

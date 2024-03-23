@@ -31,6 +31,8 @@ client.interceptors.response.use(
 
 const FILE_SIZE_UNITS = ['byte', 'KB', 'MB', 'GB', 'TB'];
 
+const DAY_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토'];
+
 const statusList: Status[] = [
   {
     id: 'WAITING',
@@ -214,4 +216,8 @@ export function parseStatusColor(status: string) {
   const result = statusList.find((item) => item.id === status);
 
   return result?.color;
+}
+
+export function getDayOfWeek(dayOfWeek: number) {
+  return DAY_OF_WEEK[dayOfWeek];
 }

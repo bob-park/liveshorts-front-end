@@ -8,7 +8,7 @@ type ScheduleOptions = {
   shopItems?: ShopItem[];
 };
 type ShortFormRecordScheduleStatus =
-  | 'ABORD'
+  | 'ABORT'
   | 'WAITING'
   | 'PROCEEDING'
   | 'SUCCESS'
@@ -34,6 +34,7 @@ type ShortFormItemRange = {
 
 type ShortFormRecordSchedule = {
   id: string;
+  schedule?: RecordSchedule;
   status: ShortFormRecordScheduleStatus;
   ranges: ShortFormItemRange[];
   createdDate: Date;

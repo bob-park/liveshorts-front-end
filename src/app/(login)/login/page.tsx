@@ -4,7 +4,7 @@
 import { useState, useLayoutEffect } from 'react';
 
 // nextjs
-import LoginForm from '@/app/components/user/LoginForm';
+import LoginForm from '@/components/user/LoginForm';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 

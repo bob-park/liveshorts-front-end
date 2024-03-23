@@ -9,7 +9,7 @@ import { Button } from 'react-daisyui';
 // react icons
 import {
   IoPlay,
-  IoStop,
+  IoPause,
   IoVolumeHigh,
   IoVolumeMedium,
   IoVolumeLow,
@@ -77,7 +77,7 @@ const PlayerStatusView = (props: {
         <>
           <div></div>
           <div className="flex justify-center items-center text-gray-400 opacity-100">
-            <IoStop className="w-48 h-48" />
+            <IoPause className="w-48 h-48" />
           </div>
           <div></div>
         </>
@@ -114,6 +114,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // state
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [isPlay, setIsPlay] = useState<boolean>(false);
   const [isLoop, setIsLoop] = useState<boolean>(false);
   const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -139,6 +140,9 @@ export default function AssetPlayer(props: AssetPlayerProps) {
         setIsFullScreen(false);
       }
     });
+
+    videoRef.current?.load();
+    // videoRef.current?.play();
   }, []);
 
   // handle
@@ -147,8 +151,10 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   };
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    e.currentTarget.play();
+    // e.currentTarget.load();
     setVideoDuration(e.currentTarget.duration);
+    setVideoProgress(0);
+    setLoaded(true);
   };
 
   const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,13 +245,18 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 h-full">
-        <div className="flex justify-center items-center relative">
+        <div className="flex justify-center items-center relative min-h-96">
+          {!loaded && (
+            <div className="flex justify-center items-center absolute top-0 left-0 p-2 w-full h-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+              <span className="loading loading-spinner loading-lg text-white" />
+            </div>
+          )}
           <video
             id=""
-            className={`w-full min-h-max ${
+            className={`min-h-max ${
               isFullScreen
-                ? 'max-h-[calc(100lvh-10rem)]'
-                : 'max-h-[calc(100lvh-25rem)]'
+                ? 'w-full max-h-[calc(100lvh-10rem)]'
+                : 'w-max max-h-[calc(100lvh-25rem)]'
             } object-contain rounded-xl`}
             ref={videoRef}
             src={src}
@@ -301,7 +312,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                       active={isPlay}
                     >
                       {isPlay ? (
-                        <IoStop className="w-5" />
+                        <IoPause className="w-5" />
                       ) : (
                         <IoPlay className="w-5" />
                       )}
