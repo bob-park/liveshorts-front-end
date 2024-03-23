@@ -21,9 +21,9 @@ import dayjs from 'dayjs';
 // store
 import { scheduleActions } from '@/store/schedule';
 
-import ScheduleDateSelector from '@/app/components/schedule/ScheduleDateSelector';
-import ScheduleList from '@/app/components/schedule/ScheduleList';
-import ReservShortFormView from '@/app/components/schedule/ReserveShortFormView';
+import ScheduleDateSelector from '@/components/schedule/ScheduleDateSelector';
+import ScheduleList from '@/components/schedule/ScheduleList';
+import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];

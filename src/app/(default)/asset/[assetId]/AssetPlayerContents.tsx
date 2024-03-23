@@ -1,6 +1,6 @@
 'use client';
 
-import AssetPlayer from '@/app/components/asset/AssetPlayer';
+import AssetPlayer from '@/components/asset/AssetPlayer';
 // react
 import {} from 'react';
 

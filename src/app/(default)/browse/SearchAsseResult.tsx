@@ -21,10 +21,10 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 // componets
-import AssetViewItem from '@/app/components/asset/AssetViewItem';
-import AssetListItem from '@/app/components/asset/AssetListItem';
-import SkeletonAssetViewItem from '@/app/components/asset/SkeletonAssetViewItem';
-import SkeletonAssetListItem from '@/app/components/asset/SkeletonAssetListItem';
+import AssetViewItem from '@/components/asset/AssetViewItem';
+import AssetListItem from '@/components/asset/AssetListItem';
+import SkeletonAssetViewItem from '@/components/asset/SkeletonAssetViewItem';
+import SkeletonAssetListItem from '@/components/asset/SkeletonAssetListItem';
 
 // dayjs
 import dayjs from 'dayjs';

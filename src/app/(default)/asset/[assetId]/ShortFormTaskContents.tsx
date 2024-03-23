@@ -16,8 +16,8 @@ import { TbReload } from 'react-icons/tb';
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 import { shortFormActions } from '@/store/shortform';
-import ShortFormList from '@/app/components/shortform/ShortFormList';
-import ShortFormPreview from '@/app/components/shortform/ShortFormPreview';
+import ShortFormList from '@/components/shortform/ShortFormList';
+import ShortFormPreview from '@/components/shortform/ShortFormPreview';
 
 // action
 const { requestSearchShortFormTask } = shortFormActions;
