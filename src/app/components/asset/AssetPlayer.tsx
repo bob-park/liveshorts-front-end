@@ -114,6 +114,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // state
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [isPlay, setIsPlay] = useState<boolean>(false);
   const [isLoop, setIsLoop] = useState<boolean>(false);
   const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -153,6 +154,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
     // e.currentTarget.load();
     setVideoDuration(e.currentTarget.duration);
     setVideoProgress(0);
+    setLoaded(true);
   };
 
   const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,7 +245,12 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 h-full">
-        <div className="flex justify-center items-center relative">
+        <div className="flex justify-center items-center relative min-h-96">
+          {!loaded && (
+            <div className="flex justify-center items-center absolute top-0 left-0 p-2 w-full h-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+              <span className="loading loading-spinner loading-lg text-white" />
+            </div>
+          )}
           <video
             id=""
             className={`min-h-max ${
