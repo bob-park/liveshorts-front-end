@@ -1,12 +1,4 @@
-# FROM node:16.13.2-alpine
-# WORKDIR /usr/src/app
-# COPY package.json ./
-# COPY yarn.lock ./
-# RUN yarn
-# COPY . .
-# RUN yarn build
-# EXPOSE 3000
-# CMD [ "yarn", "start" ]
+
 # Install dependencies only when needed
 FROM node:21-alpine AS deps
 RUN apk add --no-cache libc6-compat
@@ -35,4 +27,7 @@ COPY --from=builder --chown=bloguser:bloggroup /app/.next/static ./.next/static
 
 EXPOSE 3000
 ENV PORT 3000
+
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
+
 CMD ["node", "server.js"]

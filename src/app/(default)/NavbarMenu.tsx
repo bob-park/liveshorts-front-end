@@ -107,17 +107,17 @@ export default function NavbarMenu(props: { token: string }) {
               />
               <Dropdown.Menu className="w-48 bg-base-100 shadow-xl ">
                 <li>
-                  <Link href="/settings/profile">
+                  <a href="#">
                     <CgProfile />
                     프로필
-                  </Link>
+                  </a>
                 </li>
 
                 <li>
-                  <Link href="/settings/users">
+                  <a href="#">
                     <AiOutlineSetting />
                     설정
-                  </Link>
+                  </a>
                 </li>
 
                 <hr />
