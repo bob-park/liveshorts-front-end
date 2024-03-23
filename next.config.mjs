@@ -10,6 +10,15 @@ const nextConfig = {
       value: process.env.NEXT_PUBLIC_APP_URL,
     },
   ],
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/browse',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
