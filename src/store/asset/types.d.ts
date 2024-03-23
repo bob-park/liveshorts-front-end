@@ -1,3 +1,15 @@
+type MetadataSchema = {
+  scheamId: string;
+  dataType: 'STRING' | 'DATE' | 'NUMBER';
+  name: string;
+};
+
+type AssetMeta = {
+  assetMetadataId: string;
+  schema: MetadataSchema;
+  metadataValue?: string;
+};
+
 type AssetState = {
   assets: Asset[];
   isLoading: boolean;

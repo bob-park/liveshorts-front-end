@@ -6,23 +6,6 @@ import AssetHeaderContents from './AssetHeaderContents';
 import AssetPlayeContents from './AssetPlayerContents';
 import ShortFormTaskContents from './ShortFormTaskContents';
 
-type Asset = {
-  assetId: number;
-  title: string;
-  description?: string;
-  assetStatus: string;
-  category: Category;
-  createdDate: Date;
-  createdBy: string;
-  lastModifiedDate?: Date;
-  lastModifiedBy?: string;
-};
-
-type Category = {
-  categoryId: number;
-  name: string;
-};
-
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
@@ -71,13 +54,7 @@ export default async function AssetPage({ params }: Props) {
       <div className="col-span-1">
         <div className="grid grid-cols-2 xl:grid-cols-3 gap-10 justify-center items-start">
           <div className="col-span-2">
-            <AssetPlayeContents
-              assetId={assetId}
-              title={asset.title}
-              description={asset.description}
-              createdDate={asset.createdDate}
-              createdBy={asset.createdBy}
-            />
+            <AssetPlayeContents asset={asset} />
           </div>
           {/* shortfrom task list */}
           <div className="col-span-2 xl:col-span-1 ">
