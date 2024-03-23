@@ -245,7 +245,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 ">
-        <div className="flex justify-center items-center relative h-full aspect-video">
+        <div className="flex justify-center items-center relative min-h-96 aspect-auto">
           {!loaded && (
             <div className="flex justify-center items-center absolute top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
               <span className="loading loading-spinner loading-lg text-white" />
@@ -257,7 +257,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
               isFullScreen
                 ? 'w-full max-h-[calc(100lvh-10rem)]'
                 : 'w-max max-h-[calc(100lvh-25rem)]'
-            } object-contain rounded-xl`}
+            } aspect-auto rounded-xl`}
             ref={videoRef}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}
