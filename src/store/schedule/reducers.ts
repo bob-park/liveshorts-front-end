@@ -44,8 +44,6 @@ const reducers = {
   ) => {
     const { result } = action.payload;
 
-    console.log(result);
-
     const schedule = result?.schedule;
 
     const newSchedules = state.schedules.slice();
@@ -53,8 +51,6 @@ const reducers = {
     const scheduleIndex = state.schedules.findIndex(
       (item) => item.scheduleId === schedule?.scheduleId,
     );
-
-    console.log(scheduleIndex);
 
     if (scheduleIndex > -1) {
       newSchedules[scheduleIndex] = {

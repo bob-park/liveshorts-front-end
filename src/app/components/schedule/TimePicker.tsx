@@ -59,59 +59,61 @@ export default function TimePicker(props: TimePickerProps) {
   };
 
   return (
-    <label className="form-control w-full max-w-xs">
-      <div className="w-full ">
-        <div className="flex gap-5 justify-center items-center">
-          <div className="flex flex-col w-16 justify-center items-center">
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => handleChangeHour(true)}
-            >
-              <IoIosArrowUp />
-            </button>
-            <div className="flex gap-2 justify-center items-center">
-              <input
-                className="w-10 text-center my-4"
-                defaultValue={hour > 9 ? hour : `0${hour}`}
-              />
-              <span>시</span>
-            </div>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => handleChangeHour(false)}
-            >
-              <IoIosArrowDown />
-            </button>
+    <div className="w-full">
+      <div className="flex gap-5 justify-center items-center">
+        <div className="flex flex-col w-16 justify-center items-center">
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => handleChangeHour(true)}
+          >
+            <IoIosArrowUp />
+          </button>
+          <div className="flex gap-2 justify-center items-center">
+            <input
+              className="w-10 text-center my-4"
+              type="number"
+              value={hour > 9 ? hour : `0${hour}`}
+              onChange={(e) => setHour(Number(e.target.value))}
+            />
+            <span>시</span>
           </div>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => handleChangeHour(false)}
+          >
+            <IoIosArrowDown />
+          </button>
+        </div>
 
-          <div className="flex flex-col justify-center items-center">
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => handleChangeMinute(true)}
-            >
-              <IoIosArrowUp />
-            </button>
-            <div className="flex gap-2 justify-center items-center">
-              <input
-                className="w-10 text-center my-4"
-                defaultValue={minute > 9 ? minute : `0${minute}`}
-                max="59"
-              />
-              <span>분</span>
-            </div>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => handleChangeMinute(false)}
-            >
-              <IoIosArrowDown />
-            </button>
+        <div className="flex flex-col justify-center items-center">
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => handleChangeMinute(true)}
+          >
+            <IoIosArrowUp />
+          </button>
+          <div className="flex gap-2 justify-center items-center">
+            <input
+              className="w-10 text-center my-4"
+              type="number"
+              value={minute > 9 ? minute : `0${minute}`}
+              onChange={(e) => setMinute(Number(e.target.value))}
+              max="59"
+            />
+            <span>분</span>
           </div>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => handleChangeMinute(false)}
+          >
+            <IoIosArrowDown />
+          </button>
         </div>
       </div>
-    </label>
+    </div>
   );
 }

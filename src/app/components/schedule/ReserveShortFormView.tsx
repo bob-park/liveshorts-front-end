@@ -51,10 +51,20 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
 
     show && modal.showModal();
 
+    !show && modal.close();
+
     setSelectStartTime({ hour: 0, minute: 0 });
     setSelectEndTime({ hour: 0, minute: 10 });
     setSelectItemId(undefined);
-    setReserveItems([]);
+    setReserveItems(
+      schedule?.shorts?.ranges.map((item) => {
+        return {
+          itemId: item.itemId,
+          startTime: item.time.startTime,
+          endTime: item.time.endTime,
+        };
+      }) || [],
+    );
   }, [show, schedule]);
 
   // handle
@@ -98,6 +108,18 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
               : `0${selectEndTime.minute}`
           }:00`,
         });
+
+        setSelectStartTime({
+          hour: selectEndTime.hour,
+          minute: selectEndTime.minute,
+        });
+
+        setSelectEndTime({
+          hour: selectEndTime.hour,
+          minute: selectEndTime.minute + 10,
+        });
+
+        setSelectItemId(undefined);
       }
 
       return newReserveItems;
@@ -111,7 +133,7 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
       const index = newReserveItems.findIndex((item) => item.itemId === itemId);
 
       if (index > -1) {
-        newReserveItems.splice(index);
+        newReserveItems.splice(index, 1);
       }
 
       return newReserveItems;
@@ -125,7 +147,7 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
 
     onRequest && onRequest(reserveItems);
 
-    handleBackdrop();
+    onBackdrop && onBackdrop();
   };
 
   return (
@@ -224,7 +246,7 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
               </div>
               <div className="col-span-1 text-center">
                 <button
-                  className="btn btn-circle btn-neutral btn-sm"
+                  className="btn btn-circle btn-neutral btn-sm hover:scale-110"
                   type="button"
                   onClick={handleAddReserveItem}
                 >
@@ -239,11 +261,11 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
             {reserveItems.map((reserveItem) => (
               <div
                 key={`reserve-list-item-${reserveItem.itemId}`}
-                className="grid grid-cols-1 gap-2 justify-start items-center m-2 p-2 relative rounded-xl bg-slate-300"
+                className="grid grid-cols-1 gap-2 justify-start items-center m-2 p-3 relative rounded-xl bg-slate-300 transition delay-150 hover:-translate-y-1 hover:shadow-xl duration-300"
               >
                 <div className="mr-10">
                   <div
-                    className="tooltip w-full"
+                    className="tooltip tooltip-bottom w-full"
                     data-tip={
                       schedule?.options?.shopItems?.find(
                         (item) => item.itemId === reserveItem.itemId,
@@ -266,7 +288,7 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
                 </div>
                 <div className="absolute right-4">
                   <button
-                    className="btn btn-xs btn-circle btn-neutral "
+                    className="btn btn-xs btn-circle btn-neutral"
                     type="button"
                     onClick={() => handleRemoveReserveItem(reserveItem.itemId)}
                   >
@@ -284,7 +306,11 @@ export default function ReservShortFormView(props: ReservShortFormViewProps) {
             <button
               className="btn btn-neutral hover:scale-105"
               type="button"
-              disabled={reserveItems.length === 0}
+              disabled={
+                reserveItems.length === 0 ||
+                schedule?.shorts?.status === 'WAITING' ||
+                schedule?.shorts?.status === 'PROCEEDING'
+              }
               onClick={handleRequest}
             >
               <SiYoutubeshorts
