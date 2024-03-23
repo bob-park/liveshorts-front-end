@@ -191,7 +191,7 @@ export default function BroadcastScheduleContent(
             <div className="flex justify-end">
               <div className="tooltip" data-tip="맨 위로">
                 <button
-                  className="btn btn-circle btn-neutral"
+                  className="btn btn-circle btn-neutral transition delay-300 hover:scale-110 duration-300"
                   type="button"
                   onClick={handleScrollTop}
                 >
