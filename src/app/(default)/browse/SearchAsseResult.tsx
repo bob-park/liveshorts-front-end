@@ -334,7 +334,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                       type="text"
                       className="grow"
                       placeholder="키워드"
-                      defaultValue={searchAssetParams.title}
+                      value={searchAssetParams.title}
                       onChange={(e) =>
                         setSearchAssetParams({
                           ...searchAssetParams,
@@ -486,6 +486,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                 <div className="col-span-2">
                   <Datepicker
                     placeholder="날짜 선택"
+                    useRange={false}
                     inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
                     asSingle
                     value={{
