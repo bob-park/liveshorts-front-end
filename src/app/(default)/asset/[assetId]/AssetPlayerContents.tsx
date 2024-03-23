@@ -25,7 +25,7 @@ export default function AssetPlayeContents(props: AssetPlayeContentsProps) {
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      <div className="col-span-1 ">
+      <div className="col-span-1">
         <AssetPlayer
           src={`/api/v1/asset/${
             asset.assetId
