@@ -26,6 +26,7 @@ type PlayerStatus = 'PLAY' | 'STOP' | 'FORWARD' | 'BACKWARD';
 
 type AssetPlayerProps = {
   src: string;
+  poster?: string;
 };
 
 function VolumeIcon(props: { volumeSize: number; mute: boolean }) {
@@ -108,7 +109,7 @@ const PlayerStatusView = (props: {
 
 export default function AssetPlayer(props: AssetPlayerProps) {
   // props
-  const { src } = props;
+  const { src, poster } = props;
 
   // ref
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -256,10 +257,11 @@ export default function AssetPlayer(props: AssetPlayerProps) {
             className={`min-h-max ${
               isFullScreen
                 ? 'w-full max-h-[calc(100lvh-10rem)]'
-                : 'w-max max-h-[calc(100lvh-25rem)]'
+                : 'w-full max-h-[calc(100lvh-25rem)]'
             } aspect-auto rounded-xl`}
             playsInline
             ref={videoRef}
+            poster={poster}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}
             onTimeUpdate={(e) =>

@@ -44,6 +44,9 @@ export default function AssetPlayeContents(props: AssetPlayeContentsProps) {
           src={`/api/v1/asset/${
             asset.assetId
           }/resource?fileType=HI_RES&${Date.now()}`}
+          poster={`/api/v1/asset/${
+            asset.assetId
+          }/resource?fileType=THUMBNAIL&${Date.now()}`}
         />
       </div>
       <div className="col-span-1 mt-2 p-5">
