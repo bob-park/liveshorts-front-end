@@ -44,7 +44,7 @@ export default function AssetViewItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-110 duration-300">
+    <div className="card w-96 bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-110 duration-300 p-2">
       <figure className="w-full h-48">
         <Image
           className="w-auto h-full rounded-md "

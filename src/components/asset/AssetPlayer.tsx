@@ -3,6 +3,9 @@
 // react
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+// nextjs
+import Image from 'next/image';
+
 // daisy ui
 import { Button } from 'react-daisyui';
 
@@ -241,28 +244,29 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   return (
     <div
       id="asset_video_player"
-      className="grid grid-cols-1 w-full h-full rounded-xl bg-base-200 p-6 shadow-xl relative"
+      className="grid grid-cols-1 rounded-xl bg-base-200 p-6 shadow-xl relative"
       tabIndex={-1}
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 ">
-        <div className="flex justify-center w-full min-h-[444px] items-center relative  aspect-auto">
+        <div className="flex justify-center items-center relative aspect-auto">
           {!loaded && (
-            <div className="flex justify-center items-center absolute  top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+            <div className="flex justify-center items-center absolute top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
               <span className="loading loading-spinner loading-lg text-white" />
             </div>
           )}
+
           <video
             id=""
-            className={`min-h-max ${
+            className={`w-full ${
               isFullScreen
-                ? 'w-full max-h-[calc(100lvh-10rem)]'
-                : 'w-full max-h-[calc(100lvh-25rem)]'
+                ? 'max-h-[calc(100lvh-10rem)]'
+                : 'max-h-[calc(100lvh-25rem)]'
             } aspect-auto rounded-xl`}
             playsInline
             ref={videoRef}
-            poster={poster}
             src={src}
+            poster={poster}
             onLoadedMetadataCapture={handleLoadedMetadata}
             onTimeUpdate={(e) =>
               setVideoProgress(
@@ -280,7 +284,6 @@ export default function AssetPlayer(props: AssetPlayerProps) {
               setUpdatePlayerStatusTime(new Date().getTime());
             }}
           />
-          <div className="w-full h-full absolute"></div>
         </div>
       </div>
 

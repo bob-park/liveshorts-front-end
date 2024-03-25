@@ -38,12 +38,15 @@ export default async function AssetPage({ params }: Props) {
 
   const auth = `Bearer ${cookies().get('accessToken')?.value || ''}`;
 
-  const assetResponse = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {
-    method: 'get',
-    headers: {
-      Authorization: auth,
+  const assetResponse = await fetch(
+    MAM_API_HOST + `/api/asset/video/${assetId}`,
+    {
+      method: 'get',
+      headers: {
+        Authorization: auth,
+      },
     },
-  });
+  );
 
   const channelResponse = await fetch(MAM_API_HOST + `/api/record/channel`, {
     method: 'get',
