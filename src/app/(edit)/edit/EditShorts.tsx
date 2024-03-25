@@ -11,7 +11,7 @@ export default function EditShorts() {
   const progressRef = useRef<HTMLDivElement>(null);
   const sectionBoxRef = useRef<HTMLDivElement>(null);
   const startPositionX = useRef<number | null>(null);
-  const prevPercent = useRef<number>(100);
+  const prevPositionX = useRef<number>(0);
 
   // useState
   const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -51,6 +51,7 @@ export default function EditShorts() {
         const newX = Math.max(0, Math.min(maxX, newDivX));
 
         setPositionXPercent(newX);
+        prevPositionX.current = newX;
       }
     };
 
@@ -66,6 +67,7 @@ export default function EditShorts() {
         const maxX = progressWidth - sectionBoxWidth;
 
         setPositionXPercent((prevX) => Math.min(prevX, maxX));
+        prevPositionX.current = Math.min(positionXPercent, maxX);
       }
     };
 
@@ -84,14 +86,13 @@ export default function EditShorts() {
   }, [isDragging]);
 
   function expandProgress() {
-    const prev = prevPercent.current;
     setProgressWidthPercent((prev) => prev + 25);
+    setPositionXPercent((prevPositionX.current * progressWidthPercent) / 100);
+  }
 
-    const x = (positionXPercent * progressWidthPercent) / prev;
-
-    setPositionXPercent(x);
-
-    prevPercent.current += 25;
+  function shrinkProgress() {
+    setProgressWidthPercent((prev) => prev - 25);
+    setPositionXPercent((prevPositionX.current * progressWidthPercent) / 100);
   }
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -126,14 +127,11 @@ export default function EditShorts() {
       <div className="grid grid-rows-[50px,50px,200px] overflow-x-scroll">
         <div className="flex items-center">
           <span>{progressWidthPercent}%</span>
+
           <button onClick={expandProgress} className="w-10">
             <FaMagnifyingGlassPlus className="w-8" />
           </button>
-          <button
-            onClick={() => {
-              setProgressWidthPercent(progressWidthPercent - 25);
-            }}
-          >
+          <button onClick={shrinkProgress} className="w-10">
             <FaMagnifyingGlassMinus />
           </button>
         </div>
