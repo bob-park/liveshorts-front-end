@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 
 const TEST_ASSET_ID = "20";
+const MAX_PERCENT = 200;
+const MIN_PERCENT = 100;
 
 export default function EditShorts() {
   // useRef
@@ -17,10 +19,10 @@ export default function EditShorts() {
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isPlay, setIsPlay] = useState<boolean>(false);
-  const [section, setSection] = useState({ startTime: 0, endTime: 60 });
+  const [positionX, setPositionX] = useState<number>(0);
+  const [section, setSection] = useState({ startTime: positionX, endTime: positionX + 600 });
   const [isDragging, setIsDragging] = useState(false);
-  const [positionXPercent, setPositionXPercent] = useState<number>(0);
-  const [progressWidthPercent, setProgressWidthPercent] = useState(100);
+  const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
 
   // useEffect
   useEffect(() => {
@@ -40,59 +42,81 @@ export default function EditShorts() {
   };
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    function handleMouseMove(e: MouseEvent) {
       if (isDragging && startPositionX.current !== null && progressRef.current) {
         const ProgressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-
         const newDivX = e.clientX - startPositionX.current;
         const maxX = ProgressWidth - sectionBoxWidth;
 
         const newX = Math.max(0, Math.min(maxX, newDivX));
 
-        setPositionXPercent(newX);
+        setPositionX(newX);
         prevPositionX.current = newX;
       }
-    };
+    }
 
-    const handleMouseUp = () => {
+    function handleMouseUp() {
       setIsDragging(false);
       startPositionX.current = null;
-    };
-
-    const handleWindowResize = () => {
-      if (progressRef.current && sectionBoxRef.current) {
-        const progressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
-        const maxX = progressWidth - sectionBoxWidth;
-
-        setPositionXPercent((prevX) => Math.min(prevX, maxX));
-        prevPositionX.current = Math.min(positionXPercent, maxX);
-      }
-    };
+    }
 
     if (isDragging) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
     }
 
-    window.addEventListener("resize", handleWindowResize);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("resize", handleWindowResize);
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    function handleWindowResize() {
+      if (progressRef.current && sectionBoxRef.current) {
+        const progressWidth = progressRef.current.clientWidth;
+        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+        const maxX = progressWidth - sectionBoxWidth;
+
+        const newX = Math.min(maxX, positionX);
+
+        setPositionX(newX);
+        prevPositionX.current = newX;
+      }
+    }
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  });
+
+  useEffect(() => {
+    setSection({ ...section, startTime: positionX });
+  });
+
   function expandProgress() {
-    setProgressWidthPercent((prev) => prev + 25);
-    setPositionXPercent((prevPositionX.current * progressWidthPercent) / 100);
+    setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + 25));
+    const ProgressWidth = progressRef.current?.clientWidth ?? 0;
+    const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
+
+    const maxX = ProgressWidth - sectionBoxWidth;
+    const newX = Math.max(0, Math.min(maxX, (prevPositionX.current * progressWidthPercent) / 100));
+
+    setPositionX(newX);
   }
 
   function shrinkProgress() {
-    setProgressWidthPercent((prev) => prev - 25);
-    setPositionXPercent((prevPositionX.current * progressWidthPercent) / 100);
+    setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - 25));
+    const ProgressWidth = progressRef.current?.clientWidth ?? 0;
+    const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
+
+    const maxX = ProgressWidth - sectionBoxWidth;
+    const newX = Math.max(0, Math.min(maxX, (prevPositionX.current * progressWidthPercent) / 100));
+
+    setPositionX(newX);
   }
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
@@ -100,13 +124,15 @@ export default function EditShorts() {
     setVideoProgress(0);
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     setIsDragging(true);
-    startPositionX.current = event.clientX - positionXPercent;
+
+    startPositionX.current = e.clientX - positionX;
   };
 
   return (
-    <div className="grid grid-rows-[1fr,300px] overflow-hidden">
+    <div className="grid grid-rows-[1fr,300px]">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
@@ -162,15 +188,12 @@ export default function EditShorts() {
               width: `${((section.endTime - section.startTime) / videoDuration) * 100}%`,
               height: "25%",
               position: "absolute",
-              left: `${(positionXPercent / (progressRef.current?.clientWidth ?? 0)) * 100}%`,
+              left: `${(positionX / (progressRef.current?.clientWidth ?? 0)) * 100}%`,
               cursor: "grab",
             }}
             onMouseDown={handleMouseDown}
-            className="absolute top-0 bg-neutral-400 cursor-pointer opacity-30 hover:opacity-60"
-          >
-            <div className="absolute top-0 -left-10">왼쪽</div>
-            <div className="absolute top-0 left-10">오른쪽</div>
-          </div>
+            className="absolute top-0 bg-neutral-400 opacity-30 hover:opacity-60"
+          ></div>
         </div>
       </div>
     </div>
