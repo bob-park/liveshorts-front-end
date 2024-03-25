@@ -245,9 +245,9 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       onKeyDown={handlePlayerKeyDown}
     >
       <div className="col-span-1 ">
-        <div className="flex justify-center items-center relative min-h-96 aspect-auto">
+        <div className="flex justify-center w-full min-h-[444px] items-center relative  aspect-auto">
           {!loaded && (
-            <div className="flex justify-center items-center absolute top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+            <div className="flex justify-center items-center absolute  top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
               <span className="loading loading-spinner loading-lg text-white" />
             </div>
           )}

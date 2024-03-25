@@ -152,7 +152,7 @@ const ListAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
-          <LoadingListAssets size={10} />
+          <LoadingListAssets size={20} />
         </div>
       ) : (
         assets.map((item) => (
@@ -317,10 +317,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 m-2">
+    <div className="flex flex-col m-2">
       {/* search form */}
-      <div className="card bg-base-100 shadow-xl mx-10 p-6 min-w-[850px]">
-        <form className="p-4" onSubmit={handleSubmit}>
+      <div className="card bg-base-100 mx-10 shadow-xl p-6 min-w-[850px]">
+        <form className="p-4 max-w-[1080px] mx-auto" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-7">
             {/* 애셋 제목 */}
             <div className="col-span-1">
