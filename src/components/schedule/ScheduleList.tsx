@@ -82,15 +82,19 @@ const ScheduleListItem = ({
       </div>
       {/* thumbnail */}
       <div className="flex-none ">
-        <figure className="w-48 h-32 flex justify-center">
-          <Image
-            className="w-auto h-full rounded-md object-contain"
-            src={assetImageSrc}
-            alt="thumbnail"
-            width={400}
-            height={300}
-            onError={() => setAssetImageSrc('/default_thumbnail.png')}
-          />
+        <figure className="w-48 h-28 flex justify-center items-center">
+          {schedule.asset.assetStatus === 'REGISTERED' ? (
+            <Image
+              className="w-auto h-full rounded-xl object-contain"
+              src={assetImageSrc}
+              alt="thumbnail"
+              width={400}
+              height={300}
+              onError={() => setAssetImageSrc('/default_thumbnail.png')}
+            />
+          ) : (
+            <span className="loading loading-dots loading-lg" />
+          )}
         </figure>
       </div>
       {/* 정보 */}
