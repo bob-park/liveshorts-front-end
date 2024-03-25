@@ -258,6 +258,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
                 ? 'w-full max-h-[calc(100lvh-10rem)]'
                 : 'w-max max-h-[calc(100lvh-25rem)]'
             } aspect-auto rounded-xl`}
+            playsInline
             ref={videoRef}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}

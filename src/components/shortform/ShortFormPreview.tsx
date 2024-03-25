@@ -100,6 +100,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
             {task && (
               <video
                 className="size-full rounded-2xl"
+                playsInline
                 src={shortFormSrc}
                 ref={shortFormRef}
                 onTimeUpdate={(e) => {
