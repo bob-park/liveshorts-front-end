@@ -591,13 +591,13 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={isLoading && assets.length === 0}
+            isLoading={assets.length === 0 ?? isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={isLoading && assets.length === 0}
+            isLoading={assets.length === 0 ?? isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />
