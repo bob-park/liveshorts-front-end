@@ -11,6 +11,7 @@ export default function EditShorts() {
   const progressRef = useRef<HTMLDivElement>(null);
   const sectionBoxRef = useRef<HTMLDivElement>(null);
   const startPositionX = useRef<number | null>(null);
+  const prevPercent = useRef<number>(100);
 
   // useState
   const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -18,7 +19,7 @@ export default function EditShorts() {
   const [isPlay, setIsPlay] = useState<boolean>(false);
   const [section, setSection] = useState({ startTime: 0, endTime: 60 });
   const [isDragging, setIsDragging] = useState(false);
-  const [positionX, setPositionX] = useState<number>(0);
+  const [positionXPercent, setPositionXPercent] = useState<number>(0);
   const [progressWidthPercent, setProgressWidthPercent] = useState(100);
 
   // useEffect
@@ -49,7 +50,7 @@ export default function EditShorts() {
 
         const newX = Math.max(0, Math.min(maxX, newDivX));
 
-        setPositionX(newX);
+        setPositionXPercent(newX);
       }
     };
 
@@ -60,11 +61,11 @@ export default function EditShorts() {
 
     const handleWindowResize = () => {
       if (progressRef.current && sectionBoxRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
+        const progressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
-        const maxX = ProgressWidth - sectionBoxWidth;
+        const maxX = progressWidth - sectionBoxWidth;
 
-        setPositionX((prevX) => Math.min(prevX, maxX));
+        setPositionXPercent((prevX) => Math.min(prevX, maxX));
       }
     };
 
@@ -82,6 +83,17 @@ export default function EditShorts() {
     };
   }, [isDragging]);
 
+  function expandProgress() {
+    const prev = prevPercent.current;
+    setProgressWidthPercent((prev) => prev + 25);
+
+    const x = (positionXPercent * progressWidthPercent) / prev;
+
+    setPositionXPercent(x);
+
+    prevPercent.current += 25;
+  }
+
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     setVideoDuration(e.currentTarget.duration);
     setVideoProgress(0);
@@ -89,11 +101,11 @@ export default function EditShorts() {
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
-    startPositionX.current = event.clientX - positionX;
+    startPositionX.current = event.clientX - positionXPercent;
   };
 
   return (
-    <div className="grid grid-rows-[1fr,300px] h-full overflow-hidden">
+    <div className="grid grid-rows-[1fr,300px] overflow-hidden">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
@@ -111,26 +123,22 @@ export default function EditShorts() {
         </div>
       </div>
 
-      <div className="grid grid-rows-[50px,50px,250px] overflow-scroll">
-        <div className="flex">
-          <button
-            onClick={() => {
-              setProgressWidthPercent(progressWidthPercent * 1.5);
-            }}
-            className="w-10"
-          >
+      <div className="grid grid-rows-[50px,50px,200px] overflow-x-scroll">
+        <div className="flex items-center">
+          <span>{progressWidthPercent}%</span>
+          <button onClick={expandProgress} className="w-10">
             <FaMagnifyingGlassPlus className="w-8" />
           </button>
           <button
             onClick={() => {
-              setProgressWidthPercent(progressWidthPercent * 0.5);
+              setProgressWidthPercent(progressWidthPercent - 25);
             }}
           >
             <FaMagnifyingGlassMinus />
           </button>
         </div>
 
-        <div>도구</div>
+        <div>줄자</div>
 
         <div
           ref={progressRef}
@@ -156,7 +164,7 @@ export default function EditShorts() {
               width: `${((section.endTime - section.startTime) / videoDuration) * 100}%`,
               height: "25%",
               position: "absolute",
-              left: `${(positionX / (progressRef.current?.clientWidth || 1)) * 100}%`,
+              left: `${(positionXPercent / (progressRef.current?.clientWidth ?? 0)) * 100}%`,
               cursor: "grab",
             }}
             onMouseDown={handleMouseDown}
