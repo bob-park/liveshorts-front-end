@@ -38,6 +38,7 @@ async function callApi(
 
   apiHeaders.append('Authorization', `Bearer ${accessToken}`);
   apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
+  apiHeaders.append('Content-Type', 'application/json');
 
   if (isIncludeRange) {
     apiHeaders.append('Range', headers.get('Range') || 'bytes=0-');
