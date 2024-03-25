@@ -152,7 +152,7 @@ const ListAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
-          <LoadingListAssets size={10} />
+          <LoadingListAssets size={20} />
         </div>
       ) : (
         assets.map((item) => (
@@ -317,230 +317,232 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 m-2">
+    <div className="flex flex-col m-2">
       {/* search form */}
-      <div className="card bg-base-100 shadow-xl mx-10 p-6 min-w-[850px]">
-        <form className="p-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-7">
-            {/* 애셋 제목 */}
-            <div className="col-span-1">
-              <div className="grid grid-cols-3 gap-5 h-12">
-                <div className="col-span-1 flex justify-end items-center">
-                  <h2 className="font-extrabold">제목</h2>
-                </div>
-                <div className="col-span-2">
-                  <label className="input input-bordered flex items-center gap-2">
-                    <input
-                      type="text"
-                      className="grow"
-                      placeholder="키워드"
-                      value={searchAssetParams.title}
-                      onChange={(e) =>
-                        setSearchAssetParams({
-                          ...searchAssetParams,
-                          title: e.target.value,
-                        })
-                      }
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      className="w-4 h-4 opacity-70"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                        clipRule="evenodd"
+      <div className="card bg-base-100 mx-10 shadow-xl p-6 min-w-[850px]">
+        <form className="flex justify-center p-4 " onSubmit={handleSubmit}>
+          <div className="flex-1 max-w-[1080px]">
+            <div className="grid grid-cols-2 gap-7">
+              {/* 애셋 제목 */}
+              <div className="col-span-1">
+                <div className="grid grid-cols-3 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">제목</h2>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="input input-bordered flex items-center gap-2">
+                      <input
+                        type="text"
+                        className="grow"
+                        placeholder="키워드"
+                        value={searchAssetParams.title}
+                        onChange={(e) =>
+                          setSearchAssetParams({
+                            ...searchAssetParams,
+                            title: e.target.value,
+                          })
+                        }
                       />
-                    </svg>
-                  </label>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 16 16"
+                        fill="currentColor"
+                        className="w-4 h-4 opacity-70"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
-            {/* 숏폼 여부 */}
-            <div className="col-span-1">
-              <div className="grid grid-cols-3 gap-5 h-12">
-                <div className="col-span-1 flex justify-end items-center">
-                  <h2 className="font-extrabold">숏폼 여부</h2>
-                </div>
-                <div className="col-span-2 flex justify-start items-center">
-                  <div className="flex justify-start items-center">
-                    <div className="form-control mr-2">
-                      <label className="label cursor-pointer">
-                        <input
-                          type="radio"
-                          name="radio-10"
-                          className="radio"
-                          checked={searchAssetParams.isShortForm == undefined}
-                          onChange={(e) =>
-                            e.target.checked &&
-                            setSearchAssetParams({
-                              ...searchAssetParams,
-                              isShortForm: undefined,
-                            })
-                          }
-                        />
-                        <span className="ml-2">전체</span>
-                      </label>
-                    </div>
-                    <div className="form-control mr-2">
-                      <label className="label cursor-pointer">
-                        <input
-                          type="radio"
-                          name="radio-10"
-                          className="radio"
-                          checked={searchAssetParams.isShortForm === false}
-                          onChange={(e) =>
-                            e.target.checked &&
-                            setSearchAssetParams({
-                              ...searchAssetParams,
-                              isShortForm: false,
-                            })
-                          }
-                        />
-                        <span className="ml-2">없음</span>
-                      </label>
-                    </div>
-                    <div className="form-control mr-2">
-                      <label className="label cursor-pointer">
-                        <input
-                          type="radio"
-                          name="radio-10"
-                          className="radio"
-                          checked={searchAssetParams.isShortForm === true}
-                          onChange={(e) =>
-                            e.target.checked &&
-                            setSearchAssetParams({
-                              ...searchAssetParams,
-                              isShortForm: true,
-                            })
-                          }
-                        />
-                        <span className="ml-2">있음</span>
-                      </label>
+              {/* 숏폼 여부 */}
+              <div className="col-span-1">
+                <div className="grid grid-cols-3 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">숏폼 여부</h2>
+                  </div>
+                  <div className="col-span-2 flex justify-start items-center">
+                    <div className="flex justify-start items-center">
+                      <div className="form-control mr-2">
+                        <label className="label cursor-pointer">
+                          <input
+                            type="radio"
+                            name="radio-10"
+                            className="radio"
+                            checked={searchAssetParams.isShortForm == undefined}
+                            onChange={(e) =>
+                              e.target.checked &&
+                              setSearchAssetParams({
+                                ...searchAssetParams,
+                                isShortForm: undefined,
+                              })
+                            }
+                          />
+                          <span className="ml-2">전체</span>
+                        </label>
+                      </div>
+                      <div className="form-control mr-2">
+                        <label className="label cursor-pointer">
+                          <input
+                            type="radio"
+                            name="radio-10"
+                            className="radio"
+                            checked={searchAssetParams.isShortForm === false}
+                            onChange={(e) =>
+                              e.target.checked &&
+                              setSearchAssetParams({
+                                ...searchAssetParams,
+                                isShortForm: false,
+                              })
+                            }
+                          />
+                          <span className="ml-2">없음</span>
+                        </label>
+                      </div>
+                      <div className="form-control mr-2">
+                        <label className="label cursor-pointer">
+                          <input
+                            type="radio"
+                            name="radio-10"
+                            className="radio"
+                            checked={searchAssetParams.isShortForm === true}
+                            onChange={(e) =>
+                              e.target.checked &&
+                              setSearchAssetParams({
+                                ...searchAssetParams,
+                                isShortForm: true,
+                              })
+                            }
+                          />
+                          <span className="ml-2">있음</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* 채널 목록 */}
-            <div className="col-span-2">
-              <div className="grid grid-cols-6 gap-5 h-12">
-                <div className="col-span-1 flex justify-end items-center">
-                  <h2 className="font-extrabold">채널</h2>
-                </div>
-                <div className="col-span-5">
-                  <div className="join">
-                    <Button
-                      className="join-item w-24"
-                      type="button"
-                      active={!!!searchAssetParams.channelId}
-                      color={
-                        !!!searchAssetParams.channelId ? 'neutral' : undefined
-                      }
-                      onClick={() =>
-                        setSearchAssetParams({
-                          ...searchAssetParams,
-                          channelId: undefined,
-                        })
-                      }
-                    >
-                      전체
-                    </Button>
-                    {channels.map((channel) => (
+              {/* 채널 목록 */}
+              <div className="col-span-2">
+                <div className="grid grid-cols-6 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">채널</h2>
+                  </div>
+                  <div className="col-span-5">
+                    <div className="join">
                       <Button
-                        key={`channel-key-${channel.channelId}`}
-                        className="join-item"
+                        className="join-item w-24"
                         type="button"
-                        active={
-                          channel.channelId == searchAssetParams.channelId
-                        }
+                        active={!!!searchAssetParams.channelId}
                         color={
-                          channel.channelId == searchAssetParams.channelId
-                            ? 'neutral'
-                            : undefined
+                          !!!searchAssetParams.channelId ? 'neutral' : undefined
                         }
                         onClick={() =>
                           setSearchAssetParams({
                             ...searchAssetParams,
-                            channelId: channel.channelId,
+                            channelId: undefined,
                           })
                         }
                       >
-                        {channel.name}
+                        전체
                       </Button>
-                    ))}
+                      {channels.map((channel) => (
+                        <Button
+                          key={`channel-key-${channel.channelId}`}
+                          className="join-item"
+                          type="button"
+                          active={
+                            channel.channelId == searchAssetParams.channelId
+                          }
+                          color={
+                            channel.channelId == searchAssetParams.channelId
+                              ? 'neutral'
+                              : undefined
+                          }
+                          onClick={() =>
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              channelId: channel.channelId,
+                            })
+                          }
+                        >
+                          {channel.name}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* 방송일 */}
-            <div className="col-span-1">
-              <div className="grid grid-cols-3 gap-5 h-12">
-                <div className="col-span-1 flex justify-end items-center">
-                  <h2 className="font-extrabold">방송일</h2>
-                </div>
-                <div className="col-span-2">
-                  <Datepicker
-                    placeholder="날짜 선택"
-                    useRange={false}
-                    inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
-                    asSingle
-                    value={{
-                      startDate: dayjs(
-                        searchAssetParams.broadcastDate,
-                        DEFAULT_DATE_FORMAT,
-                      ).toDate(),
-                      endDate: dayjs(
-                        searchAssetParams.broadcastDate,
-                        DEFAULT_DATE_FORMAT,
-                      ).toDate(),
-                    }}
-                    showFooter
-                    onChange={(value) =>
-                      setSearchAssetParams({
-                        ...searchAssetParams,
-                        broadcastDate: dayjs(value?.endDate).format(
+              {/* 방송일 */}
+              <div className="col-span-1">
+                <div className="grid grid-cols-3 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">방송일</h2>
+                  </div>
+                  <div className="col-span-2">
+                    <Datepicker
+                      placeholder="날짜 선택"
+                      useRange={false}
+                      inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
+                      asSingle
+                      value={{
+                        startDate: dayjs(
+                          searchAssetParams.broadcastDate,
                           DEFAULT_DATE_FORMAT,
-                        ),
-                      })
-                    }
-                    i18n="ko"
-                    configs={{
-                      footer: {
-                        cancel: '취소',
-                        apply: '적용',
-                      },
-                    }}
-                  />
+                        ).toDate(),
+                        endDate: dayjs(
+                          searchAssetParams.broadcastDate,
+                          DEFAULT_DATE_FORMAT,
+                        ).toDate(),
+                      }}
+                      showFooter
+                      onChange={(value) =>
+                        setSearchAssetParams({
+                          ...searchAssetParams,
+                          broadcastDate: dayjs(value?.endDate).format(
+                            DEFAULT_DATE_FORMAT,
+                          ),
+                        })
+                      }
+                      i18n="ko"
+                      configs={{
+                        footer: {
+                          cancel: '취소',
+                          apply: '적용',
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-1"></div>
-            <div className="col-span-1"></div>
-            <div className="col-span-1 flex justify-end mr-10">
-              <Button
-                className="mr-4"
-                type="button"
-                size="md"
-                onClick={handleInitializeSearchParams}
-              >
-                <GrPowerReset className="w-6 h-6" />
-                초기화
-              </Button>
-              <Button
-                type="submit"
-                size="md"
-                color="neutral"
-                loading={isLoading}
-                disabled={isLoading}
-              >
-                {isLoading ? <></> : <HiOutlineSearch className="w-6 h-6" />}
-                검색
-              </Button>
+              <div className="col-span-1"></div>
+              <div className="col-span-1"></div>
+              <div className="col-span-1 flex justify-end mr-10">
+                <Button
+                  className="mr-4"
+                  type="button"
+                  size="md"
+                  onClick={handleInitializeSearchParams}
+                >
+                  <GrPowerReset className="w-6 h-6" />
+                  초기화
+                </Button>
+                <Button
+                  type="submit"
+                  size="md"
+                  color="neutral"
+                  loading={isLoading}
+                  disabled={isLoading}
+                >
+                  {isLoading ? <></> : <HiOutlineSearch className="w-6 h-6" />}
+                  검색
+                </Button>
+              </div>
             </div>
           </div>
         </form>
@@ -589,13 +591,13 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={isLoading && assets.length === 0}
+            isLoading={assets.length === 0 ?? isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={isLoading && assets.length === 0}
+            isLoading={assets.length === 0 ?? isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />

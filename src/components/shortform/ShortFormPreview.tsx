@@ -100,6 +100,7 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
             {task && (
               <video
                 className="size-full rounded-2xl"
+                playsInline
                 src={shortFormSrc}
                 ref={shortFormRef}
                 onTimeUpdate={(e) => {
@@ -125,7 +126,9 @@ export default function ShortFormPreview(props: ShortFormViewProps) {
               <div className="relative w-full h-1 bg-gray-400">
                 <div
                   className={`absolute top-0 left-0 bg-white h-1 ${
-                    isPlay ? 'transition-all duration-500' : ''
+                    shortFormProgress === 0 && isPlay
+                      ? ''
+                      : 'transition-all duration-500 ease-linear'
                   }`}
                   style={{ width: `${shortFormProgress}%` }}
                 ></div>

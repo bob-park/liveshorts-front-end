@@ -26,6 +26,7 @@ type PlayerStatus = 'PLAY' | 'STOP' | 'FORWARD' | 'BACKWARD';
 
 type AssetPlayerProps = {
   src: string;
+  poster?: string;
 };
 
 function VolumeIcon(props: { volumeSize: number; mute: boolean }) {
@@ -108,7 +109,7 @@ const PlayerStatusView = (props: {
 
 export default function AssetPlayer(props: AssetPlayerProps) {
   // props
-  const { src } = props;
+  const { src, poster } = props;
 
   // ref
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -240,14 +241,14 @@ export default function AssetPlayer(props: AssetPlayerProps) {
   return (
     <div
       id="asset_video_player"
-      className={`grid grid-cols-1 h-full rounded-xl bg-base-200 p-6 shadow-xl relative`}
+      className="grid grid-cols-1 w-full h-full rounded-xl bg-base-200 p-6 shadow-xl relative"
       tabIndex={-1}
       onKeyDown={handlePlayerKeyDown}
     >
-      <div className="col-span-1 h-full">
-        <div className="flex justify-center items-center relative min-h-96">
+      <div className="col-span-1 ">
+        <div className="flex justify-center w-full min-h-[444px] items-center relative  aspect-auto">
           {!loaded && (
-            <div className="flex justify-center items-center absolute top-0 left-0 p-2 w-full h-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+            <div className="flex justify-center items-center absolute  top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
               <span className="loading loading-spinner loading-lg text-white" />
             </div>
           )}
@@ -256,9 +257,11 @@ export default function AssetPlayer(props: AssetPlayerProps) {
             className={`min-h-max ${
               isFullScreen
                 ? 'w-full max-h-[calc(100lvh-10rem)]'
-                : 'w-max max-h-[calc(100lvh-25rem)]'
-            } object-contain rounded-xl`}
+                : 'w-full max-h-[calc(100lvh-25rem)]'
+            } aspect-auto rounded-xl`}
+            playsInline
             ref={videoRef}
+            poster={poster}
             src={src}
             onLoadedMetadataCapture={handleLoadedMetadata}
             onTimeUpdate={(e) =>
