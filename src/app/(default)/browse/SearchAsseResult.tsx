@@ -32,6 +32,7 @@ import dayjs from 'dayjs';
 // action
 import { assetActions } from '@/store/asset';
 import { Button, Loading } from 'react-daisyui';
+import MoveOnTop from '@/components/common/MoveOnTop';
 
 const { requestSearchAsset } = assetActions;
 
@@ -317,7 +318,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   };
 
   return (
-    <div className="flex flex-col m-2">
+    <div className="flex flex-col m-2 relative">
       {/* search form */}
       <div className="card bg-base-100 mx-10 shadow-xl p-6 min-w-[850px]">
         <form className="flex justify-center p-4 " onSubmit={handleSubmit}>
@@ -603,6 +604,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
           />
         )}
       </div>
+
+      <MoveOnTop />
 
       {isLoading ? (
         <div className="w-full flex justify-center items-center h-60">
