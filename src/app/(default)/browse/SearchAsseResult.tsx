@@ -605,8 +605,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         )}
       </div>
 
-      <MoveOnTop />
-
       {isLoading ? (
         <div className="w-full flex justify-center items-center h-60">
           <Loading variant="dots" size="lg" />
@@ -614,6 +612,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       ) : (
         <div id="observer" className="h-2"></div>
       )}
+
+      <MoveOnTop />
     </div>
   );
 }
