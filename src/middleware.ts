@@ -1,7 +1,4 @@
-import axios from 'axios';
-
 import { NextRequest, NextResponse } from 'next/server';
-import path from 'path';
 
 const API_PREFIX = '/api';
 const UNCHECKED_AUTH_URI_PATTERNS: string[] = ['/api/user/login'];
@@ -39,6 +36,10 @@ async function callApi(
   apiHeaders.append('Authorization', `Bearer ${accessToken}`);
   apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
   apiHeaders.append('Content-Type', 'application/json');
+  apiHeaders.append(
+    'X-Forwarded-For',
+    headers.get('X-Forwarded-For')?.split(',')[0] || '',
+  );
 
   if (isIncludeRange) {
     apiHeaders.append('Range', headers.get('Range') || 'bytes=0-');
@@ -57,9 +58,10 @@ async function callApi(
 }
 
 export async function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
+  const { nextUrl, cookies } = req;
+
+  const pathname = nextUrl.pathname;
   const response = NextResponse.next();
-  const cookies = req.cookies;
 
   const isApi = pathname.startsWith(API_PREFIX);
 
