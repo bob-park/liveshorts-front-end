@@ -95,7 +95,7 @@ const ThumbnailAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
         {isLoading ? (
-          <LoadingThumbanilAssets size={10} />
+          <LoadingThumbanilAssets size={30} />
         ) : (
           assets.map((item) => (
             <div
@@ -152,7 +152,7 @@ const ListAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
-          <LoadingListAssets size={20} />
+          <LoadingListAssets size={30} />
         </div>
       ) : (
         assets.map((item) => (
