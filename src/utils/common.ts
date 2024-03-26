@@ -46,7 +46,7 @@ const statusList: Status[] = [
   },
   {
     id: 'SUCCESS',
-    name: '성공',
+    name: '완료',
     color: 'primary',
   },
   {

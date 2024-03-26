@@ -33,10 +33,10 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
   );
 
   return (
-    <div className="flex gap-5 rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300">
-      <div className="">
+    <div className="flex gap-5 items-center rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300">
+      <div className="pl-2">
         <Image
-          className="max-w-[200px] max-h-[100px] object-contain rounded-xl "
+          className="w-full aspect-auto rounded-lg "
           src={thumbSrc}
           alt="thumbnail"
           width={200}
@@ -77,36 +77,34 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                   </div>
                 </div>
               )}
+            </div>
 
-              <div
-                className="flex-1 text-end"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <div className="flex gap-3 justify-end mr-2">
-                  <div className="tooltip" data-tip="숏폼 편집">
-                    <button className="btn btn-sm btn-neutral" type="button">
-                      <FaRegEdit className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="tooltip" data-tip="숏폼 복사">
-                    <button className="btn btn-sm btn-neutral" type="button">
-                      <LuCopyPlus className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="tooltip" data-tip="다운로드">
-                    <a
-                      className={`btn btn-sm btn-neutral ${
-                        task.status !== 'SUCCESS' && 'btn-disabled'
-                      }`}
-                      href={`/api/v1/shorts/task/${task.id}/resource/download`}
-                      download
-                    >
-                      <FiDownload className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
+            <div
+              className="flex gap-3 justify-start mt-2 mr-2"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <div className="tooltip" data-tip="숏폼 편집">
+                <button className="btn btn-sm btn-neutral" type="button">
+                  <FaRegEdit className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="tooltip" data-tip="숏폼 복사">
+                <button className="btn btn-sm btn-neutral" type="button">
+                  <LuCopyPlus className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="tooltip" data-tip="다운로드">
+                <a
+                  className={`btn btn-sm btn-neutral ${
+                    task.status !== 'SUCCESS' && 'btn-disabled'
+                  }`}
+                  href={`/api/v1/shorts/task/${task.id}/resource/download`}
+                  download
+                >
+                  <FiDownload className="w-4 h-4" />
+                </a>
               </div>
             </div>
           </div>
