@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { TbTransferIn } from 'react-icons/tb';
 import { SiYoutube } from 'react-icons/si';
 import { FiDownload } from 'react-icons/fi';
+import { FaRegEdit } from 'react-icons/fa';
+import { LuCopyPlus } from 'react-icons/lu';
 
 // timeago
 import TimeAgo from 'timeago-react';
@@ -75,16 +77,29 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                   </div>
                 </div>
               )}
-              {task.status === 'SUCCESS' && (
-                <div
-                  className="flex-1 text-end"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
+
+              <div
+                className="flex-1 text-end"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <div className="flex gap-3 justify-end mr-2">
+                  <div className="tooltip" data-tip="숏폼 편집">
+                    <button className="btn btn-sm btn-neutral" type="button">
+                      <FaRegEdit className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="tooltip" data-tip="숏폼 복사">
+                    <button className="btn btn-sm btn-neutral" type="button">
+                      <LuCopyPlus className="w-4 h-4" />
+                    </button>
+                  </div>
                   <div className="tooltip" data-tip="다운로드">
                     <a
-                      className="btn btn-sm btn-neutral"
+                      className={`btn btn-sm btn-neutral ${
+                        task.status !== 'SUCCESS' && 'btn-disabled'
+                      }`}
                       href={`/api/v1/shorts/task/${task.id}/resource/download`}
                       download
                     >
@@ -92,7 +107,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                     </a>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
           <div className="col-span-4 text-gray-500 text-sm">
