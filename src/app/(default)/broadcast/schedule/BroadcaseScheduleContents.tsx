@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useEffect } from 'react';
 
 // nextjs
 import { useRouter } from 'next/navigation';
@@ -57,15 +57,15 @@ export default function BroadcastScheduleContent(
   const { isLoading, schedules } = useAppSelector((state) => state.schedule);
 
   // useEffect
+  useEffect(() => {
+    document.addEventListener('scroll', () => {
+      setShowMoveTop(scrollY > 150);
+    });
+  }, []);
+
   useLayoutEffect(() => {
     handleGetSchedule();
   }, [selectChannelId, selectDate]);
-
-  useLayoutEffect(() => {
-    screen.height;
-
-    setShowMoveTop(document.body.offsetHeight > screen.availHeight);
-  }, [schedules]);
 
   // handle
   const handleGetSchedule = () => {
@@ -186,21 +186,23 @@ export default function BroadcastScheduleContent(
           </div>
         </div>
 
-        {showMoveTop && (
-          <div className="sticky bottom-5">
-            <div className="flex justify-end">
-              <div className="tooltip" data-tip="맨 위로">
-                <button
-                  className="btn btn-circle btn-neutral transition delay-300 hover:scale-110 duration-300"
-                  type="button"
-                  onClick={handleScrollTop}
-                >
-                  <FaArrowUp className="w-5 h-5" />
-                </button>
-              </div>
+        <div
+          className={`sticky bottom-5 transition-all delay-150 duration-300 ${
+            showMoveTop ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <div className="flex justify-end">
+            <div className="tooltip" data-tip="맨 위로">
+              <button
+                className="btn btn-circle btn-neutral transition delay-300 hover:scale-110 duration-300"
+                type="button"
+                onClick={handleScrollTop}
+              >
+                <FaArrowUp className="w-5 h-5" />
+              </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
       <ReservShortFormView
         show={showReserveShortForm}
