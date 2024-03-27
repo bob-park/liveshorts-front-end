@@ -6,6 +6,9 @@ import Image from 'next/image';
 
 // react icons
 import { SiYoutubeshorts } from 'react-icons/si';
+import { VscRecord } from 'react-icons/vsc';
+import { BiVideoRecording } from 'react-icons/bi';
+import { IoWarning } from 'react-icons/io5';
 
 // dayjs
 import dayjs from 'dayjs';
@@ -83,7 +86,22 @@ const ScheduleListItem = ({
       {/* thumbnail */}
       <div className="flex-none ">
         <figure className="w-48 h-28 flex justify-center items-center">
-          {schedule.asset.assetStatus === 'REGISTERED' ? (
+          {schedule.status === 'FAILURE' && (
+            <div>
+              <IoWarning className="w-10 h-10 text-yellow-600" />
+            </div>
+          )}
+          {schedule.status === 'WAITING' && (
+            <div>
+              <VscRecord className="w-10 h-10" />
+            </div>
+          )}
+          {schedule.status === 'RECORDING' && (
+            <div>
+              <BiVideoRecording className="w-10 h-10 text-red-600 animate-bounce" />
+            </div>
+          )}
+          {schedule.asset.assetStatus === 'REGISTERED' && (
             <Image
               className="w-auto h-full rounded-xl object-contain"
               src={assetImageSrc}
@@ -92,8 +110,6 @@ const ScheduleListItem = ({
               height={300}
               onError={() => setAssetImageSrc('/default_thumbnail.png')}
             />
-          ) : (
-            <span className="loading loading-dots loading-lg" />
           )}
         </figure>
       </div>
