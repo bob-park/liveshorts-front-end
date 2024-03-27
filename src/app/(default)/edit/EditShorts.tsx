@@ -6,23 +6,28 @@ import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
+const DEFAULT_SECTION_PX = 600;
 
 export default function EditShorts() {
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const sectionBoxRef = useRef<HTMLDivElement>(null);
-  const startPositionX = useRef<number | null>(null);
-  const prevPositionX = useRef<number>(0);
+  const startXRef = useRef<number | null>(null);
+  const endXRef = useRef<number | null>(null);
+  const prevStartX = useRef<number>(0);
+  const prevEndX = useRef<number>(DEFAULT_SECTION_PX);
   const prevProgressWidth = useRef<number>(0);
 
   // useState
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isPlay, setIsPlay] = useState<boolean>(false);
-  const [positionX, setPositionX] = useState<number>(0);
-  const [section, setSection] = useState({ startTime: positionX, endTime: positionX + 600 });
+  const [startX, setStartX] = useState<number>(0);
+  const [endX, setEndX] = useState<number>(DEFAULT_SECTION_PX);
+  //   const [section, setSection] = useState({ startTime: positionX, endTime: endX });
   const [isDragging, setIsDragging] = useState(false);
+  const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
 
   // useEffect
@@ -30,36 +35,27 @@ export default function EditShorts() {
     videoRef.current?.load();
   }, []);
 
-  const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-
-    const currentTime = videoDuration * (value / 100);
-
-    if (videoRef.current) {
-      videoRef.current.currentTime = currentTime;
-
-      setVideoProgress(value);
-    }
-  };
-
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isDragging && startPositionX.current !== null && progressRef.current) {
+      if (isDragging && startXRef.current !== null && progressRef.current) {
         const ProgressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-        const newDivX = e.clientX - startPositionX.current;
+        const newDivX = e.clientX - startXRef.current;
         const maxX = ProgressWidth - sectionBoxWidth;
 
-        const newX = Math.max(0, Math.min(maxX, newDivX));
+        const newStartX = Math.max(0, Math.min(maxX, newDivX));
+        const newEndX = newStartX + sectionBoxWidth;
 
-        setPositionX(newX);
-        prevPositionX.current = newX;
+        setStartX(newStartX);
+        setEndX(newEndX);
+        prevStartX.current = newStartX;
+        prevEndX.current = newEndX;
       }
     }
 
     function handleMouseUp() {
       setIsDragging(false);
-      startPositionX.current = null;
+      startXRef.current = null;
     }
 
     if (isDragging) {
@@ -73,6 +69,48 @@ export default function EditShorts() {
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      if (isExpandDragging.startTime && startXRef.current !== null && progressRef.current) {
+        const ProgressWidth = progressRef.current.clientWidth;
+        const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
+        const newDivX = e.clientX - startXRef.current;
+        const maxX = ProgressWidth - sectionBoxWidth;
+
+        const newX = Math.max(0, Math.min(maxX, newDivX));
+
+        setStartX(newX);
+        prevStartX.current = newX;
+      }
+      if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
+        const ProgressWidth = progressRef.current.clientWidth;
+        const newDivX = e.clientX - endXRef.current;
+        const maxX = ProgressWidth;
+
+        const newX = Math.max(0, Math.min(maxX, newDivX));
+
+        setEndX(newX);
+        prevEndX.current = newX;
+      }
+    }
+
+    function handleMouseUp() {
+      setIsExpandDragging({ startTime: false, endTime: false });
+      startXRef.current = null;
+      endXRef.current = null;
+    }
+
+    if (isExpandDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isExpandDragging]);
+
   prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
 
   useEffect(() => {
@@ -82,12 +120,17 @@ export default function EditShorts() {
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
 
         const resizeRatio = progressWidth / prevProgressWidth.current;
-        const maxX = progressWidth - sectionBoxWidth;
+        const startMaxX = progressWidth - sectionBoxWidth;
+        const endMaxX = progressWidth;
 
-        const newX = Math.max(0, Math.min(maxX, positionX * resizeRatio));
+        const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
+        const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
 
-        setPositionX(newX);
-        prevPositionX.current = newX;
+        setStartX(newStartX);
+        setEndX(newEndX);
+
+        prevStartX.current = newStartX;
+        prevEndX.current = newEndX;
       }
     }
 
@@ -103,16 +146,28 @@ export default function EditShorts() {
       const progressWidth = progressRef.current.clientWidth;
       const sectionBoxWidth = sectionBoxRef.current.clientWidth;
 
-      const maxX = progressWidth - sectionBoxWidth;
+      const startMaxX = progressWidth - sectionBoxWidth;
+      const endMaxX = progressWidth;
 
-      const newX = Math.max(0, Math.min(maxX, (prevPositionX.current * progressWidthPercent) / 100));
-      setPositionX(newX);
+      const newStartX = Math.max(0, Math.min(startMaxX, (prevStartX.current * progressWidthPercent) / 100));
+      const newEndX = Math.max(0, Math.min(endMaxX, (prevEndX.current * progressWidthPercent) / 100));
+
+      setStartX(newStartX);
+      setEndX(newEndX);
     }
   }, [progressWidthPercent]);
 
-  useEffect(() => {
-    setSection({ startTime: positionX, endTime: positionX + 600 });
-  }, [positionX]);
+  // functions
+  const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    const currentTime = videoDuration * (value / 100);
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = currentTime;
+
+      setVideoProgress(value);
+    }
+  };
 
   function expandProgress() {
     setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + 25));
@@ -131,7 +186,21 @@ export default function EditShorts() {
     e.stopPropagation();
     setIsDragging(true);
 
-    startPositionX.current = e.clientX - positionX;
+    startXRef.current = e.clientX - startX;
+  };
+
+  const handleMouseDownStartExpand = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsExpandDragging({ ...isExpandDragging, startTime: true });
+
+    startXRef.current = e.clientX - startX;
+  };
+
+  const handleMouseDownEndExpand = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsExpandDragging({ ...isExpandDragging, endTime: true });
+
+    endXRef.current = e.clientX - endX;
   };
 
   return (
@@ -188,15 +257,35 @@ export default function EditShorts() {
           <div
             ref={sectionBoxRef}
             style={{
-              width: `${((section.endTime - section.startTime) / videoDuration) * 100}%`,
+              width: `${endX - startX}px`,
               height: "25%",
-              position: "absolute",
-              left: `${positionX}px`,
-              cursor: "grab",
+              left: `${startX}px`,
             }}
             onMouseDown={handleMouseDown}
-            className="absolute top-0 bg-neutral-400 opacity-30 hover:opacity-60"
-          ></div>
+            className={`
+			absolute top-0 opacity-30 hover:opacity-60
+			cursor-grab group
+			flex justify-between
+			bg-neutral-400
+			`}
+          >
+            <div
+              onMouseDown={handleMouseDownStartExpand}
+              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}%` }}
+              className={`
+			  cursor-w-resize
+			  opacity-0 group-hover:opacity-100
+			bg-neutral-600`}
+            ></div>
+            <div
+              onMouseDown={handleMouseDownEndExpand}
+              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}%` }}
+              className={`
+			  cursor-e-resize
+			  opacity-0 group-hover:opacity-100
+			bg-neutral-600`}
+            ></div>
+          </div>
         </div>
       </div>
     </div>
