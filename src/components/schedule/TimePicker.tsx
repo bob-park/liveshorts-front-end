@@ -30,7 +30,7 @@ export default function TimePicker(props: TimePickerProps) {
   }, [time]);
 
   // handle
-  const handleChangeHour = (isPlus: boolean) => {
+  const handleClickHour = (isPlus: boolean) => {
     const plusValue = isPlus ? 1 : -1;
     let newValue = hour + plusValue;
 
@@ -41,18 +41,31 @@ export default function TimePicker(props: TimePickerProps) {
     setHour(newValue);
   };
 
-  const handleChangeMinute = (isPlus: boolean) => {
+  const handleClickMinute = (isPlus: boolean) => {
     const plusValue = isPlus ? 1 : -1;
 
-    let newHour = hour;
     let newMinute = minute + plusValue;
 
+    handleChangeMinute(newMinute);
+  };
+
+  const handleChangeMinute = (value: number) => {
+    let newHour = hour;
+    let newMinute = value;
+
     if (newMinute < 0) {
-      newMinute = 0;
+      newHour--;
+
+      newMinute = 59;
+
+      if (newHour < 0) {
+        newHour = 0;
+        newMinute = 0;
+      }
     }
 
     if (newMinute > 59) {
-      newHour += 1;
+      newHour++;
       newMinute = 0;
     }
 
@@ -69,7 +82,7 @@ export default function TimePicker(props: TimePickerProps) {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => handleChangeHour(true)}
+            onClick={() => handleClickHour(true)}
           >
             <IoIosArrowUp />
           </button>
@@ -85,7 +98,7 @@ export default function TimePicker(props: TimePickerProps) {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => handleChangeHour(false)}
+            onClick={() => handleClickHour(false)}
           >
             <IoIosArrowDown />
           </button>
@@ -95,7 +108,7 @@ export default function TimePicker(props: TimePickerProps) {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => handleChangeMinute(true)}
+            onClick={() => handleClickMinute(true)}
           >
             <IoIosArrowUp />
           </button>
@@ -104,14 +117,14 @@ export default function TimePicker(props: TimePickerProps) {
               className="w-10 text-center my-4"
               type="number"
               value={minute > 9 ? minute : `0${minute}`}
-              onChange={(e) => setMinute(Number(e.target.value))}
+              onChange={(e) => handleChangeMinute(Number(e.target.value))}
             />
             <span>분</span>
           </div>
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => handleChangeMinute(false)}
+            onClick={() => handleClickMinute(false)}
           >
             <IoIosArrowDown />
           </button>
