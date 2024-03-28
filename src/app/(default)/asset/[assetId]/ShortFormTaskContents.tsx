@@ -1,10 +1,10 @@
 'use client';
 
 // react
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 // nextjs
-import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 // react icons
 import { SiYoutubeshorts } from 'react-icons/si';
@@ -17,7 +17,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 import { shortFormActions } from '@/store/shortform';
 import ShortFormList from '@/components/shortform/ShortFormList';
-import ShortFormPreview from '@/components/shortform/ShortFormPreview';
 
 // action
 const { requestSearchShortFormTask } = shortFormActions;
@@ -47,38 +46,32 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   // props
   const { assetId } = props;
 
+  // router
+  const router = useRouter();
+
   // store
   const dispatch = useAppDispatch();
   const { isLoading, tasks } = useAppSelector((state) => state.shortForm);
 
   // state
-  const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [previewTask, setPreivewTask] = useState<ShortFormTask | undefined>();
 
   //useEffect
   useLayoutEffect(() => {
     handleGetShortFormTask();
   }, []);
 
-  // handle
-  const handleShowPreview = (taskId: string) => {
-    const previewTask = tasks.find((item) => item.id === taskId);
-
-    if (previewTask?.status !== 'SUCCESS') {
-      return;
-    }
-
-    setShowPreview(true);
-    setPreivewTask(previewTask);
-  };
-
   const handleGetShortFormTask = () => {
     dispatch(requestSearchShortFormTask({ assetId }));
   };
 
-  const handleClosePreview = () => {
-    setShowPreview(false);
-    setPreivewTask(undefined);
+  const handleMoveShortformView = (taskId: string) => {
+    const task = tasks.find((item) => item.id === taskId);
+
+    if (!task || task.status !== 'SUCCESS') {
+      return;
+    }
+
+    router.push(`/asset/${assetId}/shortform/${taskId}`);
   };
 
   return (
@@ -114,14 +107,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
         {isLoading && <ShortFormLoading />}
         {!isLoading && tasks.length === 0 && <EmptyShortFormList />}
         {!isLoading && tasks && (
-          <ShortFormList tasks={tasks} onRowClick={handleShowPreview} />
+          <ShortFormList tasks={tasks} onRowClick={handleMoveShortformView} />
         )}
       </div>
-      <ShortFormPreview
-        show={showPreview}
-        task={previewTask}
-        onBackdrop={handleClosePreview}
-      />
     </div>
   );
 }
