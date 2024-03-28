@@ -6,6 +6,8 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
+import { setIsListView } from './action';
+
 // react icon
 import {
   HiOutlineViewGrid,
@@ -42,7 +44,6 @@ type SearchAsseResultProps = {
   isListView: boolean;
   searchAssetParams: SearchAssetParams;
   channels: SearchChannel[];
-  updateListViewMode?: (isListMode: boolean) => void;
 };
 
 type SearchChannel = { channelId: number; name: string };
@@ -179,7 +180,6 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     isListView,
     searchAssetParams: prevSearchAssetParams,
     channels,
-    updateListViewMode,
   } = props;
 
   // router
@@ -262,7 +262,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
-    updateListViewMode && updateListViewMode(isListView);
+    setIsListView(isListView);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
