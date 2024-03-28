@@ -40,7 +40,7 @@ export default function AssetListItem(props: AssetListItemProps) {
     <div className="grid grid-cols-7 gap-4 mx-10 my-2 p-1 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300">
       <div className="col-span-1 h-24 flex justify-center items-center ">
         <Image
-          className="rounded-md w-auto h-full"
+          className="w-auto h-full rounded-xl object-contain"
           src={assetImageSrc}
           alt="thumbnail"
           width={200}
@@ -48,8 +48,8 @@ export default function AssetListItem(props: AssetListItemProps) {
           onError={() => setAssetImageSrc('/default_thumbnail.png')}
         />
       </div>
-      <div className="col-span-2 flex justify-center items-center mx-5">
-        <div className="tooltip w-full text-start" data-tip={title}>
+      <div className="col-span-2 flex justify-start items-center mx-5">
+        <div className="tooltip max-w-full text-start" data-tip={title}>
           <p className="w-full truncate font-bold">{title}</p>
         </div>
       </div>
