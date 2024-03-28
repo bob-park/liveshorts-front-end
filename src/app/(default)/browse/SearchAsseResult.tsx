@@ -104,18 +104,7 @@ const ThumbnailAssetView = (props: {
               className="col-span-1"
               onClick={() => handleClick(item.assetId)}
             >
-              <AssetViewItem
-                assetId={item.assetId}
-                title={item.title}
-                assetStatus={item.assetStatus}
-                category={item.category.name}
-                createdDate={item.createdDate}
-                existShortForm={item.shortFormCount > 0}
-                isUploadSns={
-                  item.uploadSnsCount > 0 &&
-                  item.shortFormCount === item.uploadSnsCount
-                }
-              />
+              <AssetViewItem asset={item} />
             </div>
           ))
         )}
