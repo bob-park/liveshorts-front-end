@@ -1,5 +1,8 @@
 'use client';
 
+// react icon
+import { TiThMenu } from 'react-icons/ti';
+
 import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
 type ShortformContentsProps = {
@@ -18,7 +21,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
       </div>
 
       {/* shortform player */}
-      <div className="h-full">
+      <div className="max-w-[608px] h-full max-h-[1080px] aspect-[9/16]">
         <div className=" "></div>
         <ShortformPlayer
           src={`/api/v1/shorts/task/${
@@ -26,7 +29,15 @@ export default function ShortformContents(props: ShortformContentsProps) {
           }/resource?t=${new Date().getTime()}`}
         />
       </div>
-      <div className=""></div>
+      <div className="w-16">
+        <div className="flex justify-center items-end">
+          <div className="tooltip" data-tip="메뉴">
+            <button className="btn btn-circle" type="button">
+              <TiThMenu className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
