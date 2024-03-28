@@ -298,60 +298,48 @@ export default function EditShorts() {
 
       <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
         <div>줄자</div>
-        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="relative h-full">
-          {/* section */}
-          <div className="w-full h-1/4 absolute top-0">
-            <div
-              ref={sectionBoxRef}
-              style={{
-                width: `${endX - startX}px`,
-                left: `${startX}px`,
-              }}
-              onMouseDown={handleMouseDown}
-              className={`
-			          absolute top-0 flex justify-between z-50 h-full
-			          cursor-grab rounded-lg
-                group
-			          opacity-30 hover:opacity-60
-                bg-neutral-400
-			          `}
-            >
-              <div
-                onMouseDown={handleMouseDownStartExpand}
-                style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-                className={`
-			            cursor-w-resize
-			            opacity-0 group-hover:opacity-100
-			          bg-neutral-600`}
-              ></div>
-              <div
-                onMouseDown={handleMouseDownEndExpand}
-                style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-                className={`
-			            cursor-e-resize
-			            opacity-0 group-hover:opacity-100
-			          bg-neutral-600`}
-              ></div>
-            </div>
-          </div>
-
-          {/* bgm */}
-          <div className="w-full h-1/4 absolute top-1/4 border-t border-neutral-500">bgm</div>
-
-          {/* title */}
-          <div className="w-full h-1/4 absolute top-2/4 border-t border-neutral-500">title</div>
-
-          {/* subtitle */}
-          <div className="w-full h-1/4 absolute top-3/4 border-t border-neutral-500">subtitle</div>
-
+        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="progressBar">
           <input
             type="range"
             min={0}
             max={100}
             value={videoProgress}
             onChange={handleChangeProgress}
-            className="w-full progress h-full rounded-none"
+            className="rangeBar"
           />
+          {/* section */}
+          <div
+            ref={sectionBoxRef}
+            style={{
+              width: `${endX - startX}px`,
+              left: `${startX}px`,
+            }}
+            onMouseDown={handleMouseDown}
+            className={`
+			          absolute top-0 flex justify-between z-50 h-full
+			          cursor-grab rounded-lg
+                group
+			          opacity-30 hover:opacity-60
+                bg-neutral-400
+			          `}
+          >
+            <div
+              onMouseDown={handleMouseDownStartExpand}
+              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+              className={`
+			            cursor-w-resize
+			            opacity-0 group-hover:opacity-100
+			          bg-neutral-600`}
+            ></div>
+            <div
+              onMouseDown={handleMouseDownEndExpand}
+              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+              className={`
+			            cursor-e-resize
+			            opacity-0 group-hover:opacity-100
+			          bg-neutral-600`}
+            ></div>
+          </div>
         </div>
       </div>
     </div>
