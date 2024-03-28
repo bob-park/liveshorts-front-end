@@ -151,15 +151,7 @@ const ListAssetView = (props: {
             className="col-span-1"
             onClick={() => handleClick(item.assetId)}
           >
-            <AssetListItem
-              assetId={item.assetId}
-              title={item.title}
-              fileSize={item.fileSize}
-              assetStatus={item.assetStatus}
-              category={item.category.name}
-              createdDate={item.createdDate}
-              createdBy={item.createdBy}
-            />
+            <AssetListItem asset={item} />
           </div>
         ))
       )}
