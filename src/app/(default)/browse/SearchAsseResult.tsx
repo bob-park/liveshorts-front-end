@@ -42,6 +42,7 @@ type SearchAsseResultProps = {
   isListView: boolean;
   searchAssetParams: SearchAssetParams;
   channels: SearchChannel[];
+  updateListViewMode?: (isListMode: boolean) => void;
 };
 
 type SearchChannel = { channelId: number; name: string };
@@ -178,6 +179,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     isListView,
     searchAssetParams: prevSearchAssetParams,
     channels,
+    updateListViewMode,
   } = props;
 
   // router
@@ -198,6 +200,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   );
 
   // useEffect
+  useLayoutEffect(() => {
+    setListViewMode(isListView);
+  }, [isListView]);
+
   useLayoutEffect(() => {
     handleSearch(0, false);
   }, [searchParams]);
@@ -256,8 +262,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
-
-    document.cookie = `isListView=${isListView}`;
+    updateListViewMode && updateListViewMode(isListView);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

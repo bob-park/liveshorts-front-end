@@ -49,12 +49,18 @@ export default async function Browse(props: {
       })
     : [];
 
+  async function setIsListView(listView: boolean) {
+    'use server';
+    cookies().set(COOKIE_NAME_IS_LIST_VIEW, listView + '');
+  }
+
   return (
     <div>
       <SearchAsseResult
         isListView={preIsListView}
         searchAssetParams={searchAssetParams}
         channels={channels}
+        updateListViewMode={setIsListView}
       />
     </div>
   );
