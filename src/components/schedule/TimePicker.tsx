@@ -32,30 +32,34 @@ export default function TimePicker(props: TimePickerProps) {
   // handle
   const handleChangeHour = (isPlus: boolean) => {
     const plusValue = isPlus ? 1 : -1;
+    let newValue = hour + plusValue;
 
-    const newValue = hour + plusValue;
+    if (newValue < 0) {
+      newValue = 0;
+    }
 
-    setHour((prev) => {
-      const nv = newValue > 0 ? newValue : 0;
-
-      onChange && onChange({ hour: nv, minute });
-
-      return nv;
-    });
+    setHour(newValue);
   };
 
   const handleChangeMinute = (isPlus: boolean) => {
     const plusValue = isPlus ? 1 : -1;
 
-    const newValue = minute + plusValue;
+    let newHour = hour;
+    let newMinute = minute + plusValue;
 
-    setMinute((prev) => {
-      const nv = newValue > 0 ? newValue : 0;
+    if (newMinute < 0) {
+      newMinute = 0;
+    }
 
-      onChange && onChange({ hour, minute: nv });
+    if (newMinute > 59) {
+      newHour += 1;
+      newMinute = 0;
+    }
 
-      return nv;
-    });
+    setHour(newHour);
+    setMinute(newMinute);
+
+    onChange && onChange({ hour: newHour, minute: newMinute });
   };
 
   return (
@@ -101,7 +105,6 @@ export default function TimePicker(props: TimePickerProps) {
               type="number"
               value={minute > 9 ? minute : `0${minute}`}
               onChange={(e) => setMinute(Number(e.target.value))}
-              max="59"
             />
             <span>분</span>
           </div>
