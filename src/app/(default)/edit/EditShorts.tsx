@@ -6,7 +6,7 @@ import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
-const DEFAULT_SECTION_PX = 600;
+const DEFAULT_SECTION_SEC = 600;
 
 export default function EditShorts() {
   // useRef
@@ -16,7 +16,7 @@ export default function EditShorts() {
   const startXRef = useRef<number | null>(null);
   const endXRef = useRef<number | null>(null);
   const prevStartX = useRef<number>(0);
-  const prevEndX = useRef<number>(600);
+  const prevEndX = useRef<number>(0);
   const prevProgressWidth = useRef<number>(0);
 
   // useState
@@ -33,6 +33,11 @@ export default function EditShorts() {
   useEffect(() => {
     videoRef.current?.load();
   }, []);
+
+  useEffect(() => {
+    prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
+    setEndX(prevEndX.current);
+  }, [videoDuration]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -202,8 +207,13 @@ export default function EditShorts() {
     endXRef.current = e.clientX - endX;
   }
 
+  function timeToPx(time: number) {
+    return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
+  }
+
+  // 추후에 startX, endX를 이용해서 api날릴 때 사용할 함수
   function pxToTime(px: number) {
-    return (px / videoDuration) * (progressRef.current?.clientWidth ?? 0);
+    return (px * videoDuration) / (progressRef.current?.clientWidth ?? 0);
   }
 
   return (
