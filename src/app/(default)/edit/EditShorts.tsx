@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "react-daisyui";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
-import { IoPause, IoPlay } from "react-icons/io5";
+import { IoPause, IoPlay, IoPlayBack, IoPlayForward } from "react-icons/io5";
+import IconButton from "./IconButton";
 
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
@@ -163,6 +164,30 @@ export default function EditShorts() {
     }
   }, [progressWidthPercent]);
 
+  useEffect(() => {
+    const handlePlayerKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+
+      if (videoRef.current) {
+        if (e.key === "ArrowRight") {
+          videoRef.current.currentTime += 10;
+        } else if (e.key === "ArrowLeft") {
+          videoRef.current.currentTime -= 10;
+        } else if (e.key === " ") {
+          const paused = videoRef.current.paused;
+
+          paused ? videoRef.current.play() : videoRef.current.pause();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handlePlayerKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handlePlayerKeyDown);
+    };
+  }, []);
+
   // functions
   function handleChangeProgress(e: React.ChangeEvent<HTMLInputElement>) {
     const value = Number(e.target.value);
@@ -209,9 +234,21 @@ export default function EditShorts() {
     endXRef.current = e.clientX - endX;
   }
 
-  const handlePlay = () => {
+  function handlePlay() {
     !isPlay ? videoRef.current?.play() : videoRef.current?.pause();
-  };
+  }
+
+  function handleBack() {
+    if (videoRef.current) {
+      videoRef.current.currentTime -= 10;
+    }
+  }
+
+  function handleFoward() {
+    if (videoRef.current) {
+      videoRef.current.currentTime += 10;
+    }
+  }
 
   function timeToPx(time: number) {
     return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
@@ -227,8 +264,8 @@ export default function EditShorts() {
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
-        <div className="flex justify-center items-center">
-          <div className="h-[calc(100lvh-450px)] max-h-[calc(100lvh-450px)]">
+        <div className="flex flex-col gap-4 justify-center items-center">
+          <div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
             <video
               controls
               ref={videoRef}
@@ -240,23 +277,23 @@ export default function EditShorts() {
               className="w-full h-full"
             ></video>
           </div>
+
+          <div>
+            <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
+            <IconButton
+              toolTip={isPlay ? "정지" : "재생"}
+              onClick={handlePlay}
+              Icon={isPlay ? <IoPause /> : <IoPlay />}
+            ></IconButton>
+            <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
+          </div>
         </div>
       </div>
 
-      {/* 비디오 제어*/}
       <div className="flex items-center">
         <span>{progressWidthPercent}%</span>
-        <button onClick={expandProgress} className="w-10">
-          <FaMagnifyingGlassPlus className="w-8" />
-        </button>
-        <button onClick={shrinkProgress} className="w-10">
-          <FaMagnifyingGlassMinus />
-        </button>
-        <div className="tooltip" data-tip={isPlay ? "정지" : "재생"}>
-          <Button className="" type="button" shape="square" onClick={handlePlay} active={isPlay}>
-            {isPlay ? <IoPause className="w-5" /> : <IoPlay className="w-5" />}
-          </Button>
-        </div>
+        <IconButton toolTip="25% 확대" onClick={expandProgress} Icon={<FaMagnifyingGlassPlus />}></IconButton>
+        <IconButton toolTip="25% 축소" onClick={shrinkProgress} Icon={<FaMagnifyingGlassMinus />}></IconButton>
       </div>
 
       <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
@@ -276,7 +313,6 @@ export default function EditShorts() {
 			          cursor-grab rounded-lg
                 group
 			          opacity-30 hover:opacity-60
-                border-4 box-content
                 bg-neutral-400
 			          `}
             >
@@ -314,7 +350,7 @@ export default function EditShorts() {
             max={100}
             value={videoProgress}
             onChange={handleChangeProgress}
-            className="w-full progress h-full rounded-none "
+            className="w-full progress h-full rounded-none"
           />
         </div>
       </div>
