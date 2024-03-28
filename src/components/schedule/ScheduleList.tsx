@@ -123,8 +123,8 @@ const ScheduleListItem = ({
                 <SiYoutubeshorts className="w-5 h-5" />
               </div>
             )}
-            <div className="tooltip w-full" data-tip={schedule.title}>
-              <h2 className="w-full text-start truncate text-xl font-bold">
+            <div className="tooltip max-w-full" data-tip={schedule.title}>
+              <h2 className="text-start truncate text-xl font-bold">
                 {schedule.title}
               </h2>
             </div>
