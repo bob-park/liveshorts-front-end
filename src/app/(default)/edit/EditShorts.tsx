@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Button } from "react-daisyui";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
+import { IoPause, IoPlay } from "react-icons/io5";
 
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
@@ -207,6 +209,10 @@ export default function EditShorts() {
     endXRef.current = e.clientX - endX;
   }
 
+  const handlePlay = () => {
+    !isPlay ? videoRef.current?.play() : videoRef.current?.pause();
+  };
+
   function timeToPx(time: number) {
     return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
   }
@@ -217,88 +223,99 @@ export default function EditShorts() {
   }
 
   return (
-    <div className="grid grid-rows-[1fr,300px]">
+    <div className="grid grid-rows-[1fr,50px,250px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
-        <div className="">
-          <video
-            controls
-            ref={videoRef}
-            src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
-            onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
-            onLoadedMetadataCapture={handleLoadedMetadata}
-            onPause={() => setIsPlay(false)}
-            onPlay={() => setIsPlay(true)}
-            className="w-full"
-          ></video>
+        <div className="flex justify-center items-center">
+          <div className="h-[calc(100lvh-450px)] max-h-[calc(100lvh-450px)]">
+            <video
+              controls
+              ref={videoRef}
+              src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
+              onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
+              onLoadedMetadataCapture={handleLoadedMetadata}
+              onPause={() => setIsPlay(false)}
+              onPlay={() => setIsPlay(true)}
+              className="w-full h-full"
+            ></video>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-rows-[50px,50px,200px] overflow-x-scroll">
-        <div className="flex items-center">
-          <span>{progressWidthPercent}%</span>
-
-          <button onClick={expandProgress} className="w-10">
-            <FaMagnifyingGlassPlus className="w-8" />
-          </button>
-          <button onClick={shrinkProgress} className="w-10">
-            <FaMagnifyingGlassMinus />
-          </button>
+      {/* 비디오 제어*/}
+      <div className="flex items-center">
+        <span>{progressWidthPercent}%</span>
+        <button onClick={expandProgress} className="w-10">
+          <FaMagnifyingGlassPlus className="w-8" />
+        </button>
+        <button onClick={shrinkProgress} className="w-10">
+          <FaMagnifyingGlassMinus />
+        </button>
+        <div className="tooltip" data-tip={isPlay ? "정지" : "재생"}>
+          <Button className="" type="button" shape="square" onClick={handlePlay} active={isPlay}>
+            {isPlay ? <IoPause className="w-5" /> : <IoPlay className="w-5" />}
+          </Button>
         </div>
+      </div>
 
+      <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
         <div>줄자</div>
+        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="relative h-full">
+          {/* section */}
+          <div className="w-full h-1/4 absolute top-0">
+            <div
+              ref={sectionBoxRef}
+              style={{
+                width: `${endX - startX}px`,
+                left: `${startX}px`,
+              }}
+              onMouseDown={handleMouseDown}
+              className={`
+			          absolute top-0 flex justify-between z-50 h-full
+			          cursor-grab rounded-lg
+                group
+			          opacity-30 hover:opacity-60
+                border-4 box-content
+                bg-neutral-400
+			          `}
+            >
+              <div
+                onMouseDown={handleMouseDownStartExpand}
+                style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+                className={`
+			            cursor-w-resize
+			            opacity-0 group-hover:opacity-100
+			          bg-neutral-600`}
+              ></div>
+              <div
+                onMouseDown={handleMouseDownEndExpand}
+                style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+                className={`
+			            cursor-e-resize
+			            opacity-0 group-hover:opacity-100
+			          bg-neutral-600`}
+              ></div>
+            </div>
+          </div>
 
-        <div
-          ref={progressRef}
-          style={{ width: `${progressWidthPercent}%` }}
-          className="relative bg-neutral-50 bg-opacity-25"
-        >
-          <div className="w-full h-1/4 bg-neutral-50 absolute top-1/4 border-t border-neutral-500">bgm</div>
-          <div className="w-full h-1/4 bg-neutral-50 absolute top-2/4 border-t border-neutral-500">title</div>
-          <div className="w-full h-1/4 bg-neutral-50 absolute top-3/4 border-t border-neutral-500">subtitle</div>
+          {/* bgm */}
+          <div className="w-full h-1/4 absolute top-1/4 border-t border-neutral-500">bgm</div>
+
+          {/* title */}
+          <div className="w-full h-1/4 absolute top-2/4 border-t border-neutral-500">title</div>
+
+          {/* subtitle */}
+          <div className="w-full h-1/4 absolute top-3/4 border-t border-neutral-500">subtitle</div>
+
           <input
-            className="w-full progress h-full rounded-none"
             type="range"
             min={0}
             max={100}
             value={videoProgress}
-            defaultValue={0}
             onChange={handleChangeProgress}
+            className="w-full progress h-full rounded-none "
           />
-
-          <div
-            ref={sectionBoxRef}
-            style={{
-              width: `${endX - startX}px`,
-              height: "25%",
-              left: `${startX}px`,
-            }}
-            onMouseDown={handleMouseDown}
-            className={`
-			absolute top-0 opacity-30 hover:opacity-60
-			cursor-grab group
-			flex justify-between
-			bg-neutral-400
-			`}
-          >
-            <div
-              onMouseDown={handleMouseDownStartExpand}
-              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-              className={`
-			  cursor-w-resize
-			  opacity-0 group-hover:opacity-100
-			bg-neutral-600`}
-            ></div>
-            <div
-              onMouseDown={handleMouseDownEndExpand}
-              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-              className={`
-			  cursor-e-resize
-			  opacity-0 group-hover:opacity-100
-			bg-neutral-600`}
-            ></div>
-          </div>
         </div>
       </div>
     </div>
