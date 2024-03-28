@@ -93,7 +93,7 @@ export default function TimePicker(props: TimePickerProps) {
               value={hour > 9 ? hour : `0${hour}`}
               onChange={(e) => setHour(Number(e.target.value))}
             />
-            <span>시</span>
+            <span className="w-8">시간</span>
           </div>
           <button
             className="btn btn-ghost"
