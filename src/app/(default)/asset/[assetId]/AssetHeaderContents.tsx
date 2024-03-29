@@ -8,13 +8,20 @@ import { useRouter } from 'next/navigation';
 
 import BackwardButton from '@/components/common/BackwardButton';
 
-export default function AssetHeaderContents() {
+type AssetHeaderContentsProps = {
+  prevUri?: string;
+};
+
+export default function AssetHeaderContents(props: AssetHeaderContentsProps) {
+  // props
+  const { prevUri } = props;
+
   // router
   const router = useRouter();
 
   // handler
   const handleBackdrop = () => {
-    router.back();
+    prevUri ? router.push(prevUri) : router.back();
   };
 
   return (

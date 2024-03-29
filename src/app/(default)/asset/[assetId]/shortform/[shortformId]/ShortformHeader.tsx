@@ -21,7 +21,8 @@ export default function ShortformHeader(props: ShortformHeaderProps) {
 
   // handler
   const handleBackdrop = () => {
-    router.push(`/asset/${assetId}`);
+    // router.push(`/asset/${assetId}`);
+    router.back();
   };
 
   return (

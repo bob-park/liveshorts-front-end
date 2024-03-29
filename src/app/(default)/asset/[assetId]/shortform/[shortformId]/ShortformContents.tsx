@@ -56,11 +56,11 @@ export default function ShortformContents(props: ShortformContentsProps) {
 
   // handle
   const handlePrev = () => {
-    prev && router.push(`/asset/${assetId}/shortform/${prev.id}`);
+    prev && router.replace(`/asset/${assetId}/shortform/${prev.id}`);
   };
 
   const handleNext = () => {
-    next && router.push(`/asset/${assetId}/shortform/${next.id}`);
+    next && router.replace(`/asset/${assetId}/shortform/${next.id}`);
   };
 
   return (
