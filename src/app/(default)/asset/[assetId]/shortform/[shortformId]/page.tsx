@@ -8,7 +8,7 @@ import ShortformContents from './ShortformContents';
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 type Props = {
-  params: { assetId: number; shortformId: number };
+  params: { assetId: number; shortformId: string };
 };
 
 export async function generateMetadata(
@@ -43,14 +43,6 @@ export default async function ShortFormPage({ params }: Props) {
     Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
   };
 
-  const response = await fetch(
-    MAM_API_HOST + `/api/v1/shorts/task/${shortformId}`,
-    {
-      method: 'get',
-      headers,
-    },
-  );
-
   const shortsResponse = await fetch(
     MAM_API_HOST + `/api/v1/shorts/task/search?assetId=${assetId}`,
     {
@@ -59,22 +51,11 @@ export default async function ShortFormPage({ params }: Props) {
     },
   );
 
-  const shortform: ShortFormTask = await response
-    .json()
-    .then((res) => res.result);
-
   const shortformList: ShortFormTask[] = await shortsResponse
     .json()
     .then((res) =>
       res.result.filter((item: ShortFormTask) => item.status === 'SUCCESS'),
     );
-
-  const nowIndex = shortformList.findIndex((item) => item.id === shortform.id);
-  const prevShortformId = nowIndex > 0 && shortformList[nowIndex - 1].id;
-  const nextShortformId =
-    nowIndex > -1 &&
-    nowIndex + 1 < shortformList.length &&
-    shortformList[nowIndex + 1].id;
 
   return (
     <div className="grid grid-cols-1 gap-2 px-5 py-2">
@@ -85,9 +66,9 @@ export default async function ShortFormPage({ params }: Props) {
       {/* contents */}
       <div className="w-full h-[calc(100lvh-12rem)]">
         <ShortformContents
-          shortform={shortform}
-          prevShortformId={prevShortformId}
-          nextShortformId={nextShortformId}
+          assetId={assetId}
+          shortformId={shortformId}
+          list={shortformList}
         />
       </div>
     </div>

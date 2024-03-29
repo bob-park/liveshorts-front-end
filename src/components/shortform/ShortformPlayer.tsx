@@ -6,11 +6,14 @@ import { IoPlay, IoPause, IoVolumeMute, IoVolumeHigh } from 'react-icons/io5';
 
 type ShortformPlayerProps = {
   src: string;
+  autoPlay?: boolean;
+  hidePregress?: boolean;
+  hoverEvent?: boolean;
 };
 
 export default function ShortformPlayer(props: ShortformPlayerProps) {
   // props
-  const { src } = props;
+  const { src, autoPlay, hidePregress, hoverEvent } = props;
 
   // state
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -68,11 +71,11 @@ export default function ShortformPlayer(props: ShortformPlayerProps) {
         onPause={() => setIsPlay(false)}
         onLoadedMetadata={(e) => {
           setLoadedShortFormVideo(true);
-          e.currentTarget.play();
+          autoPlay && e.currentTarget.play();
         }}
       />
 
-      {loadedShortFormVideo && (
+      {loadedShortFormVideo && !hidePregress && (
         <div className="absolute top-3 left-0 w-full px-4 ">
           <div className="relative w-full h-1 bg-gray-400">
             <div
@@ -89,7 +92,7 @@ export default function ShortformPlayer(props: ShortformPlayerProps) {
 
       <div
         className={`absolute flex justify-between top-0 left-0 size-full rounded-2xl transition-opacity duration-300 ${
-          hover
+          hoverEvent && hover
             ? 'opacity-100 bg-gradient-to-b from-black via-transparent to-black'
             : 'opacity-0'
         }`}
