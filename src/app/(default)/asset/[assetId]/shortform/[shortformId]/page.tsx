@@ -61,7 +61,7 @@ export default async function ShortFormPage({ params }: Props) {
     <div className="grid grid-cols-1 gap-2 px-5 py-2">
       {/* back drop */}
       <div className="">
-        <ShortformHeader />
+        <ShortformHeader assetId={assetId} />
       </div>
       {/* contents */}
       <div className="w-full h-[calc(100lvh-12rem)]">

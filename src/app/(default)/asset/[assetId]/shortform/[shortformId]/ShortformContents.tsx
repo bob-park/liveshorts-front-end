@@ -73,19 +73,9 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* shortform player */}
       <div className="h-full aspect-[9/16]">
         <div className="h-full flex flex-col gap-1 justify-center items-center">
-          {/* prev */}
-          <div className="flex-none w-full h-5">
-            {prev && <div className="size-full bg-black rounded-b-2xl"></div>}
-          </div>
-
           {/* player */}
           <div className="h-full">
             <ShortformPlayer src={nowSrc} hoverEvent autoPlay />
-          </div>
-
-          {/* next */}
-          <div className="flex-none w-full h-5">
-            {next && <div className="size-full bg-black rounded-t-2xl"></div>}
           </div>
         </div>
       </div>

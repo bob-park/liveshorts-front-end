@@ -8,13 +8,20 @@ import { useRouter } from 'next/navigation';
 
 import BackwardButton from '@/components/common/BackwardButton';
 
-export default function ShortformHeader() {
+type ShortformHeaderProps = {
+  assetId: number;
+};
+
+export default function ShortformHeader(props: ShortformHeaderProps) {
+  //props
+  const { assetId } = props;
+
   // router
   const router = useRouter();
 
   // handler
   const handleBackdrop = () => {
-    router.back();
+    router.push(`/asset/${assetId}`);
   };
 
   return (
