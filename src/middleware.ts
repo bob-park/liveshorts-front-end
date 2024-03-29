@@ -83,7 +83,7 @@ export async function middleware(req: NextRequest) {
     if (uncheckedAuth(pathname) && apiResponse.status === 401) {
       return new NextResponse(apiResponse.body, {
         ...apiResponse,
-        status: 400,
+        status: 401,
       });
     }
 

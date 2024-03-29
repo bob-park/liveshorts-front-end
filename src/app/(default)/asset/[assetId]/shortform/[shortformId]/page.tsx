@@ -8,7 +8,7 @@ import ShortformContents from './ShortformContents';
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 type Props = {
-  params: { shortformId: number };
+  params: { assetId: number; shortformId: number };
 };
 
 export async function generateMetadata(
@@ -37,15 +37,25 @@ export async function generateMetadata(
 }
 
 export default async function ShortFormPage({ params }: Props) {
-  const { shortformId } = params;
+  const { assetId, shortformId } = params;
+
+  const headers = {
+    Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+  };
 
   const response = await fetch(
     MAM_API_HOST + `/api/v1/shorts/task/${shortformId}`,
     {
       method: 'get',
-      headers: {
-        Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
-      },
+      headers,
+    },
+  );
+
+  const shortsResponse = await fetch(
+    MAM_API_HOST + `/api/v1/shorts/task/search?assetId=${assetId}`,
+    {
+      method: 'get',
+      headers: headers,
     },
   );
 
@@ -53,16 +63,32 @@ export default async function ShortFormPage({ params }: Props) {
     .json()
     .then((res) => res.result);
 
+  const shortformList: ShortFormTask[] = await shortsResponse
+    .json()
+    .then((res) =>
+      res.result.filter((item: ShortFormTask) => item.status === 'SUCCESS'),
+    );
+
+  const nowIndex = shortformList.findIndex((item) => item.id === shortform.id);
+  const prevShortformId = nowIndex > 0 && shortformList[nowIndex - 1].id;
+  const nextShortformId =
+    nowIndex > -1 &&
+    nowIndex + 1 < shortformList.length &&
+    shortformList[nowIndex + 1].id;
+
   return (
-    <div className="grid grid-cols-1 gap-4 px-5 py-2">
+    <div className="grid grid-cols-1 gap-2 px-5 py-2">
       {/* back drop */}
       <div className="">
         <ShortformHeader />
       </div>
-
       {/* contents */}
-      <div className="w-full h-[calc(100lvh-15rem)]">
-        <ShortformContents shortform={shortform} />
+      <div className="w-full h-[calc(100lvh-12rem)]">
+        <ShortformContents
+          shortform={shortform}
+          prevShortformId={prevShortformId}
+          nextShortformId={nextShortformId}
+        />
       </div>
     </div>
   );
