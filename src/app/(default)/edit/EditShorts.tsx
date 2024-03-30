@@ -12,336 +12,403 @@ const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 
 export default function EditShorts() {
-  // useRef
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const sectionBoxRef = useRef<HTMLDivElement>(null);
-  const startXRef = useRef<number | null>(null);
-  const endXRef = useRef<number | null>(null);
-  const prevStartX = useRef<number>(0);
-  const prevEndX = useRef<number>(0);
-  const prevProgressWidth = useRef<number>(0);
+	// useRef
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const progressRef = useRef<HTMLDivElement>(null);
+	const progressBarRef = useRef<HTMLDivElement>(null);
+	const sectionBoxRef = useRef<HTMLDivElement>(null);
+	const progressBarXRef = useRef<number | null>(null);
+	const startXRef = useRef<number | null>(null);
+	const endXRef = useRef<number | null>(null);
+	const prevProgressBarX = useRef<number>(0);
+	const prevStartX = useRef<number>(0);
+	const prevEndX = useRef<number>(0);
+	const prevProgressWidth = useRef<number>(0);
 
-  // useState
-  const [videoProgress, setVideoProgress] = useState<number>(0);
-  const [videoDuration, setVideoDuration] = useState(0);
-  const [isPlay, setIsPlay] = useState<boolean>(false);
-  const [startX, setStartX] = useState<number>(0);
-  const [endX, setEndX] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
-  const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
+	// useState
+	const [videoProgress, setVideoProgress] = useState<number>(0);
+	const [videoDuration, setVideoDuration] = useState(0);
+	const [isPlay, setIsPlay] = useState(false);
+	const [progressBarX, setProgressBarX] = useState(0);
+	const [startX, setStartX] = useState(0);
+	const [endX, setEndX] = useState(0);
+	const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
+	const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
+	const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
+	const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
 
-  // useEffect
-  useEffect(() => {
-    videoRef.current?.load();
-  }, []);
+	// useEffect
+	useEffect(() => {
+		videoRef.current?.load();
+	}, []);
 
-  useEffect(() => {
-    prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
-    setEndX(prevEndX.current);
-  }, [videoDuration]);
+	useEffect(() => {
+		prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
+		setEndX(prevEndX.current);
+	}, [videoDuration]);
 
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      if (isDragging && startXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-        const newDivX = e.clientX - startXRef.current;
-        const maxX = ProgressWidth - sectionBoxWidth;
+	useEffect(() => {
+		function handleMouseMove(e: MouseEvent) {
+			if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current) {
+				const ProgressWidth = progressRef.current.clientWidth;
+				const progressBarWidth = progressBarRef.current!.clientWidth;
+				const newDivX = e.clientX - progressBarXRef.current;
+				const maxX = ProgressWidth - progressBarWidth;
 
-        const newStartX = Math.max(0, Math.min(maxX, newDivX));
-        const newEndX = newStartX + sectionBoxWidth;
+				const newStartX = Math.max(0, Math.min(maxX, newDivX));
 
-        setStartX(newStartX);
-        setEndX(newEndX);
-        prevStartX.current = newStartX;
-        prevEndX.current = newEndX;
-      }
-    }
+				setProgressBarX(newStartX);
+				prevProgressBarX.current = newStartX;
+			}
+		}
 
-    function handleMouseUp() {
-      setIsDragging(false);
-      startXRef.current = null;
-    }
+		function handleMouseUp() {
+			setIsProgressBarDragging(false);
+			progressBarXRef.current = null;
+		}
 
-    if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
+		if (isProgressBarDragging) {
+			window.addEventListener("mousemove", handleMouseMove);
+			window.addEventListener("mouseup", handleMouseUp);
+		}
 
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging]);
+		return () => {
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [isProgressBarDragging]);
 
-  useEffect(() => {
-    function handleMouseMove(e: MouseEvent) {
-      if (isExpandDragging.startTime && startXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-        const newDivX = e.clientX - startXRef.current;
-        const maxX = ProgressWidth - sectionBoxWidth;
+	useEffect(() => {
+		function handleMouseMove(e: MouseEvent) {
+			if (isSectionBoxDragging && startXRef.current !== null && progressRef.current) {
+				const ProgressWidth = progressRef.current.clientWidth;
+				const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
+				const newDivX = e.clientX - startXRef.current;
+				const maxX = ProgressWidth - sectionBoxWidth;
 
-        const newX = Math.max(0, Math.min(maxX, newDivX));
+				const newStartX = Math.max(0, Math.min(maxX, newDivX));
+				const newEndX = newStartX + sectionBoxWidth;
 
-        setStartX(newX);
-        prevStartX.current = newX;
-      }
-      if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const newDivX = e.clientX - endXRef.current;
-        const maxX = ProgressWidth;
+				setStartX(newStartX);
+				setEndX(newEndX);
+				prevStartX.current = newStartX;
+				prevEndX.current = newEndX;
+			}
+		}
 
-        const newX = Math.max(0, Math.min(maxX, newDivX));
+		function handleMouseUp() {
+			setIsSectionBoxDragging(false);
+			startXRef.current = null;
+		}
 
-        setEndX(newX);
-        prevEndX.current = newX;
-      }
-    }
+		if (isSectionBoxDragging) {
+			window.addEventListener("mousemove", handleMouseMove);
+			window.addEventListener("mouseup", handleMouseUp);
+		}
 
-    function handleMouseUp() {
-      setIsExpandDragging({ startTime: false, endTime: false });
-      startXRef.current = null;
-      endXRef.current = null;
-    }
+		return () => {
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [isSectionBoxDragging]);
 
-    if (isExpandDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-    }
+	useEffect(() => {
+		function handleMouseMove(e: MouseEvent) {
+			if (isExpandDragging.startTime && startXRef.current !== null && progressRef.current) {
+				const ProgressWidth = progressRef.current.clientWidth;
+				const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
+				const newDivX = e.clientX - startXRef.current;
+				const maxX = ProgressWidth - sectionBoxWidth;
 
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isExpandDragging]);
+				const newX = Math.max(0, Math.min(maxX, newDivX));
 
-  prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
+				setStartX(newX);
+				prevStartX.current = newX;
+			}
+			if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
+				const ProgressWidth = progressRef.current.clientWidth;
+				const newDivX = e.clientX - endXRef.current;
+				const maxX = ProgressWidth;
 
-  useEffect(() => {
-    function handleWindowResize() {
-      if (progressRef.current && sectionBoxRef.current) {
-        const progressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+				const newX = Math.max(0, Math.min(maxX, newDivX));
 
-        const resizeRatio = progressWidth / prevProgressWidth.current;
-        const startMaxX = progressWidth - sectionBoxWidth;
-        const endMaxX = progressWidth;
+				setEndX(newX);
+				prevEndX.current = newX;
+			}
+		}
 
-        const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
-        const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
+		function handleMouseUp() {
+			setIsExpandDragging({ startTime: false, endTime: false });
+			startXRef.current = null;
+			endXRef.current = null;
+		}
 
-        setStartX(newStartX);
-        setEndX(newEndX);
+		if (isExpandDragging) {
+			window.addEventListener("mousemove", handleMouseMove);
+			window.addEventListener("mouseup", handleMouseUp);
+		}
 
-        prevStartX.current = newStartX;
-        prevEndX.current = newEndX;
-      }
-    }
+		return () => {
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [isExpandDragging]);
 
-    window.addEventListener("resize", handleWindowResize);
+	prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
 
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, []);
+	useEffect(() => {
+		function handleWindowResize() {
+			if (progressRef.current && sectionBoxRef.current && progressBarRef.current) {
+				const progressWidth = progressRef.current.clientWidth;
+				const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+				const preogressBarWidth = progressBarRef.current.clientWidth;
 
-  useEffect(() => {
-    if (progressRef.current && sectionBoxRef.current) {
-      const progressWidth = progressRef.current.clientWidth;
-      const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+				const resizeRatio = progressWidth / prevProgressWidth.current;
+				const startMaxX = progressWidth - sectionBoxWidth;
+				const endMaxX = progressWidth;
+				const progressBarMaxX = progressWidth - preogressBarWidth;
 
-      const startMaxX = progressWidth - sectionBoxWidth;
-      const endMaxX = progressWidth;
+				const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
+				const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
+				const newprogressBarX = Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio);
 
-      const newStartX = Math.max(0, Math.min(startMaxX, (prevStartX.current * progressWidthPercent) / 100));
-      const newEndX = Math.max(0, Math.min(endMaxX, (prevEndX.current * progressWidthPercent) / 100));
+				setStartX(newStartX);
+				setEndX(newEndX);
+				setProgressBarX(newprogressBarX);
 
-      setStartX(newStartX);
-      setEndX(newEndX);
-    }
-  }, [progressWidthPercent]);
+				prevStartX.current = newStartX;
+				prevEndX.current = newEndX;
+				prevProgressBarX.current = newprogressBarX;
+			}
+		}
 
-  useEffect(() => {
-    const handlePlayerKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
+		window.addEventListener("resize", handleWindowResize);
 
-      if (videoRef.current) {
-        if (e.key === "ArrowRight") {
-          videoRef.current.currentTime += 10;
-        } else if (e.key === "ArrowLeft") {
-          videoRef.current.currentTime -= 10;
-        } else if (e.key === " ") {
-          const paused = videoRef.current.paused;
+		return () => {
+			window.removeEventListener("resize", handleWindowResize);
+		};
+	}, []);
 
-          paused ? videoRef.current.play() : videoRef.current.pause();
-        }
-      }
-    };
+	// TODO prevPecent를 저장해서 비교 후 좌표 설정
+	useEffect(() => {
+		if (progressRef.current && sectionBoxRef.current && progressBarRef.current) {
+			const progressWidth = progressRef.current.clientWidth;
+			const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+			const preogressBarWidth = progressBarRef.current.clientWidth;
 
-    window.addEventListener("keydown", handlePlayerKeyDown);
+			const startMaxX = progressWidth - sectionBoxWidth;
+			const endMaxX = progressWidth;
+			const progressBarMaxX = progressWidth - preogressBarWidth;
 
-    return () => {
-      window.removeEventListener("keydown", handlePlayerKeyDown);
-    };
-  }, []);
+			const newStartX = Math.max(0, Math.min(startMaxX, (prevStartX.current * progressWidthPercent) / 100));
+			const newEndX = Math.max(0, Math.min(endMaxX, (prevEndX.current * progressWidthPercent) / 100));
+			const newProgressBarX = Math.max(
+				0,
+				Math.min(progressBarMaxX, (prevProgressBarX.current * progressWidthPercent) / 100)
+			);
 
-  // functions
-  function handleChangeProgress(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = Number(e.target.value);
-    const currentTime = videoDuration * (value / 100);
+			setStartX(newStartX);
+			setEndX(newEndX);
+			setProgressBarX(newProgressBarX);
+		}
+	}, [progressWidthPercent]);
 
-    if (videoRef.current) {
-      videoRef.current.currentTime = currentTime;
+	useEffect(() => {
+		const handlePlayerKeyDown = (e: KeyboardEvent) => {
+			e.preventDefault();
 
-      setVideoProgress(value);
-    }
-  }
+			if (videoRef.current) {
+				if (e.key === "ArrowRight") {
+					videoRef.current.currentTime += 10;
+				} else if (e.key === "ArrowLeft") {
+					videoRef.current.currentTime -= 10;
+				} else if (e.key === " ") {
+					const paused = videoRef.current.paused;
 
-  function expandProgress() {
-    setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + 25));
-  }
+					paused ? videoRef.current.play() : videoRef.current.pause();
+				}
+			}
+		};
 
-  function shrinkProgress() {
-    setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - 25));
-  }
+		window.addEventListener("keydown", handlePlayerKeyDown);
 
-  function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
-    setVideoDuration(e.currentTarget.duration);
-    setVideoProgress(0);
-  }
+		return () => {
+			window.removeEventListener("keydown", handlePlayerKeyDown);
+		};
+	}, []);
 
-  function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    setIsDragging(true);
+	useEffect(() => {
+		if (videoRef.current) {
+			const time = pxToTime(progressBarX);
+			videoRef.current.currentTime = time;
+			setVideoProgress(time);
+		}
+	}, [progressBarX]);
 
-    startXRef.current = e.clientX - startX;
-  }
+	// functions
+	function handleClickProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		const x = e.clientX;
+		setProgressBarX(x);
+	}
 
-  function handleMouseDownStartExpand(e: React.MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    setIsExpandDragging({ ...isExpandDragging, startTime: true });
+	function expandProgress() {
+		setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + 25));
+	}
 
-    startXRef.current = e.clientX - startX;
-  }
+	function shrinkProgress() {
+		setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - 25));
+	}
 
-  function handleMouseDownEndExpand(e: React.MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    setIsExpandDragging({ ...isExpandDragging, endTime: true });
+	function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
+		setVideoDuration(e.currentTarget.duration);
+		setVideoProgress(0);
+	}
 
-    endXRef.current = e.clientX - endX;
-  }
+	function handleMouseDownProgressBar(e: React.MouseEvent<HTMLDivElement>) {
+		e.stopPropagation();
+		setIsProgressBarDragging(true);
 
-  function handlePlay() {
-    !isPlay ? videoRef.current?.play() : videoRef.current?.pause();
-  }
+		progressBarXRef.current = e.clientX - progressBarX;
+	}
 
-  function handleBack() {
-    if (videoRef.current) {
-      videoRef.current.currentTime -= 10;
-    }
-  }
+	function handleMouseDownSectionBox(e: React.MouseEvent<HTMLDivElement>) {
+		e.stopPropagation();
+		setIsSectionBoxDragging(true);
 
-  function handleFoward() {
-    if (videoRef.current) {
-      videoRef.current.currentTime += 10;
-    }
-  }
+		startXRef.current = e.clientX - startX;
+	}
 
-  function timeToPx(time: number) {
-    return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
-  }
+	function handleMouseDownStartExpand(e: React.MouseEvent<HTMLDivElement>) {
+		e.stopPropagation();
+		setIsExpandDragging({ ...isExpandDragging, startTime: true });
 
-  // 추후에 startX, endX를 이용해서 api날릴 때 사용할 함수
-  function pxToTime(px: number) {
-    return (px * videoDuration) / (progressRef.current?.clientWidth ?? 0);
-  }
+		startXRef.current = e.clientX - startX;
+	}
 
-  return (
-    <div className="grid grid-rows-[1fr,50px,250px] h-full">
-      <div className="grid grid-cols-[300px,1fr] border-b">
-        <div className="border-r">작업 패널</div>
+	function handleMouseDownEndExpand(e: React.MouseEvent<HTMLDivElement>) {
+		e.stopPropagation();
+		setIsExpandDragging({ ...isExpandDragging, endTime: true });
 
-        <div className="flex flex-col gap-4 justify-center items-center">
-          <div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
-            <video
-              controls
-              ref={videoRef}
-              src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
-              onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
-              onLoadedMetadataCapture={handleLoadedMetadata}
-              onPause={() => setIsPlay(false)}
-              onPlay={() => setIsPlay(true)}
-              className="w-full h-full"
-            ></video>
-          </div>
+		endXRef.current = e.clientX - endX;
+	}
 
-          <div>
-            <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
-            <IconButton
-              toolTip={isPlay ? "정지" : "재생"}
-              onClick={handlePlay}
-              Icon={isPlay ? <IoPause /> : <IoPlay />}
-            ></IconButton>
-            <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
-          </div>
-        </div>
-      </div>
+	function handlePlay() {
+		!isPlay ? videoRef.current?.play() : videoRef.current?.pause();
+	}
 
-      <div className="flex items-center">
-        <span>{progressWidthPercent}%</span>
-        <IconButton toolTip="25% 확대" onClick={expandProgress} Icon={<FaMagnifyingGlassPlus />}></IconButton>
-        <IconButton toolTip="25% 축소" onClick={shrinkProgress} Icon={<FaMagnifyingGlassMinus />}></IconButton>
-      </div>
+	function handleBack() {
+		if (videoRef.current) {
+			videoRef.current.currentTime -= 10;
+		}
+	}
 
-      <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
-        <div>줄자</div>
-        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="progressBar">
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={videoProgress}
-            onChange={handleChangeProgress}
-            className="rangeBar"
-          />
-          {/* section */}
-          <div
-            ref={sectionBoxRef}
-            style={{
-              width: `${endX - startX}px`,
-              left: `${startX}px`,
-            }}
-            onMouseDown={handleMouseDown}
-            className={`
-			          absolute top-0 flex justify-between z-50 h-full
+	function handleFoward() {
+		if (videoRef.current) {
+			videoRef.current.currentTime += 10;
+		}
+	}
+
+	function timeToPx(time: number) {
+		return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
+	}
+
+	// 추후에 startX, endX를 이용해서 api날릴 때 사용할 함수
+	function pxToTime(px: number) {
+		return (px * videoDuration) / (progressRef.current?.clientWidth ?? 0);
+	}
+
+	return (
+		<div className="grid grid-rows-[1fr,50px,250px] h-full">
+			<div className="grid grid-cols-[300px,1fr] border-b">
+				<div className="border-r">작업 패널</div>
+
+				<div className="flex flex-col gap-4 justify-center items-center">
+					<div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
+						<video
+							controls
+							ref={videoRef}
+							src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
+							onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
+							onLoadedMetadataCapture={handleLoadedMetadata}
+							onPause={() => setIsPlay(false)}
+							onPlay={() => setIsPlay(true)}
+							className="w-full h-full"
+						></video>
+					</div>
+
+					<div>
+						<IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
+						<IconButton
+							toolTip={isPlay ? "정지" : "재생"}
+							onClick={handlePlay}
+							Icon={isPlay ? <IoPause /> : <IoPlay />}
+						></IconButton>
+						<IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
+					</div>
+				</div>
+			</div>
+
+			<div className="flex items-center">
+				<span>{progressWidthPercent}%</span>
+				<IconButton toolTip="25% 확대" onClick={expandProgress} Icon={<FaMagnifyingGlassPlus />}></IconButton>
+				<IconButton toolTip="25% 축소" onClick={shrinkProgress} Icon={<FaMagnifyingGlassMinus />}></IconButton>
+			</div>
+
+			<div className="grid grid-rows-[50px,200px] overflow-x-scroll">
+				<div>줄자</div>
+				<div
+					ref={progressRef}
+					style={{ width: `${progressWidthPercent}%` }}
+					onClick={handleClickProgress}
+					className="relative bg-neutral-50"
+				>
+					<div
+						ref={progressBarRef}
+						style={{
+							left: `${progressBarX}px`,
+						}}
+						onMouseDown={handleMouseDownProgressBar}
+						className={`
+					w-1 h-full absolute
+					cursor-pointer z-50
+					bg-red-900 `}
+					></div>
+
+					{/* section */}
+					<div
+						ref={sectionBoxRef}
+						style={{
+							width: `${endX - startX}px`,
+							left: `${startX}px`,
+						}}
+						onMouseDown={handleMouseDownSectionBox}
+						className={`
+			          absolute top-0 flex justify-between z-40 h-full
 			          cursor-grab rounded-lg
                 group
 			          opacity-30 hover:opacity-60
                 bg-neutral-400
 			          `}
-          >
-            <div
-              onMouseDown={handleMouseDownStartExpand}
-              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-              className={`
+					>
+						<div
+							onMouseDown={handleMouseDownStartExpand}
+							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+							className={`
 			            cursor-w-resize
 			            opacity-0 group-hover:opacity-100
 			          bg-neutral-600`}
-            ></div>
-            <div
-              onMouseDown={handleMouseDownEndExpand}
-              style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
-              className={`
+						></div>
+						<div
+							onMouseDown={handleMouseDownEndExpand}
+							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+							className={`
 			            cursor-e-resize
 			            opacity-0 group-hover:opacity-100
 			          bg-neutral-600`}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+						></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
