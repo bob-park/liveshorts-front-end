@@ -335,10 +335,11 @@ export default function EditShorts() {
 		return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
 	}
 
-	// 추후에 startX, endX를 이용해서 api날릴 때 사용할 함수
 	function pxToTime(px: number) {
 		return (px * videoDuration) / (progressRef.current?.clientWidth ?? 0);
 	}
+
+	const timeArray = fillRangeWithInterval(5, videoDuration);
 
 	return (
 		<div className="grid grid-rows-[1fr,50px,250px] h-full">
@@ -391,7 +392,18 @@ export default function EditShorts() {
 			</div>
 
 			<div className="grid grid-rows-[50px,200px] overflow-x-scroll">
-				<div>줄자</div>
+				<div style={{ width: `${progressWidthPercent}%` }} className="flex justify-between pb-2">
+					{timeArray.map((v, i) => (
+						<div key={i} className="grid grid-cols-5 border-l">
+							<div className="border-r"></div>
+							<div className="border-r"></div>
+							<div className="border-r"></div>
+							<div className="border-r"></div>
+							<div></div>
+							<span className="text-sm">{v}</span>
+						</div>
+					))}
+				</div>
 				<div
 					ref={progressRef}
 					style={{ width: `${progressWidthPercent}%` }}
@@ -419,10 +431,10 @@ export default function EditShorts() {
 					>
 						<div
 							onMouseDown={handleMouseDownStartExpand}
-							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
+							// style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
 							className={`
 			            cursor-w-resize
-									rounded-l-lg
+									rounded-l-lg w-7
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
 			          bg-slate-600
@@ -439,10 +451,9 @@ export default function EditShorts() {
 						></div>
 						<div
 							onMouseDown={handleMouseDownEndExpand}
-							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
 							className={`
 			            cursor-e-resize
-									rounded-r-lg
+									rounded-r-lg w-7
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
 			          bg-slate-600
@@ -465,4 +476,29 @@ export default function EditShorts() {
 			</div>
 		</div>
 	);
+}
+
+// util 함수
+function secondsToHhmmss(seconds: number) {
+	const hours = Math.floor(seconds / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
+
+	const HH = String(hours).padStart(2, "0");
+	const MM = String(minutes).padStart(2, "0");
+	const SS = String(remainingSeconds).padStart(2, "0");
+
+	return `${HH}:${MM}:${SS}`;
+}
+
+function fillRangeWithInterval(number: number, videoDuration: number) {
+	const interval = videoDuration / (number - 1);
+
+	const result = [];
+	for (let i = 0; i < number; i++) {
+		result.push(Math.round(i * interval));
+	}
+	const timeArray = result.map((v) => secondsToHhmmss(v));
+
+	return timeArray;
 }
