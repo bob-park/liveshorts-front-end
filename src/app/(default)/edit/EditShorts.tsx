@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button } from "react-daisyui";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { IoPause, IoPlay, IoPlayBack, IoPlayForward } from "react-icons/io5";
 import IconButton from "./IconButton";
@@ -50,10 +49,10 @@ export default function EditShorts() {
 	useEffect(() => {
 		function handleMouseMove(e: MouseEvent) {
 			if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current) {
-				const ProgressWidth = progressRef.current.clientWidth;
+				const progressWidth = progressRef.current.clientWidth;
 				const progressBarWidth = progressBarRef.current!.clientWidth;
 				const newDivX = e.clientX - progressBarXRef.current;
-				const maxX = ProgressWidth - progressBarWidth;
+				const maxX = progressWidth - progressBarWidth;
 
 				const newStartX = Math.max(0, Math.min(maxX, newDivX));
 
@@ -170,15 +169,15 @@ export default function EditShorts() {
 
 				const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
 				const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
-				const newprogressBarX = Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio);
+				const newProgressBarX = Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio);
 
 				setStartX(newStartX);
 				setEndX(newEndX);
-				setProgressBarX(newprogressBarX);
+				setProgressBarX(newProgressBarX);
 
 				prevStartX.current = newStartX;
 				prevEndX.current = newEndX;
-				prevProgressBarX.current = newprogressBarX;
+				prevProgressBarX.current = newProgressBarX;
 			}
 		}
 
