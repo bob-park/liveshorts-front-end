@@ -1,120 +1,13 @@
 .fade-out {
-  animation: fadeOut 1s cubic-bezier(0.2, 1, 0.2, 1);
-  animation-fill-mode: forwards;
+	animation: fadeOut 1s cubic-bezier(0.2, 1, 0.2, 1);
+	animation-fill-mode: forwards;
 }
 
 @keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.progressBar {
-  vertical-align: baseline;
-  position: relative;
-  width: 100%;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  overflow: hidden;
-  height: 100%;
-  background-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
-}
-.progressBar::-webkit-progress-bar {
-  border-radius: var(--rounded-box, 1rem);
-  background-color: transparent;
-}
-.progress::-moz-progress-bar {
-  border-radius: var(--rounded-box, 1rem);
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-bc, oklch(var(--bc) / var(--tw-bg-opacity)));
-}
-.progressBar::-webkit-progress-value {
-  border-radius: var(--rounded-box, 1rem);
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-bc, oklch(var(--bc) / var(--tw-bg-opacity)));
-}
-.progressBar:indeterminate {
-  --progress-color: var(--fallback-bc, oklch(var(--bc) / 1));
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--progress-color) -1%,
-    var(--progress-color) 10%,
-    transparent 10%,
-    transparent 90%
-  );
-  background-size: 200%;
-  background-position-x: 15%;
-  animation: progress-loading 5s ease-in-out infinite;
-}
-
-.rangeBar {
-  height: 100%;
-  width: 100%;
-  cursor: pointer;
-  -moz-appearance: none;
-  appearance: none;
-  -webkit-appearance: none;
-  --range-shdw: var(--fallback-bc, oklch(var(--bc) / 1));
-  overflow: hidden;
-  background-color: transparent;
-}
-
-.rangeBar:focus {
-  outline: none;
-}
-
-.rangeBar:focus-visible::-webkit-slider-thumb {
-  --focus-shadow: 0 0 0 6px var(--fallback-b1, oklch(var(--b1) / 1)) inset, 0 0 0 2rem var(--range-shdw) inset;
-}
-.rangeBar:focus-visible::-moz-range-thumb {
-  --focus-shadow: 0 0 0 6px var(--fallback-b1, oklch(var(--b1) / 1)) inset, 0 0 0 2rem var(--range-shdw) inset;
-}
-.rangeBar::-webkit-slider-runnable-track {
-  height: 100%;
-  width: 100%;
-  border-radius: var(--rounded-box, 1rem);
-  /* background-color: var(--fallback-bc, oklch(var(--bc) / 0.1)); */
-}
-.rangeBar::-moz-range-track {
-  height: 100%;
-  width: 100%;
-  border-radius: var(--rounded-box, 1rem);
-  /* background-color: var(--fallback-bc, oklch(var(--bc) / 0.1)); */
-}
-.rangeBar::-webkit-slider-thumb {
-  position: relative;
-  height: 100%;
-  width: 2px;
-  border-radius: var(--rounded-box, 1rem);
-  border-style: none;
-  --tw-bg-opacity: 1;
-  background-color: rgb(52 52 52);
-  appearance: none;
-  -webkit-appearance: none;
-  top: 50%;
-  color: var(--range-shdw);
-  transform: translateY(-50%);
-  --filler-size: 100rem;
-  --filler-offset: 0.6rem;
-  /* box-shadow: 0 0 0 3px var(--range-shdw) inset, var(--focus-shadow, 0 0),
-    calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size); */
-}
-.rangeBar::-moz-range-thumb {
-  position: relative;
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: var(--rounded-box, 1rem);
-  border-style: none;
-  --tw-bg-opacity: 1;
-  /* background-color: var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity))); */
-  top: 50%;
-  color: var(--range-shdw);
-  --filler-size: 100rem;
-  --filler-offset: 0.5rem;
-  box-shadow: 0 0 0 3px var(--range-shdw) inset, var(--focus-shadow, 0 0),
-    calc(var(--filler-size) * -1 - var(--filler-offset)) 0 0 var(--filler-size);
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }
