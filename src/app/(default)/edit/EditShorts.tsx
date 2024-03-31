@@ -246,9 +246,10 @@ export default function EditShorts() {
 	}, [progressBarX]);
 
 	// functions
-	function handleClickProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+	function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
 		const x = e.clientX;
 		setProgressBarX(x);
+		prevProgressBarX.current = x;
 	}
 
 	function expandProgress() {
@@ -359,21 +360,9 @@ export default function EditShorts() {
 				<div
 					ref={progressRef}
 					style={{ width: `${progressWidthPercent}%` }}
-					onClick={handleClickProgress}
+					onMouseDown={handleMouseDownProgress}
 					className="relative bg-neutral-50"
 				>
-					<div
-						ref={progressBarRef}
-						style={{
-							left: `${progressBarX}px`,
-						}}
-						onMouseDown={handleMouseDownProgressBar}
-						className={`
-					w-1 h-full absolute
-					cursor-pointer z-50
-					bg-red-900 `}
-					></div>
-
 					{/* section */}
 					<div
 						ref={sectionBoxRef}
@@ -383,7 +372,7 @@ export default function EditShorts() {
 						}}
 						onMouseDown={handleMouseDownSectionBox}
 						className={`
-			          absolute top-0 flex justify-between z-40 h-full
+			          absolute top-0 flex justify-between h-full
 			          cursor-grab rounded-lg
                 group
 			          opacity-30 hover:opacity-60
@@ -407,6 +396,18 @@ export default function EditShorts() {
 			          bg-neutral-600`}
 						></div>
 					</div>
+
+					<div
+						ref={progressBarRef}
+						style={{
+							left: `${progressBarX}px`,
+						}}
+						onMouseDown={handleMouseDownProgressBar}
+						className={`
+					w-1 h-full absolute
+					cursor-pointer
+					bg-red-900 `}
+					></div>
 				</div>
 			</div>
 		</div>
