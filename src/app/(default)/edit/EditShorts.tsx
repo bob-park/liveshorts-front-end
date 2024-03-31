@@ -5,6 +5,8 @@ import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { IoPause, IoPlay, IoPlayBack, IoPlayForward } from "react-icons/io5";
 import IconButton from "./IconButton";
 
+type LineType = "video" | "bgm" | "title" | "subtitle";
+
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
@@ -37,7 +39,7 @@ export default function EditShorts() {
 	const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
 	const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
 	const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
-	const [selectedLine, setSelctedLine] = useState("");
+	const [selectedLine, setSelctedLine] = useState<LineType | null>(null);
 
 	// useEffect
 	useEffect(() => {
@@ -345,7 +347,7 @@ export default function EditShorts() {
 
 				<div
 					onClick={() => {
-						setSelctedLine("");
+						setSelctedLine(null);
 					}}
 					className="flex flex-col gap-4 justify-center items-center"
 				>
@@ -412,30 +414,39 @@ export default function EditShorts() {
 			          absolute top-0 flex justify-between h-full
 			          cursor-grab rounded-lg
                 group
-								inset-0 border-4 box-content
-								${selectedLine !== "video" && "hover:border-opacity-50"}
-								${selectedLine === "video" ? "border-opacity-100" : "border-opacity-0"}
                 bg-slate-200
-								border-slate-600
 			          `}
 					>
 						<div
 							onMouseDown={handleMouseDownStartExpand}
-							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
 							className={`
 			            cursor-w-resize
+									rounded-l-lg
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-			          bg-slate-600`}
+			          bg-slate-600
+								`}
+						></div>
+						<div
+							className={`
+							w-full
+						inset-0 border-t-4 border-b-4 box-content border-opacity-0
+						${selectedLine !== "video" && "group-hover:border-opacity-50"}
+						${selectedLine === "video" ? " border-opacity-100" : "border-opacity-0"}
+								border-slate-600
+								`}
 						></div>
 						<div
 							onMouseDown={handleMouseDownEndExpand}
-							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
+							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
 							className={`
 			            cursor-e-resize
+									rounded-r-lg
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-			          bg-slate-600`}
+			          bg-slate-600
+								`}
 						></div>
 					</div>
 
