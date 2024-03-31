@@ -9,6 +9,7 @@ const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
+const WIDTH_PERCENT_STEP = 25;
 
 export default function EditShorts() {
 	// useRef
@@ -23,9 +24,10 @@ export default function EditShorts() {
 	const prevStartX = useRef<number>(0);
 	const prevEndX = useRef<number>(0);
 	const prevProgressWidth = useRef<number>(0);
+	const prevProgressWidthPercent = useRef<number>(0);
 
 	// useState
-	const [videoProgress, setVideoProgress] = useState<number>(0);
+	// const [videoProgress, setVideoProgress] = useState<number>(0);
 	const [videoDuration, setVideoDuration] = useState(0);
 	const [isPlay, setIsPlay] = useState(false);
 	const [progressBarX, setProgressBarX] = useState(0);
@@ -188,28 +190,37 @@ export default function EditShorts() {
 		};
 	}, []);
 
-	// TODO prevPecent를 저장해서 비교 후 좌표 설정
 	useEffect(() => {
-		if (progressRef.current && sectionBoxRef.current && progressBarRef.current) {
-			const progressWidth = progressRef.current.clientWidth;
-			const sectionBoxWidth = sectionBoxRef.current.clientWidth;
-			const preogressBarWidth = progressBarRef.current.clientWidth;
+		function handleChangeWitdhPercent() {
+			if (progressRef.current && sectionBoxRef.current && progressBarRef.current && prevProgressWidthPercent.current) {
+				const progressWidth = progressRef.current.clientWidth;
+				const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+				const preogressBarWidth = progressBarRef.current.clientWidth;
 
-			const startMaxX = progressWidth - sectionBoxWidth;
-			const endMaxX = progressWidth;
-			const progressBarMaxX = progressWidth - preogressBarWidth;
+				const resizeRatio = progressWidthPercent / prevProgressWidthPercent.current;
+				const startMaxX = progressWidth - sectionBoxWidth;
+				const endMaxX = progressWidth;
+				const progressBarMaxX = progressWidth - preogressBarWidth;
 
-			const newStartX = Math.max(0, Math.min(startMaxX, (prevStartX.current * progressWidthPercent) / 100));
-			const newEndX = Math.max(0, Math.min(endMaxX, (prevEndX.current * progressWidthPercent) / 100));
-			const newProgressBarX = Math.max(
-				0,
-				Math.min(progressBarMaxX, (prevProgressBarX.current * progressWidthPercent) / 100)
-			);
+				const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
+				const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
+				const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
 
-			setStartX(newStartX);
-			setEndX(newEndX);
-			setProgressBarX(newProgressBarX);
+				setStartX(newStartX);
+				setEndX(newEndX);
+				setProgressBarX(newProgressBarX);
+
+				prevStartX.current = newStartX;
+				prevEndX.current = newEndX;
+				prevProgressBarX.current = newProgressBarX;
+			}
 		}
+
+		handleChangeWitdhPercent();
+
+		return () => {
+			handleChangeWitdhPercent();
+		};
 	}, [progressWidthPercent]);
 
 	useEffect(() => {
@@ -240,7 +251,7 @@ export default function EditShorts() {
 		if (videoRef.current) {
 			const time = pxToTime(progressBarX);
 			videoRef.current.currentTime = time;
-			setVideoProgress(time);
+			// setVideoProgress(time);
 		}
 	}, [progressBarX]);
 
@@ -252,16 +263,18 @@ export default function EditShorts() {
 	}
 
 	function expandProgress() {
-		setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + 25));
+		setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP));
+		prevProgressWidthPercent.current = progressWidthPercent;
 	}
 
 	function shrinkProgress() {
-		setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - 25));
+		setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - WIDTH_PERCENT_STEP));
+		prevProgressWidthPercent.current = progressWidthPercent;
 	}
 
 	function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
 		setVideoDuration(e.currentTarget.duration);
-		setVideoProgress(0);
+		// setVideoProgress(0);
 	}
 
 	function handleMouseDownProgressBar(e: React.MouseEvent<HTMLDivElement>) {
@@ -328,7 +341,7 @@ export default function EditShorts() {
 							controls
 							ref={videoRef}
 							src={`/api/v1/asset/${TEST_ASSET_ID}/resource?fileType=HI_RES&t=${new Date().getTime}`}
-							onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
+							// onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
 							onLoadedMetadataCapture={handleLoadedMetadata}
 							onPause={() => setIsPlay(false)}
 							onPlay={() => setIsPlay(true)}
@@ -350,8 +363,16 @@ export default function EditShorts() {
 
 			<div className="flex items-center">
 				<span>{progressWidthPercent}%</span>
-				<IconButton toolTip="25% 확대" onClick={expandProgress} Icon={<FaMagnifyingGlassPlus />}></IconButton>
-				<IconButton toolTip="25% 축소" onClick={shrinkProgress} Icon={<FaMagnifyingGlassMinus />}></IconButton>
+				<IconButton
+					toolTip={`${WIDTH_PERCENT_STEP}% 확대`}
+					onClick={expandProgress}
+					Icon={<FaMagnifyingGlassPlus />}
+				></IconButton>
+				<IconButton
+					toolTip={`${WIDTH_PERCENT_STEP}% 축소`}
+					onClick={shrinkProgress}
+					Icon={<FaMagnifyingGlassMinus />}
+				></IconButton>
 			</div>
 
 			<div className="grid grid-rows-[50px,200px] overflow-x-scroll">
