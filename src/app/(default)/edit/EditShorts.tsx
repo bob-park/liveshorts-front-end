@@ -202,6 +202,8 @@ export default function EditShorts() {
 				const endMaxX = progressWidth;
 				const progressBarMaxX = progressWidth - preogressBarWidth;
 
+				// handleMouseDownProgress함수와 연관된 버그 해결
+
 				const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
 				const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
 				const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
@@ -257,9 +259,14 @@ export default function EditShorts() {
 
 	// functions
 	function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-		const x = e.clientX;
-		setProgressBarX(x);
-		prevProgressBarX.current = x;
+		if (progressRef.current) {
+			const rect = progressRef.current.getBoundingClientRect();
+			const scrollLeft = progressRef.current.scrollLeft;
+			const x = e.clientX - rect.left + scrollLeft;
+
+			setProgressBarX(x);
+			prevProgressBarX.current = x;
+		}
 	}
 
 	function expandProgress() {
