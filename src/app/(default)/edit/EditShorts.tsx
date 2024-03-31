@@ -37,6 +37,7 @@ export default function EditShorts() {
 	const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
 	const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
 	const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
+	const [selectedLine, setSelctedLine] = useState("");
 
 	// useEffect
 	useEffect(() => {
@@ -342,7 +343,12 @@ export default function EditShorts() {
 			<div className="grid grid-cols-[300px,1fr] border-b">
 				<div className="border-r">작업 패널</div>
 
-				<div className="flex flex-col gap-4 justify-center items-center">
+				<div
+					onClick={() => {
+						setSelctedLine("");
+					}}
+					className="flex flex-col gap-4 justify-center items-center"
+				>
 					<div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
 						<video
 							controls
@@ -388,7 +394,10 @@ export default function EditShorts() {
 					ref={progressRef}
 					style={{ width: `${progressWidthPercent}%` }}
 					onMouseDown={handleMouseDownProgress}
-					className="relative bg-neutral-50"
+					onClick={() => {
+						setSelctedLine("video");
+					}}
+					className="relative bg-slate-50"
 				>
 					{/* section */}
 					<div
@@ -396,14 +405,18 @@ export default function EditShorts() {
 						style={{
 							width: `${endX - startX}px`,
 							left: `${startX}px`,
+							height: "25%",
 						}}
 						onMouseDown={handleMouseDownSectionBox}
 						className={`
 			          absolute top-0 flex justify-between h-full
 			          cursor-grab rounded-lg
                 group
-			          opacity-30 hover:opacity-60
-                bg-neutral-400
+								inset-0 border-4 box-content
+								${selectedLine !== "video" && "hover:border-opacity-50"}
+								${selectedLine === "video" ? "border-opacity-100" : "border-opacity-0"}
+                bg-slate-200
+								border-slate-600
 			          `}
 					>
 						<div
@@ -411,16 +424,18 @@ export default function EditShorts() {
 							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
 							className={`
 			            cursor-w-resize
-			            opacity-0 group-hover:opacity-100
-			          bg-neutral-600`}
+									${selectedLine !== "video" && "group-hover:opacity-50"}
+									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+			          bg-slate-600`}
 						></div>
 						<div
 							onMouseDown={handleMouseDownEndExpand}
 							style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 100}px` }}
 							className={`
 			            cursor-e-resize
-			            opacity-0 group-hover:opacity-100
-			          bg-neutral-600`}
+									${selectedLine !== "video" && "group-hover:opacity-50"}
+									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+			          bg-slate-600`}
 						></div>
 					</div>
 
@@ -433,7 +448,7 @@ export default function EditShorts() {
 						className={`
 					w-1 h-full absolute
 					cursor-pointer
-					bg-red-900 `}
+					bg-red-700 `}
 					></div>
 				</div>
 			</div>
