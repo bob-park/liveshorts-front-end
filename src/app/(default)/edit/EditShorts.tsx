@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { IoPause, IoPlay, IoPlayBack, IoPlayForward } from "react-icons/io5";
 import IconButton from "./IconButton";
+import TimeInput, { TimeObject } from "@/components/edit/TimeInput";
 
 type LineType = "video" | "bgm" | "title" | "subtitle";
 
@@ -40,6 +41,8 @@ export default function EditShorts() {
   const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
   const [selectedLine, setSelctedLine] = useState<LineType | null>(null);
+  const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
+  const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
 
   // useEffect
   useEffect(() => {
@@ -125,7 +128,10 @@ export default function EditShorts() {
         const maxX = ProgressWidth - sectionBoxWidth;
 
         const newX = Math.max(0, Math.min(maxX, newDivX));
+        const newTime = pxToTime(newX);
+        const newTimeObject = secondsToTimeObject(newTime);
 
+        setStartTimeInput(newTimeObject);
         setStartX(newX);
         prevStartX.current = newX;
       }
@@ -135,6 +141,10 @@ export default function EditShorts() {
         const maxX = ProgressWidth;
 
         const newX = Math.max(0, Math.min(maxX, newDivX));
+        const newTime = pxToTime(newX);
+        const newTimeObject = secondsToTimeObject(newTime);
+
+        setEndTimeInput(newTimeObject);
 
         setEndX(newX);
         prevEndX.current = newX;
@@ -230,14 +240,15 @@ export default function EditShorts() {
 
   useEffect(() => {
     const handlePlayerKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-
       if (videoRef.current) {
         if (e.key === "ArrowRight") {
+          e.preventDefault();
           videoRef.current.currentTime += 10;
         } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
           videoRef.current.currentTime -= 10;
         } else if (e.key === " ") {
+          e.preventDefault();
           const paused = videoRef.current.paused;
 
           paused ? videoRef.current.play() : videoRef.current.pause();
@@ -259,6 +270,20 @@ export default function EditShorts() {
       // setVideoProgress(time);
     }
   }, [progressBarX]);
+
+  useEffect(() => {
+    const newStartTime = timeObjectToSeconds(startTimeInput);
+    const newEndTime = timeObjectToSeconds(endTimeInput);
+
+    const newStartX = timeToPx(newStartTime);
+    const newEndX = timeToPx(newEndTime);
+
+    setStartX(newStartX);
+    setEndX(newEndX);
+
+    prevStartX.current = newStartX;
+    prevEndX.current = newEndX;
+  }, [startTimeInput, endTimeInput, videoDuration]);
 
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -332,17 +357,27 @@ export default function EditShorts() {
   }
 
   function timeToPx(time: number) {
-    return (time / videoDuration) * (progressRef.current?.clientWidth ?? 0);
+    return Math.round((time / videoDuration) * (progressRef.current?.clientWidth ?? 0));
   }
 
   function pxToTime(px: number) {
-    return (px * videoDuration) / (progressRef.current?.clientWidth ?? 0);
+    return Math.round((px * videoDuration) / (progressRef.current?.clientWidth ?? 0));
+  }
+
+  function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setStartTimeInput({ ...startTimeInput, [name]: value });
+  }
+
+  function handleChangeEndTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setEndTimeInput({ ...startTimeInput, [name]: value });
   }
 
   const timeArray = fillRangeWithInterval(5, videoDuration);
 
   return (
-    <div className="grid grid-rows-[1fr,50px,250px] h-full">
+    <div className="grid grid-rows-[1fr,250px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
@@ -350,7 +385,7 @@ export default function EditShorts() {
           onClick={() => {
             setSelctedLine(null);
           }}
-          className="flex flex-col gap-4 justify-center items-center"
+          className="flex flex-col gap-4 justify-center items-center p-2"
         >
           <div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
             <video
@@ -365,30 +400,37 @@ export default function EditShorts() {
             ></video>
           </div>
 
-          <div>
-            <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
-            <IconButton
-              toolTip={isPlay ? "정지" : "재생"}
-              onClick={handlePlay}
-              Icon={isPlay ? <IoPause /> : <IoPlay />}
-            ></IconButton>
-            <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} />
+              <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} />
+            </div>
+
+            <div className="flex items-center">
+              <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
+              <IconButton
+                toolTip={isPlay ? "정지" : "재생"}
+                onClick={handlePlay}
+                Icon={isPlay ? <IoPause /> : <IoPlay />}
+              ></IconButton>
+              <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
+            </div>
+
+            <div className="flex items-center">
+              <span>{progressWidthPercent}%</span>
+              <IconButton
+                toolTip={`${WIDTH_PERCENT_STEP}% 확대`}
+                onClick={expandProgress}
+                Icon={<FaMagnifyingGlassPlus />}
+              ></IconButton>
+              <IconButton
+                toolTip={`${WIDTH_PERCENT_STEP}% 축소`}
+                onClick={shrinkProgress}
+                Icon={<FaMagnifyingGlassMinus />}
+              ></IconButton>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="flex items-center">
-        <span>{progressWidthPercent}%</span>
-        <IconButton
-          toolTip={`${WIDTH_PERCENT_STEP}% 확대`}
-          onClick={expandProgress}
-          Icon={<FaMagnifyingGlassPlus />}
-        ></IconButton>
-        <IconButton
-          toolTip={`${WIDTH_PERCENT_STEP}% 축소`}
-          onClick={shrinkProgress}
-          Icon={<FaMagnifyingGlassMinus />}
-        ></IconButton>
       </div>
 
       <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
@@ -434,7 +476,7 @@ export default function EditShorts() {
               // style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
               className={`
 			            cursor-w-resize
-									rounded-l-lg w-7
+									rounded-l-lg w-[24px] min-w-[24px]
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
 			          bg-slate-600
@@ -453,7 +495,7 @@ export default function EditShorts() {
               onMouseDown={handleMouseDownEndExpand}
               className={`
 			            cursor-e-resize
-									rounded-r-lg w-7
+									rounded-r-lg w-[24px] min-w-[24px]
 									${selectedLine !== "video" && "group-hover:opacity-50"}
 									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
 			          bg-slate-600
@@ -480,15 +522,40 @@ export default function EditShorts() {
 
 // util 함수
 function secondsToHhmmss(seconds: number) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
+  const hour = Math.floor(seconds / 3600);
+  const min = Math.floor((seconds % 3600) / 60);
+  const sec = Math.floor(seconds % 60);
 
-  const HH = String(hours).padStart(2, "0");
-  const MM = String(minutes).padStart(2, "0");
-  const SS = String(remainingSeconds).padStart(2, "0");
+  const HH = String(hour).padStart(2, "0");
+  const MM = String(min).padStart(2, "0");
+  const SS = String(sec).padStart(2, "0");
 
   return `${HH}:${MM}:${SS}`;
+}
+
+function secondsToTimeObject(seconds: number) {
+  const hour = Math.floor(seconds / 3600);
+  const min = Math.floor((seconds % 3600) / 60);
+  const sec = seconds % 60;
+
+  const formattedHour = String(hour).padStart(2, "0");
+  const formattedMin = String(min).padStart(2, "0");
+  const formattedSec = String(sec).padStart(2, "0");
+
+  return {
+    hour: formattedHour,
+    min: formattedMin,
+    sec: formattedSec,
+  };
+}
+
+function timeObjectToSeconds(time: TimeObject) {
+  const { hour, min, sec } = time;
+  const numberHour = Number(hour);
+  const numberMin = Number(min);
+  const numberSec = Number(sec);
+
+  return numberHour * 3600 + numberMin * 60 + numberSec;
 }
 
 function fillRangeWithInterval(number: number, videoDuration: number) {
