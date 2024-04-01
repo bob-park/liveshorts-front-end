@@ -100,6 +100,13 @@ export default function EditShorts() {
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
         const newEndX = newStartX + sectionBoxWidth;
 
+        const newStartTime = pxToTime(newStartX);
+        const newEndTime = pxToTime(newEndX);
+        const newStartTimeObject = secondsToTimeObject(newStartTime);
+        const newEndTimeObject = secondsToTimeObject(newEndTime);
+
+        setStartTimeInput(newStartTimeObject);
+        setEndTimeInput(newEndTimeObject);
         setStartX(newStartX);
         setEndX(newEndX);
         prevStartX.current = newStartX;
@@ -439,88 +446,106 @@ export default function EditShorts() {
         </div>
       </div>
 
-      <div onMouseDown={handleMouseDownProgress} className="grid grid-rows-[30px,200px] gap-[10px] overflow-x-scroll">
+      <div
+        ref={progressRef}
+        style={{ width: `${progressWidthPercent}%` }}
+        onMouseDown={handleMouseDownProgress}
+        className="relative grid grid-rows-[32px,8px,200px] overflow-x-scroll"
+      >
         <div
-          style={{ width: `${progressWidthPercent}%`, gridTemplateColumns: `repeat(${timeLineIntervalCount - 1},1fr)` }}
-          className="relative grid pb-2"
+          style={{ gridTemplateColumns: `repeat(${timeLineIntervalCount - 1},1fr)` }}
+          className="relative grid bg-slate-200"
         >
           {timeArray.map((v, i) => (
-            <div key={i} className="grid grid-cols-[repeat(5,1fr)] border-l border-neutral-900">
-              <div className="border-r h-2 border-neutral-900"></div>
-              <div className="border-r border-neutral-900"></div>
-              <div className="border-r border-neutral-900"></div>
-              <div className="border-r border-neutral-900"></div>
+            <div key={i} className="grid grid-cols-[repeat(5,1fr)] border-l border-slate-700">
+              <div className="border-r h-2 mb-1 border-slate-700"></div>
+              <div className="border-r h-2 border-slate-700"></div>
+              <div className="border-r h-2 border-slate-700"></div>
+              <div className="border-r h-2 border-slate-700"></div>
               <div></div>
 
-              <span className="pl-2 pt-2 text-xs">{v}</span>
+              <span className="pl-2 text-xs">{v}</span>
             </div>
           ))}
           <span className="text-xs absolute right-0 top-4">{secondsToHhmmss(videoDuration)}</span>
         </div>
-        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="relative bg-slate-50">
+
+        <div className="w-full h-2 bg-slate-200"></div>
+
+        <div className="h-full bg-slate-50">
           {/* section */}
-          <div
-            ref={sectionBoxRef}
-            style={{
-              width: `${endX - startX}px`,
-              left: `${startX}px`,
-              height: "25%",
-            }}
-            onMouseDown={handleMouseDownSectionBox}
-            onClick={() => {
-              setSelctedLine("video");
-            }}
-            className={`
-			          absolute top-0 flex justify-between h-full
-			          cursor-grab rounded-lg
-                group
-                bg-slate-200
-			          `}
-          >
+          <div className="relative h-1/4 border-b border-slate-300">
             <div
-              onMouseDown={handleMouseDownStartExpand}
-              // style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
+              ref={sectionBoxRef}
+              style={{
+                width: `${endX - startX}px`,
+                left: `${startX}px`,
+              }}
+              onMouseDown={handleMouseDownSectionBox}
+              onClick={() => {
+                setSelctedLine("video");
+              }}
               className={`
-			            cursor-w-resize
-									rounded-l-lg w-[24px] min-w-[24px]
-									${selectedLine !== "video" && "group-hover:opacity-50"}
-									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-			          bg-slate-600
-								`}
-            ></div>
-            <div
-              className={`
-							w-full
-						inset-0 border-t-4 border-b-4 box-content border-opacity-0
-						${selectedLine !== "video" && "group-hover:border-opacity-50"}
-						${selectedLine === "video" ? " border-opacity-100" : "border-opacity-0"}
-								border-slate-600
-								`}
-            ></div>
-            <div
-              onMouseDown={handleMouseDownEndExpand}
-              className={`
-			            cursor-e-resize
-									rounded-r-lg w-[24px] min-w-[24px]
-									${selectedLine !== "video" && "group-hover:opacity-50"}
-									${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-			          bg-slate-600
-								`}
-            ></div>
+                  absolute top-0 flex justify-between h-full
+                  cursor-grab rounded-lg
+                  group
+                  bg-slate-200
+                          `}
+            >
+              <div
+                onMouseDown={handleMouseDownStartExpand}
+                // style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
+                className={`
+                    cursor-w-resize
+                    rounded-l-lg w-[24px] min-w-[24px]
+                    ${selectedLine !== "video" && "group-hover:opacity-50"}
+                    ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+                    bg-slate-600
+                          `}
+              ></div>
+              <div
+                className={`
+                      w-full
+                      inset-0 border-t-4 border-b-4 box-content border-opacity-0
+                      ${selectedLine !== "video" && "group-hover:border-opacity-50"}
+                      ${selectedLine === "video" ? " border-opacity-100" : "border-opacity-0"}
+                    border-slate-600
+                          `}
+              ></div>
+              <div
+                onMouseDown={handleMouseDownEndExpand}
+                className={`
+                          cursor-e-resize
+                          rounded-r-lg w-[24px] min-w-[24px]
+                          ${selectedLine !== "video" && "group-hover:opacity-50"}
+                          ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+                          bg-slate-600
+                          `}
+              ></div>
+            </div>
           </div>
 
-          <div
-            ref={progressBarRef}
-            style={{
-              left: `${progressBarX}px`,
-            }}
-            onMouseDown={handleMouseDownProgressBar}
-            className={`
-					w-1 absolute -top-10 bottom-0
+          {/* title */}
+          <div className="relative h-1/4 border-b border-slate-300"></div>
+
+          {/* subtitle */}
+          <div className="relative h-1/4 border-b border-slate-300"></div>
+
+          {/* bgm */}
+          <div className="relative h-1/4 border-b border-slate-300"></div>
+        </div>
+
+        <div
+          ref={progressBarRef}
+          style={{
+            left: `${progressBarX}px`,
+          }}
+          onMouseDown={handleMouseDownProgressBar}
+          className={`
+					w-1 absolute top-0 bottom-0
 					cursor-pointer
 					bg-red-700 progressBar`}
-          ></div>
-        </div>
+        ></div>
       </div>
     </div>
   );
