@@ -16,3 +16,14 @@
 .timeInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+.progressBar::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 18px solid rgb(185 28 28);
+  transform: translateX(-50%);
+}

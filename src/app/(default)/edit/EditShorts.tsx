@@ -439,7 +439,7 @@ export default function EditShorts() {
         </div>
       </div>
 
-      <div className="grid grid-rows-[30px,200px] gap-[10px] overflow-x-scroll">
+      <div onMouseDown={handleMouseDownProgress} className="grid grid-rows-[30px,200px] gap-[10px] overflow-x-scroll">
         <div
           style={{ width: `${progressWidthPercent}%`, gridTemplateColumns: `repeat(${timeLineIntervalCount - 1},1fr)` }}
           className="relative grid pb-2"
@@ -457,15 +457,7 @@ export default function EditShorts() {
           ))}
           <span className="text-xs absolute right-0 top-4">{secondsToHhmmss(videoDuration)}</span>
         </div>
-        <div
-          ref={progressRef}
-          style={{ width: `${progressWidthPercent}%` }}
-          onMouseDown={handleMouseDownProgress}
-          onClick={() => {
-            setSelctedLine("video");
-          }}
-          className="relative bg-slate-50"
-        >
+        <div ref={progressRef} style={{ width: `${progressWidthPercent}%` }} className="relative bg-slate-50">
           {/* section */}
           <div
             ref={sectionBoxRef}
@@ -475,6 +467,9 @@ export default function EditShorts() {
               height: "25%",
             }}
             onMouseDown={handleMouseDownSectionBox}
+            onClick={() => {
+              setSelctedLine("video");
+            }}
             className={`
 			          absolute top-0 flex justify-between h-full
 			          cursor-grab rounded-lg
@@ -521,9 +516,9 @@ export default function EditShorts() {
             }}
             onMouseDown={handleMouseDownProgressBar}
             className={`
-					w-1 h-full absolute
+					w-1 absolute -top-10 bottom-0
 					cursor-pointer
-					bg-red-700 `}
+					bg-red-700 progressBar`}
           ></div>
         </div>
       </div>
