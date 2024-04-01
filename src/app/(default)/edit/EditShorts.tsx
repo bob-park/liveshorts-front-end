@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
-import { IoPause, IoPlay, IoPlayBack, IoPlayForward } from "react-icons/io5";
-import IconButton from "./IconButton";
-import TimeInput, { TimeObject } from "@/components/edit/TimeInput";
+import { TimeObject } from "@/components/edit/TimeInput";
+import ControlBar from "./ControlBar";
+import SectionBox from "./SectionBox";
+import { secondsToHhmmss, secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval } from "./util";
+import TimeLine from "./TimeLine";
 
-type LineType = "video" | "bgm" | "title" | "subtitle";
+export type LineType = "video" | "bgm" | "title" | "subtitle";
 
+export const WIDTH_PERCENT_STEP = 25;
 const TEST_ASSET_ID = "20";
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
-const WIDTH_PERCENT_STEP = 25;
 const DEFAULT_INTERVAL_COUNT = 6;
 
 export default function EditShorts() {
@@ -389,6 +390,10 @@ export default function EditShorts() {
     setEndTimeInput({ ...startTimeInput, [name]: value });
   }
 
+  function handleClickLine(line: LineType) {
+    setSelctedLine(line);
+  }
+
   return (
     <div className="grid grid-rows-[1fr,240px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
@@ -413,36 +418,19 @@ export default function EditShorts() {
             ></video>
           </div>
 
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-3">
-              <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} />
-              <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} />
-            </div>
-
-            <div className="flex items-center">
-              <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
-              <IconButton
-                toolTip={isPlay ? "정지" : "재생"}
-                onClick={handlePlay}
-                Icon={isPlay ? <IoPause /> : <IoPlay />}
-              ></IconButton>
-              <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
-            </div>
-
-            <div className="flex items-center">
-              <span>{progressWidthPercent}%</span>
-              <IconButton
-                toolTip={`${WIDTH_PERCENT_STEP}% 확대`}
-                onClick={expandProgress}
-                Icon={<FaMagnifyingGlassPlus />}
-              ></IconButton>
-              <IconButton
-                toolTip={`${WIDTH_PERCENT_STEP}% 축소`}
-                onClick={shrinkProgress}
-                Icon={<FaMagnifyingGlassMinus />}
-              ></IconButton>
-            </div>
-          </div>
+          <ControlBar
+            startTimeInput={startTimeInput}
+            endTimeInput={endTimeInput}
+            isPlay={isPlay}
+            progressWidthPercent={progressWidthPercent}
+            handleChangeStartTimeInput={handleChangeStartTimeInput}
+            handleChangeEndTimeInput={handleChangeEndTimeInput}
+            handleBack={handleBack}
+            handleFoward={handleFoward}
+            handlePlay={handlePlay}
+            expandProgress={expandProgress}
+            shrinkProgress={shrinkProgress}
+          />
         </div>
       </div>
 
@@ -452,77 +440,25 @@ export default function EditShorts() {
         onMouseDown={handleMouseDownProgress}
         className="relative grid grid-rows-[32px,8px,200px] overflow-x-scroll"
       >
-        <div
-          style={{ gridTemplateColumns: `repeat(${timeLineIntervalCount - 1},1fr)` }}
-          className="relative grid bg-slate-200"
-        >
-          {timeArray.map((v, i) => (
-            <div key={i} className="grid grid-cols-[repeat(5,1fr)] border-l border-slate-700">
-              <div className="border-r h-2 mb-1 border-slate-700"></div>
-              <div className="border-r h-2 border-slate-700"></div>
-              <div className="border-r h-2 border-slate-700"></div>
-              <div className="border-r h-2 border-slate-700"></div>
-              <div></div>
-
-              <span className="pl-2 text-xs">{v}</span>
-            </div>
-          ))}
-          <span className="text-xs absolute right-0 top-4">{secondsToHhmmss(videoDuration)}</span>
-        </div>
+        <TimeLine timeLineIntervalCount={timeLineIntervalCount} timeArray={timeArray} videoDuration={videoDuration} />
 
         <div className="w-full h-2 bg-slate-200"></div>
 
         <div className="h-full bg-slate-50">
           {/* section */}
           <div className="relative h-1/4 border-b border-slate-300">
-            <div
-              ref={sectionBoxRef}
-              style={{
-                width: `${endX - startX}px`,
-                left: `${startX}px`,
+            <SectionBox
+              sectionBoxRef={sectionBoxRef}
+              startX={startX}
+              endX={endX}
+              selectedLine={selectedLine}
+              handleMouseDownSectionBox={handleMouseDownSectionBox}
+              handleMouseDownStartExpand={handleMouseDownStartExpand}
+              handleMouseDownEndExpand={handleMouseDownEndExpand}
+              handleClickLine={() => {
+                handleClickLine("video");
               }}
-              onMouseDown={handleMouseDownSectionBox}
-              onClick={() => {
-                setSelctedLine("video");
-              }}
-              className={`
-                  absolute top-0 flex justify-between h-full
-                  cursor-grab rounded-lg
-                  group
-                  bg-slate-200
-                          `}
-            >
-              <div
-                onMouseDown={handleMouseDownStartExpand}
-                // style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
-                className={`
-                    cursor-w-resize
-                    rounded-l-lg w-[24px] min-w-[24px]
-                    ${selectedLine !== "video" && "group-hover:opacity-50"}
-                    ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-                    bg-slate-600
-                          `}
-              ></div>
-              <div
-                className={`
-                      w-full
-                      inset-0 border-t-4 border-b-4 box-content border-opacity-0
-                      ${selectedLine !== "video" && "group-hover:border-opacity-50"}
-                      ${selectedLine === "video" ? " border-opacity-100" : "border-opacity-0"}
-                    border-slate-600
-                          `}
-              ></div>
-              <div
-                onMouseDown={handleMouseDownEndExpand}
-                className={`
-                          cursor-e-resize
-                          rounded-r-lg w-[24px] min-w-[24px]
-                          ${selectedLine !== "video" && "group-hover:opacity-50"}
-                          ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
-                          bg-slate-600
-                          `}
-              ></div>
-            </div>
+            />
           </div>
 
           {/* title */}
@@ -549,54 +485,4 @@ export default function EditShorts() {
       </div>
     </div>
   );
-}
-
-// util 함수
-function secondsToHhmmss(seconds: number) {
-  const hour = Math.floor(seconds / 3600);
-  const min = Math.floor((seconds % 3600) / 60);
-  const sec = Math.floor(seconds % 60);
-
-  const HH = String(hour).padStart(2, "0");
-  const MM = String(min).padStart(2, "0");
-  const SS = String(sec).padStart(2, "0");
-
-  return `${HH}:${MM}:${SS}`;
-}
-
-function secondsToTimeObject(seconds: number) {
-  const hour = Math.floor(seconds / 3600);
-  const min = Math.floor((seconds % 3600) / 60);
-  const sec = seconds % 60;
-
-  const formattedHour = String(hour).padStart(2, "0");
-  const formattedMin = String(min).padStart(2, "0");
-  const formattedSec = String(sec).padStart(2, "0");
-
-  return {
-    hour: formattedHour,
-    min: formattedMin,
-    sec: formattedSec,
-  };
-}
-
-function timeObjectToSeconds(time: TimeObject) {
-  const { hour, min, sec } = time;
-  const numberHour = Number(hour);
-  const numberMin = Number(min);
-  const numberSec = Number(sec);
-
-  return numberHour * 3600 + numberMin * 60 + numberSec;
-}
-
-function fillRangeWithInterval(number: number, videoDuration: number) {
-  const interval = videoDuration / (number - 1);
-
-  const result = [];
-  for (let i = 0; i < number - 1; i++) {
-    result.push(Math.round(i * interval));
-  }
-  const timeArray = result.map((v) => secondsToHhmmss(v));
-
-  return timeArray;
 }
