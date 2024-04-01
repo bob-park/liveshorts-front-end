@@ -13,6 +13,7 @@ const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const WIDTH_PERCENT_STEP = 25;
+const DEFAULT_INTERVAL_COUNT = 6;
 
 export default function EditShorts() {
   // useRef
@@ -43,6 +44,9 @@ export default function EditShorts() {
   const [selectedLine, setSelctedLine] = useState<LineType | null>(null);
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
+  const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
+
+  const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
 
   // useEffect
   useEffect(() => {
@@ -300,11 +304,15 @@ export default function EditShorts() {
   function expandProgress() {
     setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
+
+    setTimeLineIntervalCount((prev) => (progressWidthPercent === MAX_PERCENT ? prev : prev + 1));
   }
 
   function shrinkProgress() {
     setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
+
+    setTimeLineIntervalCount((prev) => (progressWidthPercent === MIN_PERCENT ? prev : prev - 1));
   }
 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
@@ -374,10 +382,8 @@ export default function EditShorts() {
     setEndTimeInput({ ...startTimeInput, [name]: value });
   }
 
-  const timeArray = fillRangeWithInterval(5, videoDuration);
-
   return (
-    <div className="grid grid-rows-[1fr,250px] h-full">
+    <div className="grid grid-rows-[1fr,240px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div className="border-r">작업 패널</div>
 
@@ -433,18 +439,23 @@ export default function EditShorts() {
         </div>
       </div>
 
-      <div className="grid grid-rows-[50px,200px] overflow-x-scroll">
-        <div style={{ width: `${progressWidthPercent}%` }} className="flex justify-between pb-2">
+      <div className="grid grid-rows-[30px,200px] gap-[10px] overflow-x-scroll">
+        <div
+          style={{ width: `${progressWidthPercent}%`, gridTemplateColumns: `repeat(${timeLineIntervalCount - 1},1fr)` }}
+          className="relative grid pb-2"
+        >
           {timeArray.map((v, i) => (
-            <div key={i} className="grid grid-cols-5 border-l">
-              <div className="border-r"></div>
-              <div className="border-r"></div>
-              <div className="border-r"></div>
-              <div className="border-r"></div>
+            <div key={i} className="grid grid-cols-[repeat(5,1fr)] border-l border-neutral-900">
+              <div className="border-r h-2 border-neutral-900"></div>
+              <div className="border-r border-neutral-900"></div>
+              <div className="border-r border-neutral-900"></div>
+              <div className="border-r border-neutral-900"></div>
               <div></div>
-              <span className="text-sm">{v}</span>
+
+              <span className="pl-2 pt-2 text-xs">{v}</span>
             </div>
           ))}
+          <span className="text-xs absolute right-0 top-4">{secondsToHhmmss(videoDuration)}</span>
         </div>
         <div
           ref={progressRef}
@@ -562,7 +573,7 @@ function fillRangeWithInterval(number: number, videoDuration: number) {
   const interval = videoDuration / (number - 1);
 
   const result = [];
-  for (let i = 0; i < number; i++) {
+  for (let i = 0; i < number - 1; i++) {
     result.push(Math.round(i * interval));
   }
   const timeArray = result.map((v) => secondsToHhmmss(v));
