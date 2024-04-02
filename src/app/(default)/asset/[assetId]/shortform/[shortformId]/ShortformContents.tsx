@@ -70,7 +70,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
   return (
     <div className="flex justify-center items-end size-full gap-1 relative h-full">
       {/* title */}
-      <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-56 2xl:w-80">
+      <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-48 2xl:w-80">
         <h2 className="text-2xl font-bold">{shortform.title}</h2>
         <h3 className="mt-2 text-lg text-gray-500">{shortform.asset.title}</h3>
       </div>
@@ -114,7 +114,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
 
       {/* extra */}
       <div
-        className={`flex-none w-56 xl:w-64 2xl:w-80 h-full rounded-xl shadow-2xl px-3 py-2 transition-all duration-150 ${
+        className={`flex-none w-80 h-full rounded-xl shadow-2xl px-3 py-2 transition-all duration-150 ${
           showExtra
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 translate-x-2 hidden'
