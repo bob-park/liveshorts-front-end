@@ -2,6 +2,7 @@ type ShortFormState = {
   isLoading: boolean;
   tasks: ShortFormTask[];
   page: Pagination;
+  extraTypes: ShortFormExtraType[];
 };
 
 type ShortFormTask = {
@@ -45,4 +46,11 @@ type ShortFormUploadInstance = {
 
 type ShortFormExtra = {
   id: string;
+  extraType: ShortFormExtraType;
+  status: TaskStatus;
+};
+
+type ShortFormExtraType = {
+  id: string;
+  name: string;
 };

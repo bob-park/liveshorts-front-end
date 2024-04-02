@@ -8,8 +8,10 @@ import { useRouter } from 'next/navigation';
 
 // react icon
 import { TiThMenu } from 'react-icons/ti';
-import { FiDownload } from 'react-icons/fi';
+import { TbTransferIn } from 'react-icons/tb';
+import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { RiAiGenerate } from 'react-icons/ri';
 
 import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
@@ -17,11 +19,12 @@ type ShortformContentsProps = {
   assetId: number;
   shortform: ShortFormTask;
   list: ShortFormTask[];
+  extraTypes: ShortFormExtraType[];
 };
 
 export default function ShortformContents(props: ShortformContentsProps) {
   // props
-  const { assetId, shortform, list } = props;
+  const { assetId, shortform, list, extraTypes } = props;
 
   // router
   const router = useRouter();
@@ -85,6 +88,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* menu */}
       <div className="w-16">
         <div className="flex flex-col justify-center items-end gap-3 mb-2">
+          {/* download */}
           <div className="tooltip w-full" data-tip="다운로드">
             <a
               className="btn btn-circle btn-neutral hover:scale-110"
@@ -106,6 +110,60 @@ export default function ShortformContents(props: ShortformContentsProps) {
               <TiThMenu className="w-6 h-6" />
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* extra */}
+      <div className="flex-none w-56 h-full rounded-xl shadow-2xl px-3 py-2">
+        <div className="flex flex-col size-full justify-start items-start gap-2 overflow-auto">
+          <div className="flex w-full justify-center items-center mb-2">
+            <span className="mr-2">
+              <TbTransferIn className="w-6 h-6" />
+            </span>
+            <h2 className="text-xl font-bold">입수 영상 목록</h2>
+          </div>
+          {extraTypes.map((item) => (
+            <div
+              key={`extra-type-row-${item.id}`}
+              className="flex flex-col gap-3 w-full px-4 py-2 rounded-2xl bg-gray-100"
+            >
+              <h2 className="text-lg font-bold">{item.name}</h2>
+              <div className="mt-2">
+                <div className="flex justify-between items-center">
+                  <div className="tooltip" data-tip="다운로드">
+                    <a
+                      className={`btn btn-circle btn-neutral ${
+                        shortform.taskExtras?.find(
+                          (taskExtra) => taskExtra.extraType.id === item.id,
+                        )?.status !== 'SUCCESS' && 'btn-disabled'
+                      }`}
+                      type="button"
+                      href={`/api/v1/shorts/task/extra/${
+                        shortform.taskExtras?.find(
+                          (taskExtra) => taskExtra.extraType.id === item.id,
+                        )?.id
+                      }/resource/download`}
+                    >
+                      <FiDownload className="w-5 h-5" />
+                    </a>
+                  </div>
+                  <div className="tooltip" data-tip="생성 요청">
+                    <button
+                      className="btn btn-circle btn-neutral"
+                      type="button"
+                      disabled={
+                        !!shortform.taskExtras?.find(
+                          (taskExtra) => taskExtra.extraType.id === item.id,
+                        )
+                      }
+                    >
+                      <FiUpload className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

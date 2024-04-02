@@ -43,6 +43,7 @@ export default async function ShortFormPage({ params }: Props) {
     Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
   };
 
+  // request
   const shortFormResponse = await fetch(
     `${MAM_API_HOST}/api/v1/shorts/task/${shortformId}`,
     {
@@ -59,6 +60,15 @@ export default async function ShortFormPage({ params }: Props) {
     },
   );
 
+  const extraTypesResponse = await fetch(
+    `${MAM_API_HOST}/api/v1/shorts/extra/type`,
+    {
+      method: 'get',
+      headers,
+    },
+  );
+
+  // response
   const shortform: ShortFormTask = await shortFormResponse
     .json()
     .then((res) => res.result);
@@ -68,6 +78,10 @@ export default async function ShortFormPage({ params }: Props) {
     .then((res) =>
       res.result.filter((item: ShortFormTask) => item.status === 'SUCCESS'),
     );
+
+  const extraTypes: ShortFormExtraType[] = await extraTypesResponse
+    .json()
+    .then((res) => res.result);
 
   return (
     <div className="grid grid-cols-1 gap-2 px-5 py-2">
@@ -81,6 +95,7 @@ export default async function ShortFormPage({ params }: Props) {
           assetId={assetId}
           shortform={shortform}
           list={shortformList}
+          extraTypes={extraTypes}
         />
       </div>
     </div>
