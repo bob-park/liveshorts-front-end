@@ -29,6 +29,21 @@
   border-radius: 0;
 }
 
+.progressBar::before {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 18px solid rgb(185 28 28);
+  transform: translateX(-50%);
+}
+
+#active-tab {
+  background-color: rgb(51 65 85);
+}
+
 /* input 화살표 없애기 */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,

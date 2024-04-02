@@ -1,9 +1,9 @@
-import EditShorts from "./EditShorts";
+import TemplateProvider from "./TemplateProvider";
 
-export default async function Create() {
+export default async function Edit() {
   return (
-    <div className="h-full">
-      <EditShorts />
+    <div className="h-[calc(100vh-96px)]">
+      <TemplateProvider />
     </div>
   );
 }
