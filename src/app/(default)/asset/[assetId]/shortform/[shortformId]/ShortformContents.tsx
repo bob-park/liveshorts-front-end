@@ -15,13 +15,13 @@ import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
 type ShortformContentsProps = {
   assetId: number;
-  shortformId: string;
+  shortform: ShortFormTask;
   list: ShortFormTask[];
 };
 
 export default function ShortformContents(props: ShortformContentsProps) {
   // props
-  const { assetId, shortformId, list } = props;
+  const { assetId, shortform, list } = props;
 
   // router
   const router = useRouter();
@@ -35,10 +35,10 @@ export default function ShortformContents(props: ShortformContentsProps) {
 
   // useEffect
   useEffect(() => {
-    const now = list.find((item) => item.id === shortformId);
+    const now = list.find((item) => item.id === shortform.id);
 
     setNow(now);
-  }, [shortformId]);
+  }, [shortform]);
 
   useEffect(() => {
     if (!now) {
@@ -68,8 +68,8 @@ export default function ShortformContents(props: ShortformContentsProps) {
     <div className="flex justify-center items-end size-full gap-1 relative h-full">
       {/* title */}
       <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-64 2xl:w-96">
-        <h2 className="text-2xl font-bold">{now?.title}</h2>
-        <h3 className="text-lg text-gray-500">{now?.asset.title}</h3>
+        <h2 className="text-2xl font-bold">{shortform.title}</h2>
+        <h3 className="mt-2 text-lg text-gray-500">{shortform.asset.title}</h3>
       </div>
 
       {/* shortform player */}

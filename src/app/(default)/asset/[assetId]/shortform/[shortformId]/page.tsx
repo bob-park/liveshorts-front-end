@@ -43,15 +43,27 @@ export default async function ShortFormPage({ params }: Props) {
     Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
   };
 
-  const shortsResponse = await fetch(
-    MAM_API_HOST + `/api/v1/shorts/task/search?assetId=${assetId}`,
+  const shortFormResponse = await fetch(
+    `${MAM_API_HOST}/api/v1/shorts/task/${shortformId}`,
     {
       method: 'get',
-      headers: headers,
+      headers,
     },
   );
 
-  const shortformList: ShortFormTask[] = await shortsResponse
+  const shortsFormListResponse = await fetch(
+    MAM_API_HOST + `/api/v1/shorts/task/search?assetId=${assetId}`,
+    {
+      method: 'get',
+      headers,
+    },
+  );
+
+  const shortform: ShortFormTask = await shortFormResponse
+    .json()
+    .then((res) => res.result);
+
+  const shortformList: ShortFormTask[] = await shortsFormListResponse
     .json()
     .then((res) =>
       res.result.filter((item: ShortFormTask) => item.status === 'SUCCESS'),
@@ -67,7 +79,7 @@ export default async function ShortFormPage({ params }: Props) {
       <div className="w-full h-[calc(100lvh-12rem)]">
         <ShortformContents
           assetId={assetId}
-          shortformId={shortformId}
+          shortform={shortform}
           list={shortformList}
         />
       </div>
