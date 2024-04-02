@@ -4,10 +4,30 @@ import { useEffect, useRef, useState } from "react";
 import { TimeObject } from "@/components/edit/TimeInput";
 import ControlBar from "./ControlBar";
 import SectionBox from "./SectionBox";
-import { secondsToHhmmss, secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval } from "./util";
+import { secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval } from "./util";
 import TimeLine from "./TimeLine";
+import TabMenu from "./TabMenu";
+import TitleMenu from "./menu/TitleMenu";
+import SubtitleMenu from "./menu/SubtitleMenu";
+import BgmMenu from "./menu/BgmMenu";
+import TitleInput from "./menu/TitleInput";
+
+export interface TitleContent {
+  text: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  font: string;
+  size: number;
+  color: string;
+  background: string;
+  textOpacity: number;
+  bgOpacity: number;
+}
 
 export type LineType = "video" | "bgm" | "title" | "subtitle";
+export type WorkMenu = "title" | "subtitle" | "bgm";
 
 export const WIDTH_PERCENT_STEP = 25;
 const TEST_ASSET_ID = "20";
@@ -46,8 +66,11 @@ export default function EditShorts() {
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
+  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("title");
+  const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
+  const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
 
   // useEffect
   useEffect(() => {
@@ -394,10 +417,55 @@ export default function EditShorts() {
     setSelctedLine(line);
   }
 
+  function handleClickWorkMenu(workMenu: WorkMenu) {
+    setSelectedWorkMenu(workMenu);
+  }
+
+  function handleClickAddTitle() {
+    const newTitle = {
+      text: "제목을 입력하세요.",
+      x1: 0,
+      y1: 0,
+      x2: 1,
+      y2: 0.2,
+      font: fontArray[1],
+      size: 30,
+      color: "#ffffff",
+      background: "#000000",
+      textOpacity: 1,
+      bgOpacity: 1,
+    };
+    setTitleContent(newTitle);
+  }
+
+  function handleClickDeleteTitle() {
+    setTitleContent(null);
+  }
+
+  function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value } = e.target;
+    if (titleContent) {
+      setTitleContent({ ...titleContent, [name]: value });
+    }
+  }
+
   return (
     <div className="grid grid-rows-[1fr,240px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
-        <div className="border-r">작업 패널</div>
+        <div className="border-r flex flex-col">
+          <TabMenu selectedWorkMenu={selectedWorkMenu} handleClick={handleClickWorkMenu} />
+          {selectedWorkMenu === "title" && (
+            <TitleMenu
+              titleContent={titleContent}
+              optionArray={fontArray}
+              handleClickAddTitle={handleClickAddTitle}
+              handleClickDeleteTitle={handleClickDeleteTitle}
+              handleChangeTitle={handleChangeTitle}
+            />
+          )}
+          {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
+          {selectedWorkMenu === "bgm" && <BgmMenu />}
+        </div>
 
         <div
           onClick={() => {
@@ -405,7 +473,8 @@ export default function EditShorts() {
           }}
           className="flex flex-col gap-4 justify-center items-center p-2"
         >
-          <div className="h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
+          <div className="relative h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
+            {titleContent && <TitleInput title={titleContent} handleChangeTitle={handleChangeTitle} />}
             <video
               controls
               ref={videoRef}

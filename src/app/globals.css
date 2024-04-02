@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "SpoqaHanSansNeo-Thin";
+  src: url("/fonts/SpoqaHanSansNeo-Thin.ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SpoqaHanSansNeo-Regular";
+  src: url("/fonts/SpoqaHanSansNeo-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SpoqaHanSansNeo-Bold";
+  src: url("/fonts/SpoqaHanSansNeo-Bold.ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

@@ -27,3 +27,7 @@
   border-top: 18px solid rgb(185 28 28);
   transform: translateX(-50%);
 }
+
+#active-tab {
+  background-color: rgb(51 65 85);
+}
