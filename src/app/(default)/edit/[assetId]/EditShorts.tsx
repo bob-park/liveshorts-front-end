@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { TimeObject } from '@/components/edit/TimeInput';
-import ControlBar from './ControlBar';
-import SectionBox from './SectionBox';
-import {
-  secondsToTimeObject,
-  timeObjectToSeconds,
-  fillRangeWithInterval,
-} from './util';
-import TimeLine from './TimeLine';
-import TabMenu from './TabMenu';
-import TitleMenu from './menu/TitleMenu';
-import SubtitleMenu from './menu/SubtitleMenu';
-import BgmMenu from './menu/BgmMenu';
-import TitleInput from './menu/TitleInput';
+import { useEffect, useRef, useState } from "react";
+import { TimeObject } from "@/components/edit/TimeInput";
+import ControlBar from "./ControlBar";
+import SectionBox from "./SectionBox";
+import { secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval } from "./util";
+import TimeLine from "./TimeLine";
+import TabMenu from "./TabMenu";
+import TitleMenu from "./menu/TitleMenu";
+import SubtitleMenu from "./menu/SubtitleMenu";
+import BgmMenu from "./menu/BgmMenu";
+import TitleInput from "./menu/TitleInput";
 
 interface EditShortsProps {
   assetId: number;
@@ -35,8 +31,8 @@ export interface TitleContent {
   bgOpacity: number;
 }
 
-export type ActivePanel = 'video' | 'bgm' | 'title' | 'subtitle';
-export type WorkMenu = 'title' | 'subtitle' | 'bgm';
+export type ActivePanel = "video" | "bgm" | "title" | "subtitle";
+export type WorkMenu = "title" | "subtitle" | "bgm";
 
 export const WIDTH_PERCENT_STEP = 25;
 // const TEST_ASSET_ID = '20';
@@ -76,25 +72,15 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     endTime: false,
   });
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
-  const [activePanel, setActivePanel] = useState<ActivePanel>('video');
-  const [startTimeInput, setStartTimeInput] = useState<TimeObject>(
-    secondsToTimeObject(0),
-  );
-  const [endTimeInput, setEndTimeInput] = useState<TimeObject>(
-    secondsToTimeObject(DEFAULT_SECTION_SEC),
-  );
-  const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(
-    DEFAULT_INTERVAL_COUNT,
-  );
-  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>('title');
+  const [activePanel, setActivePanel] = useState<ActivePanel>("video");
+  const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
+  const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
+  const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
+  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("title");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
-  const fontArray = [
-    'SpoqaHanSansNeo-Thin',
-    'SpoqaHanSansNeo-Regular',
-    'SpoqaHanSansNeo-Bold',
-  ];
+  const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
 
   // useEffect
   useEffect(() => {
@@ -108,11 +94,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (
-        isProgressBarDragging &&
-        progressBarXRef.current !== null &&
-        progressRef.current
-      ) {
+      if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current) {
         const progressWidth = progressRef.current.clientWidth;
         const progressBarWidth = progressBarRef.current!.clientWidth;
         const newDivX = e.clientX - progressBarXRef.current;
@@ -131,23 +113,19 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     }
 
     if (isProgressBarDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isProgressBarDragging]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (
-        isSectionBoxDragging &&
-        startXRef.current !== null &&
-        progressRef.current
-      ) {
+      if (isSectionBoxDragging && startXRef.current !== null && progressRef.current) {
         const ProgressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
         const newDivX = e.clientX - startXRef.current;
@@ -176,23 +154,19 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     }
 
     if (isSectionBoxDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isSectionBoxDragging]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (
-        isExpandDragging.startTime &&
-        startXRef.current !== null &&
-        progressRef.current
-      ) {
+      if (isExpandDragging.startTime && startXRef.current !== null && progressRef.current) {
         const ProgressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
         const newDivX = e.clientX - startXRef.current;
@@ -206,11 +180,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
         setStartX(newX);
         prevStartX.current = newX;
       }
-      if (
-        isExpandDragging.endTime &&
-        endXRef.current !== null &&
-        progressRef.current
-      ) {
+      if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
         const ProgressWidth = progressRef.current.clientWidth;
         const newDivX = e.clientX - endXRef.current;
         const maxX = ProgressWidth;
@@ -233,13 +203,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     }
 
     if (isExpandDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isExpandDragging]);
 
@@ -247,11 +217,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
   useEffect(() => {
     function handleWindowResize() {
-      if (
-        progressRef.current &&
-        sectionBoxRef.current &&
-        progressBarRef.current
-      ) {
+      if (progressRef.current && sectionBoxRef.current && progressBarRef.current) {
         const progressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
         const preogressBarWidth = progressBarRef.current.clientWidth;
@@ -263,10 +229,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
         const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
         const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
-        const newProgressBarX = Math.min(
-          progressBarMaxX,
-          prevProgressBarX.current * resizeRatio,
-        );
+        const newProgressBarX = Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio);
 
         setStartX(newStartX);
         setEndX(newEndX);
@@ -278,45 +241,30 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
       }
     }
 
-    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener("resize", handleWindowResize);
 
     return () => {
-      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener("resize", handleWindowResize);
     };
   }, []);
 
   useEffect(() => {
     function handleChangeWitdhPercent() {
-      if (
-        progressRef.current &&
-        sectionBoxRef.current &&
-        progressBarRef.current &&
-        prevProgressWidthPercent.current
-      ) {
+      if (progressRef.current && sectionBoxRef.current && progressBarRef.current && prevProgressWidthPercent.current) {
         const progressWidth = progressRef.current.clientWidth;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
         const preogressBarWidth = progressBarRef.current.clientWidth;
 
-        const resizeRatio =
-          progressWidthPercent / prevProgressWidthPercent.current;
+        const resizeRatio = progressWidthPercent / prevProgressWidthPercent.current;
         const startMaxX = progressWidth - sectionBoxWidth;
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
         // handleMouseDownProgress함수와 연관된 버그 해결
 
-        const newStartX = Math.max(
-          0,
-          Math.min(startMaxX, prevStartX.current * resizeRatio),
-        );
-        const newEndX = Math.max(
-          0,
-          Math.min(endMaxX, prevEndX.current * resizeRatio),
-        );
-        const newProgressBarX = Math.max(
-          0,
-          Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio),
-        );
+        const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
+        const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
+        const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
 
         setStartX(newStartX);
         setEndX(newEndX);
@@ -337,14 +285,14 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
   useEffect(() => {
     const handlePlayerKeyDown = (e: KeyboardEvent) => {
-      if (videoRef.current && activePanel === 'video') {
-        if (e.key === 'ArrowRight') {
+      if (videoRef.current && activePanel === "video") {
+        if (e.key === "ArrowRight") {
           e.preventDefault();
           videoRef.current.currentTime += 10;
-        } else if (e.key === 'ArrowLeft') {
+        } else if (e.key === "ArrowLeft") {
           e.preventDefault();
           videoRef.current.currentTime -= 10;
-        } else if (e.key === ' ') {
+        } else if (e.key === " ") {
           e.preventDefault();
           const paused = videoRef.current.paused;
 
@@ -353,10 +301,10 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
       }
     };
 
-    window.addEventListener('keydown', handlePlayerKeyDown);
+    window.addEventListener("keydown", handlePlayerKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handlePlayerKeyDown);
+      window.removeEventListener("keydown", handlePlayerKeyDown);
     };
   }, [activePanel]);
 
@@ -383,9 +331,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   }, [startTimeInput, endTimeInput, videoDuration]);
 
   // functions
-  function handleMouseDownProgress(
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) {
+  function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (progressRef.current) {
       const rect = progressRef.current.getBoundingClientRect();
       const scrollLeft = progressRef.current.scrollLeft;
@@ -397,25 +343,17 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   }
 
   function expandProgress() {
-    setProgressWidthPercent((prev) =>
-      prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP,
-    );
+    setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
 
-    setTimeLineIntervalCount((prev) =>
-      progressWidthPercent === MAX_PERCENT ? prev : prev + 1,
-    );
+    setTimeLineIntervalCount((prev) => (progressWidthPercent === MAX_PERCENT ? prev : prev + 1));
   }
 
   function shrinkProgress() {
-    setProgressWidthPercent((prev) =>
-      prev === MIN_PERCENT ? prev : prev - WIDTH_PERCENT_STEP,
-    );
+    setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
 
-    setTimeLineIntervalCount((prev) =>
-      progressWidthPercent === MIN_PERCENT ? prev : prev - 1,
-    );
+    setTimeLineIntervalCount((prev) => (progressWidthPercent === MIN_PERCENT ? prev : prev - 1));
   }
 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
@@ -468,15 +406,11 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   }
 
   function timeToPx(time: number) {
-    return Math.round(
-      (time / videoDuration) * (progressRef.current?.clientWidth ?? 0),
-    );
+    return Math.round((time / videoDuration) * (progressRef.current?.clientWidth ?? 0));
   }
 
   function pxToTime(px: number) {
-    return Math.round(
-      (px * videoDuration) / (progressRef.current?.clientWidth ?? 0),
-    );
+    return Math.round((px * videoDuration) / (progressRef.current?.clientWidth ?? 0));
   }
 
   function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -499,15 +433,15 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
   function handleClickAddTitle() {
     const newTitle = {
-      text: '제목을 입력하세요.',
+      text: "제목을 입력하세요.",
       x1: 0,
       y1: 0,
       x2: 1,
       y2: 0.2,
       font: fontArray[1],
       size: 30,
-      color: '#ffffff',
-      background: '#000000',
+      color: "#ffffff",
+      background: "#000000",
       textOpacity: 1,
       bgOpacity: 1,
     };
@@ -518,9 +452,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     setTitleContent(null);
   }
 
-  function handleChangeTitle(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) {
+  function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     if (titleContent) {
       setTitleContent({ ...titleContent, [name]: value });
@@ -532,15 +464,12 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
       <div className="grid grid-cols-[300px,1fr] border-b">
         <div
           onClick={() => {
-            handleClickPanel('title');
+            handleClickPanel("title");
           }}
           className="border-r flex flex-col"
         >
-          <TabMenu
-            selectedWorkMenu={selectedWorkMenu}
-            handleClick={handleClickWorkMenu}
-          />
-          {selectedWorkMenu === 'title' && (
+          <TabMenu selectedWorkMenu={selectedWorkMenu} handleClick={handleClickWorkMenu} />
+          {selectedWorkMenu === "title" && (
             <TitleMenu
               titleContent={titleContent}
               optionArray={fontArray}
@@ -549,13 +478,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
               handleChangeTitle={handleChangeTitle}
             />
           )}
-          {selectedWorkMenu === 'subtitle' && <SubtitleMenu />}
-          {selectedWorkMenu === 'bgm' && <BgmMenu />}
+          {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
+          {selectedWorkMenu === "bgm" && <BgmMenu />}
         </div>
 
         <div
           onClick={() => {
-            handleClickPanel('video');
+            handleClickPanel("video");
           }}
           className="flex flex-col gap-4 justify-center items-center p-2"
         >
@@ -565,16 +494,14 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
                 title={titleContent}
                 handleChangeTitle={handleChangeTitle}
                 handleClickPanel={() => {
-                  handleClickPanel('title');
+                  handleClickPanel("title");
                 }}
               />
             )}
             <video
               controls
               ref={videoRef}
-              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${
-                new Date().getTime
-              }`}
+              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime}`}
               // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
@@ -605,11 +532,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
         onMouseDown={handleMouseDownProgress}
         className="relative grid grid-rows-[32px,8px,200px] overflow-x-scroll"
       >
-        <TimeLine
-          timeLineIntervalCount={timeLineIntervalCount}
-          timeArray={timeArray}
-          videoDuration={videoDuration}
-        />
+        <TimeLine timeLineIntervalCount={timeLineIntervalCount} timeArray={timeArray} videoDuration={videoDuration} />
 
         <div className="w-full h-2 bg-slate-200"></div>
 
@@ -625,7 +548,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
               handleMouseDownStartExpand={handleMouseDownStartExpand}
               handleMouseDownEndExpand={handleMouseDownEndExpand}
               handleClickPanel={() => {
-                handleClickPanel('video');
+                handleClickPanel("video");
               }}
             />
           </div>
