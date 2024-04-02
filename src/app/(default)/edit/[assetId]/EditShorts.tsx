@@ -15,7 +15,7 @@ import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template } from "./type";
 
 interface EditShortsProps {
-  assetId: number;
+  videoSrc: string;
   templateList: Template[];
 }
 
@@ -25,7 +25,7 @@ const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
 
-export default function EditShorts({ assetId, templateList }: EditShortsProps) {
+export default function EditShorts({ videoSrc, templateList }: EditShortsProps) {
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -501,7 +501,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
             <video
               controls
               ref={videoRef}
-              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime()}`}
+              src={videoSrc}
               // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
