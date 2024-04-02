@@ -11,7 +11,7 @@ import { TiThMenu } from 'react-icons/ti';
 import { TbTransferIn } from 'react-icons/tb';
 import { FiDownload, FiUpload } from 'react-icons/fi';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import { RiAiGenerate } from 'react-icons/ri';
+import { SiYoutubeshorts } from 'react-icons/si';
 
 import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
@@ -88,6 +88,16 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* menu */}
       <div className="w-16">
         <div className="flex flex-col justify-center items-end gap-3 mb-2">
+          {/* YouTube Upload */}
+          <div className="tooltip w-full" data-tip="숏폼 업로드">
+            <button
+              className="btn btn-circle btn-neutral hover:scale-110"
+              type="button"
+            >
+              <SiYoutubeshorts className="w-6 h-6 " />
+            </button>
+          </div>
+
           {/* download */}
           <div className="tooltip w-full" data-tip="다운로드">
             <a
@@ -114,7 +124,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
 
       {/* extra */}
       <div
-        className={`flex-none w-80 h-full rounded-xl shadow-2xl px-3 py-2 transition-all duration-150 ${
+        className={`flex-none w-80 h-full ml-4 rounded-xl shadow-2xl px-5 py-2 transition-all duration-150 ${
           showExtra
             ? 'opacity-100 translate-x-0'
             : 'opacity-0 translate-x-2 hidden'
