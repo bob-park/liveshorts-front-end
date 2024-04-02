@@ -38,12 +38,15 @@ export default async function AssetPage({ params }: Props) {
 
   const auth = `Bearer ${cookies().get('accessToken')?.value || ''}`;
 
-  const assetResponse = await fetch(MAM_API_HOST + `/api/asset/${assetId}`, {
-    method: 'get',
-    headers: {
-      Authorization: auth,
+  const assetResponse = await fetch(
+    MAM_API_HOST + `/api/asset/video/${assetId}`,
+    {
+      method: 'get',
+      headers: {
+        Authorization: auth,
+      },
     },
-  });
+  );
 
   const channelResponse = await fetch(MAM_API_HOST + `/api/record/channel`, {
     method: 'get',
@@ -64,12 +67,12 @@ export default async function AssetPage({ params }: Props) {
         <AssetHeaderContents />
       </div>
       <div className="col-span-1">
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-10 justify-center items-start">
+        <div className="grid grid-cols-2 2xl:grid-cols-3 gap-10 justify-center items-start">
           <div className="col-span-2">
             <AssetPlayeContents asset={asset} channels={channels} />
           </div>
           {/* shortfrom task list */}
-          <div className="col-span-2 xl:col-span-1 ">
+          <div className="col-span-2 2xl:col-span-1">
             <ShortFormTaskContents assetId={assetId} />
           </div>
         </div>
