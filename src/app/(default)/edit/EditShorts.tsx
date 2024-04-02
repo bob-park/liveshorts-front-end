@@ -26,7 +26,7 @@ export interface TitleContent {
   bgOpacity: number;
 }
 
-export type LineType = "video" | "bgm" | "title" | "subtitle";
+export type ActivePanel = "video" | "bgm" | "title" | "subtitle";
 export type WorkMenu = "title" | "subtitle" | "bgm";
 
 export const WIDTH_PERCENT_STEP = 25;
@@ -62,7 +62,7 @@ export default function EditShorts() {
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
   const [isExpandDragging, setIsExpandDragging] = useState({ startTime: false, endTime: false });
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
-  const [selectedLine, setSelctedLine] = useState<LineType | null>(null);
+  const [activePanel, setActivePanel] = useState<ActivePanel>("video");
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
@@ -413,8 +413,8 @@ export default function EditShorts() {
     setEndTimeInput({ ...startTimeInput, [name]: value });
   }
 
-  function handleClickLine(line: LineType) {
-    setSelctedLine(line);
+  function handleClickPanel(panel: ActivePanel) {
+    setActivePanel(panel);
   }
 
   function handleClickWorkMenu(workMenu: WorkMenu) {
@@ -452,7 +452,12 @@ export default function EditShorts() {
   return (
     <div className="grid grid-rows-[1fr,240px] h-full">
       <div className="grid grid-cols-[300px,1fr] border-b">
-        <div className="border-r flex flex-col">
+        <div
+          onClick={() => {
+            handleClickPanel("title");
+          }}
+          className="border-r flex flex-col"
+        >
           <TabMenu selectedWorkMenu={selectedWorkMenu} handleClick={handleClickWorkMenu} />
           {selectedWorkMenu === "title" && (
             <TitleMenu
@@ -469,7 +474,7 @@ export default function EditShorts() {
 
         <div
           onClick={() => {
-            setSelctedLine(null);
+            handleClickPanel("video");
           }}
           className="flex flex-col gap-4 justify-center items-center p-2"
         >
@@ -520,12 +525,12 @@ export default function EditShorts() {
               sectionBoxRef={sectionBoxRef}
               startX={startX}
               endX={endX}
-              selectedLine={selectedLine}
+              activePanel={activePanel}
               handleMouseDownSectionBox={handleMouseDownSectionBox}
               handleMouseDownStartExpand={handleMouseDownStartExpand}
               handleMouseDownEndExpand={handleMouseDownEndExpand}
-              handleClickLine={() => {
-                handleClickLine("video");
+              handleClickPanel={() => {
+                handleClickPanel("video");
               }}
             />
           </div>

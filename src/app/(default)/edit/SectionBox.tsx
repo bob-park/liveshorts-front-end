@@ -1,25 +1,25 @@
-import { LineType } from "./EditShorts";
+import { ActivePanel } from "./EditShorts";
 
 interface SectionBoxProps {
   sectionBoxRef: React.RefObject<HTMLDivElement>;
   startX: number;
   endX: number;
-  selectedLine: LineType | null;
+  activePanel: ActivePanel | null;
   handleMouseDownSectionBox: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownStartExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownEndExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleClickLine: () => void;
+  handleClickPanel: () => void;
 }
 
 export default function SectionBox({
   sectionBoxRef,
   startX,
   endX,
-  selectedLine,
+  activePanel,
   handleMouseDownSectionBox,
   handleMouseDownStartExpand,
   handleMouseDownEndExpand,
-  handleClickLine,
+  handleClickPanel,
 }: SectionBoxProps) {
   return (
     <div
@@ -29,7 +29,7 @@ export default function SectionBox({
         left: `${startX}px`,
       }}
       onMouseDown={handleMouseDownSectionBox}
-      onClick={handleClickLine}
+      onClick={handleClickPanel}
       className={`
         absolute top-0 flex justify-between h-full
         cursor-grab rounded-lg
@@ -43,8 +43,8 @@ export default function SectionBox({
         className={`
           cursor-w-resize
           rounded-l-lg w-[24px] min-w-[24px]
-          ${selectedLine !== "video" && "group-hover:opacity-50"}
-          ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+          ${activePanel !== "video" && "group-hover:opacity-50"}
+          ${activePanel === "video" ? " opacity-100" : "opacity-0"}
           bg-slate-600
                 `}
       ></div>
@@ -52,8 +52,8 @@ export default function SectionBox({
         className={`
             w-full
             inset-0 border-t-4 border-b-4 box-content border-opacity-0
-            ${selectedLine !== "video" && "group-hover:border-opacity-50"}
-            ${selectedLine === "video" ? " border-opacity-100" : "border-opacity-0"}
+            ${activePanel !== "video" && "group-hover:border-opacity-50"}
+            ${activePanel === "video" ? " border-opacity-100" : "border-opacity-0"}
           border-slate-600
                 `}
       ></div>
@@ -62,8 +62,8 @@ export default function SectionBox({
         className={`
                 cursor-e-resize
                 rounded-r-lg w-[24px] min-w-[24px]
-                ${selectedLine !== "video" && "group-hover:opacity-50"}
-                ${selectedLine === "video" ? " opacity-100" : "opacity-0"}
+                ${activePanel !== "video" && "group-hover:opacity-50"}
+                ${activePanel === "video" ? " opacity-100" : "opacity-0"}
                 bg-slate-600
                 `}
       ></div>
