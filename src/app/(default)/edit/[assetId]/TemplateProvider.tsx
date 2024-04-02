@@ -1,25 +1,17 @@
-import EditShorts from './EditShorts';
-import { cookies } from 'next/headers';
+import EditShorts from "./EditShorts";
+import { cookies } from "next/headers";
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
-const API_PREFIX = '/api';
+const API_PREFIX = "/api";
 
-export default async function TemplateProvider({
-  assetId,
-}: {
-  assetId: number;
-}) {
+export default async function TemplateProvider({ assetId }: { assetId: number }) {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
-  let headers = new Headers();
-  headers.append('Authorization', `Bearer ${accessToken}`);
-  //   headers.append("User-Agent", headers.get("User-Agent") || "");
-  headers.append('Content-Type', 'application/json');
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const headers = new Headers();
+  headers.append("Authorization", `Bearer ${accessToken}`);
 
-  const result = await fetch(
-    `${MAM_API_HOST}/${API_PREFIX}/v1/shorts/template/list`,
-  );
+  const result = await fetch(`${MAM_API_HOST}${API_PREFIX}/v1/shorts/template/list`, { headers });
   const templateList = await result.json();
 
-  return <EditShorts assetId={assetId} templateList={templateList} />;
+  return <EditShorts assetId={assetId} templateList={templateList.result} />;
 }

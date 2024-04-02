@@ -11,39 +11,21 @@ import TitleMenu from "./menu/TitleMenu";
 import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
 import TitleInput from "./menu/TitleInput";
+import TemplateMenu from "./menu/TemplateMenu";
+import { TitleContent, ActivePanel, WorkMenu, Template } from "./type";
 
 interface EditShortsProps {
   assetId: number;
-  templateList: any;
+  templateList: Template[];
 }
-
-export interface TitleContent {
-  text: string;
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  font: string;
-  size: number;
-  color: string;
-  background: string;
-  textOpacity: number;
-  bgOpacity: number;
-}
-
-export type ActivePanel = "video" | "bgm" | "title" | "subtitle";
-export type WorkMenu = "title" | "subtitle" | "bgm";
 
 export const WIDTH_PERCENT_STEP = 25;
-// const TEST_ASSET_ID = '20';
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
 
 export default function EditShorts({ assetId, templateList }: EditShortsProps) {
-  console.log(templateList);
-
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -76,8 +58,9 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
-  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("title");
+  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -459,16 +442,31 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     }
   }
 
+  function handleClickTemplate(template?: Template) {
+    setSelectedTemplate(template ?? null);
+  }
+
   return (
     <div className="grid grid-rows-[1fr,240px] h-full">
-      <div className="grid grid-cols-[300px,1fr] border-b">
+      <div className="grid grid-cols-[340px,1fr] border-b">
         <div
           onClick={() => {
             handleClickPanel("title");
           }}
           className="border-r flex flex-col"
         >
-          <TabMenu selectedWorkMenu={selectedWorkMenu} handleClick={handleClickWorkMenu} />
+          <TabMenu
+            selectedWorkMenu={selectedWorkMenu}
+            handleClick={handleClickWorkMenu}
+            handleClickWorkMenu={handleClickWorkMenu}
+          />
+          {selectedWorkMenu === "template" && (
+            <TemplateMenu
+              templateList={templateList}
+              selectedTemplateId={selectedTemplate?.templateId ?? ""}
+              handleClickTemplate={handleClickTemplate}
+            />
+          )}
           {selectedWorkMenu === "title" && (
             <TitleMenu
               titleContent={titleContent}
@@ -476,6 +474,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
+              handleClickWorkMenu={handleClickWorkMenu}
             />
           )}
           {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
@@ -496,12 +495,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
                 handleClickPanel={() => {
                   handleClickPanel("title");
                 }}
+                handleClickWorkMenu={handleClickWorkMenu}
               />
             )}
             <video
               controls
               ref={videoRef}
-              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime}`}
+              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime()}`}
               // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}

@@ -1,30 +1,20 @@
-import { ActivePanel, TitleContent } from '../EditShorts';
-import { hexToRgba } from '../util';
+import { ActivePanel, TitleContent, WorkMenu } from "../EditShorts";
+import { hexToRgba } from "../util";
 
 interface TitleInputProps {
   title: TitleContent;
   handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClickPanel(): void;
+  handleClickWorkMenu(workMenu: WorkMenu): void;
 }
 
 export default function TitleInput({
   title,
   handleChangeTitle,
   handleClickPanel,
+  handleClickWorkMenu,
 }: TitleInputProps) {
-  const {
-    text,
-    x1,
-    y1,
-    x2,
-    y2,
-    font,
-    size,
-    color,
-    background,
-    textOpacity,
-    bgOpacity,
-  } = title;
+  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
 
   return (
     <input
@@ -45,6 +35,7 @@ export default function TitleInput({
       onClick={(e) => {
         e.stopPropagation();
         handleClickPanel();
+        handleClickWorkMenu("title");
       }}
       onChange={handleChangeTitle}
       className={`
