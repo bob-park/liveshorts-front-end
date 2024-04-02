@@ -12,6 +12,10 @@ import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
 import TitleInput from "./menu/TitleInput";
 
+interface EditShortsProps {
+  templateList: any;
+}
+
 export interface TitleContent {
   text: string;
   x1: number;
@@ -36,7 +40,9 @@ const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
 
-export default function EditShorts() {
+export default function EditShorts({ templateList }: EditShortsProps) {
+  console.log(templateList);
+
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
