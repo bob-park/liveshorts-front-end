@@ -74,6 +74,10 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     router.push(`/asset/${assetId}/shortform/${taskId}`);
   };
 
+  const handleCreateShortForm = () => {
+    router.push(`/edit/${assetId}`);
+  };
+
   return (
     <div className="gird grid-cols-1 gap-2 w-full h-full rounded-box shadow-2xl p-5">
       <div className="col-span-1">
@@ -85,6 +89,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
             <button
               className="btn btn-sm btn-neutral transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-blue-950 duration-300"
               type="button"
+              onClick={handleCreateShortForm}
             >
               <IoAddCircleSharp className="w-6 h-6" />
               숏폼 생성
