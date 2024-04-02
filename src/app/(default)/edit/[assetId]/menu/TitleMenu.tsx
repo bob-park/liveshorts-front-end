@@ -1,12 +1,14 @@
-import { TitleContent } from "../EditShorts";
-import TitleItem from "./TitleItem";
+import { TitleContent } from '../EditShorts';
+import TitleItem from './TitleItem';
 
 interface TitleMenuProps {
   titleContent: TitleContent | null;
   optionArray: string[];
   handleClickAddTitle: () => void;
   handleClickDeleteTitle: () => void;
-  handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChangeTitle: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
 }
 
 export default function TitleMenu({
@@ -28,7 +30,11 @@ export default function TitleMenu({
       )}
 
       {!titleContent && (
-        <button disabled={!!titleContent} onClick={handleClickAddTitle} className="btn absolute bottom-4 right-4">
+        <button
+          disabled={!!titleContent}
+          onClick={handleClickAddTitle}
+          className="btn absolute bottom-4 right-4"
+        >
           + 제목 추가
         </button>
       )}

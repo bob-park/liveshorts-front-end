@@ -1,5 +1,5 @@
-import { ActivePanel, TitleContent } from "../EditShorts";
-import { hexToRgba } from "../util";
+import { ActivePanel, TitleContent } from '../EditShorts';
+import { hexToRgba } from '../util';
 
 interface TitleInputProps {
   title: TitleContent;
@@ -7,8 +7,24 @@ interface TitleInputProps {
   handleClickPanel(): void;
 }
 
-export default function TitleInput({ title, handleChangeTitle, handleClickPanel }: TitleInputProps) {
-  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
+export default function TitleInput({
+  title,
+  handleChangeTitle,
+  handleClickPanel,
+}: TitleInputProps) {
+  const {
+    text,
+    x1,
+    y1,
+    x2,
+    y2,
+    font,
+    size,
+    color,
+    background,
+    textOpacity,
+    bgOpacity,
+  } = title;
 
   return (
     <input
