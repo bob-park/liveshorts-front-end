@@ -572,9 +572,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
             <video
               controls
               ref={videoRef}
-              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${
-                new Date().getTime
-              }`}
+              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime()}`}
               // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
