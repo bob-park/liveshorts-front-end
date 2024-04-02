@@ -275,7 +275,7 @@ export default function EditShorts() {
 
   useEffect(() => {
     const handlePlayerKeyDown = (e: KeyboardEvent) => {
-      if (videoRef.current) {
+      if (videoRef.current && activePanel === "video") {
         if (e.key === "ArrowRight") {
           e.preventDefault();
           videoRef.current.currentTime += 10;
@@ -296,7 +296,7 @@ export default function EditShorts() {
     return () => {
       window.removeEventListener("keydown", handlePlayerKeyDown);
     };
-  }, []);
+  }, [activePanel]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -479,7 +479,15 @@ export default function EditShorts() {
           className="flex flex-col gap-4 justify-center items-center p-2"
         >
           <div className="relative h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
-            {titleContent && <TitleInput title={titleContent} handleChangeTitle={handleChangeTitle} />}
+            {titleContent && (
+              <TitleInput
+                title={titleContent}
+                handleChangeTitle={handleChangeTitle}
+                handleClickPanel={() => {
+                  handleClickPanel("title");
+                }}
+              />
+            )}
             <video
               controls
               ref={videoRef}
