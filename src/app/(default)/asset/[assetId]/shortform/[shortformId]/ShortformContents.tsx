@@ -31,6 +31,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
   const [prev, setPrev] = useState<ShortFormTask | false>(false);
   const [now, setNow] = useState<ShortFormTask>();
   const [next, setNext] = useState<ShortFormTask | false>(false);
+  const [showExtra, setShowExtra] = useState<boolean>(false);
 
   // useEffect
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* title */}
       <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-64 2xl:w-96">
         <h2 className="text-2xl font-bold">{now?.title}</h2>
+        <h3 className="text-lg text-gray-500">{now?.asset.title}</h3>
       </div>
 
       {/* shortform player */}
@@ -82,7 +84,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
 
       {/* menu */}
       <div className="w-16">
-        <div className="flex flex-col justify-center items-end gap-3 mb-4">
+        <div className="flex flex-col justify-center items-end gap-3 mb-2">
           <div className="tooltip w-full" data-tip="다운로드">
             <a
               className="btn btn-circle btn-neutral hover:scale-110"
@@ -92,8 +94,15 @@ export default function ShortformContents(props: ShortformContentsProps) {
               <FiDownload className="w-6 h-6" />
             </a>
           </div>
+
+          {/* menu */}
           <div className="tooltip w-full" data-tip="메뉴">
-            <button className="btn btn-circle hover:scale-110" type="button">
+            <button
+              className="btn btn-circle btn-neutral hover:scale-110"
+              type="button"
+              onMouseEnter={() => setShowExtra(true)}
+              onMouseLeave={() => setShowExtra(false)}
+            >
               <TiThMenu className="w-6 h-6" />
             </button>
           </div>
@@ -101,31 +110,35 @@ export default function ShortformContents(props: ShortformContentsProps) {
       </div>
 
       {/* prev next */}
-      <div className="absolute top-0 right-0 h-full">
+      <div className="absolute top-0 right-5 h-full">
         <div className="grid grid-col-1 h-full justify-center content-between">
           {/* prev button */}
           <div>
             {prev && (
-              <button
-                className="btn btn-circle btn-neutral hover:scale-110"
-                type="button"
-                onClick={handlePrev}
-              >
-                <FaArrowUp className="w-8 h-8" />
-              </button>
+              <div className="tooltip" data-tip="이전 숏폼 영상">
+                <button
+                  className="btn btn-circle btn-neutral hover:scale-110"
+                  type="button"
+                  onClick={handlePrev}
+                >
+                  <FaArrowUp className="w-8 h-8" />
+                </button>
+              </div>
             )}
           </div>
 
           {/* prev button */}
           <div>
             {next && (
-              <button
-                className="btn btn-circle btn-neutral hover:scale-110"
-                type="button"
-                onClick={handleNext}
-              >
-                <FaArrowDown className="w-8 h-8" />
-              </button>
+              <div className="tooltip" data-tip="다음 숏폼 영상">
+                <button
+                  className="btn btn-circle btn-neutral hover:scale-110"
+                  type="button"
+                  onClick={handleNext}
+                >
+                  <FaArrowDown className="w-8 h-8" />
+                </button>
+              </div>
             )}
           </div>
         </div>

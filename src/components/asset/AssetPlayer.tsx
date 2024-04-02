@@ -293,14 +293,14 @@ export default function AssetPlayer(props: AssetPlayerProps) {
             <progress
               className="progress w-full"
               max={100}
-              value={videoProgress}
+              value={videoProgress + ''}
             />
             <input
               className="range w-full transition opacity-0 hover:opacity-100 absolute top-3 left-0"
               type="range"
               max="100"
               min="0"
-              value={videoProgress}
+              value={videoProgress + ''}
               onChange={handleChangeProgress}
             />
           </div>

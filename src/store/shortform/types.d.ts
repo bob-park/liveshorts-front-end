@@ -10,7 +10,7 @@ type ShortFormTask = {
   template: ShortFormTemplate;
   status: TaskStatus;
   fitToTemplate: boolean;
-  asset: { assetId: number };
+  asset: Asset;
   uploadInstances?: ShortFormUploadInstance[];
   taskExtras?: ShortFormExtra[];
   createdDate: Date;
