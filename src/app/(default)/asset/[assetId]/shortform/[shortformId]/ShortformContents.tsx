@@ -70,7 +70,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
   return (
     <div className="flex justify-center items-end size-full gap-1 relative h-full">
       {/* title */}
-      <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-64 2xl:w-96">
+      <div className="absolute bottom-0 left-0 invisible xl:visible xl:w-56 2xl:w-80">
         <h2 className="text-2xl font-bold">{shortform.title}</h2>
         <h3 className="mt-2 text-lg text-gray-500">{shortform.asset.title}</h3>
       </div>
@@ -104,8 +104,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
             <button
               className="btn btn-circle btn-neutral hover:scale-110"
               type="button"
-              onMouseEnter={() => setShowExtra(true)}
-              onMouseLeave={() => setShowExtra(false)}
+              onClick={() => setShowExtra(!showExtra)}
             >
               <TiThMenu className="w-6 h-6" />
             </button>
@@ -114,8 +113,14 @@ export default function ShortformContents(props: ShortformContentsProps) {
       </div>
 
       {/* extra */}
-      <div className="flex-none w-56 h-full rounded-xl shadow-2xl px-3 py-2">
-        <div className="flex flex-col size-full justify-start items-start gap-2 overflow-auto">
+      <div
+        className={`flex-none w-56 xl:w-64 2xl:w-80 h-full rounded-xl shadow-2xl px-3 py-2 transition-all duration-150 ${
+          showExtra
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 translate-x-2 hidden'
+        }`}
+      >
+        <div className="flex flex-col size-full justify-start items-start gap-2 p-4 overflow-auto">
           <div className="flex w-full justify-center items-center mb-2">
             <span className="mr-2">
               <TbTransferIn className="w-6 h-6" />
@@ -125,7 +130,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
           {extraTypes.map((item) => (
             <div
               key={`extra-type-row-${item.id}`}
-              className="flex flex-col gap-3 w-full px-4 py-2 rounded-2xl bg-gray-100"
+              className="flex flex-col gap-3 w-full px-4 py-2 rounded-2xl bg-gray-100 transition-all duration-150 hover:scale-105 hover:shadow-xl"
             >
               <h2 className="text-lg font-bold">{item.name}</h2>
               <div className="mt-2">
