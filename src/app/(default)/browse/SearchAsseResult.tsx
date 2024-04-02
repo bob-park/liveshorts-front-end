@@ -6,6 +6,8 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
+import { setIsListView } from './action';
+
 // react icon
 import {
   HiOutlineViewGrid,
@@ -32,6 +34,7 @@ import dayjs from 'dayjs';
 // action
 import { assetActions } from '@/store/asset';
 import { Button, Loading } from 'react-daisyui';
+import MoveOnTop from '@/components/common/MoveOnTop';
 
 const { requestSearchAsset } = assetActions;
 
@@ -95,7 +98,7 @@ const ThumbnailAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
         {isLoading ? (
-          <LoadingThumbanilAssets size={10} />
+          <LoadingThumbanilAssets size={30} />
         ) : (
           assets.map((item) => (
             <div
@@ -103,18 +106,7 @@ const ThumbnailAssetView = (props: {
               className="col-span-1"
               onClick={() => handleClick(item.assetId)}
             >
-              <AssetViewItem
-                assetId={item.assetId}
-                title={item.title}
-                assetStatus={item.assetStatus}
-                category={item.category.name}
-                createdDate={item.createdDate}
-                existShortForm={item.shortFormCount > 0}
-                isUploadSns={
-                  item.uploadSnsCount > 0 &&
-                  item.shortFormCount === item.uploadSnsCount
-                }
-              />
+              <AssetViewItem asset={item} />
             </div>
           ))
         )}
@@ -152,7 +144,7 @@ const ListAssetView = (props: {
       {!isLoading && assets.length === 0 && <EmptyAssetList />}
       {isLoading ? (
         <div className="col-span-1 border-b-1 border-b-gray-200">
-          <LoadingListAssets size={20} />
+          <LoadingListAssets size={30} />
         </div>
       ) : (
         assets.map((item) => (
@@ -161,15 +153,7 @@ const ListAssetView = (props: {
             className="col-span-1"
             onClick={() => handleClick(item.assetId)}
           >
-            <AssetListItem
-              assetId={item.assetId}
-              title={item.title}
-              fileSize={item.fileSize}
-              assetStatus={item.assetStatus}
-              category={item.category.name}
-              createdDate={item.createdDate}
-              createdBy={item.createdBy}
-            />
+            <AssetListItem asset={item} />
           </div>
         ))
       )}
@@ -216,6 +200,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   );
 
   // useEffect
+  useLayoutEffect(() => {
+    setListViewMode(isListView);
+  }, [isListView]);
+
   useLayoutEffect(() => {
     handleSearch(0, false);
   }, [searchParams]);
@@ -274,8 +262,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleToggleViewMode = (isListView: boolean) => {
     setListViewMode(isListView);
-
-    document.cookie = `isListView=${isListView}`;
+    setIsListView(isListView);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -317,7 +304,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   };
 
   return (
-    <div className="flex flex-col m-2">
+    <div className="flex flex-col m-2 relative">
       {/* search form */}
       <div className="card bg-base-100 mx-10 shadow-xl p-6 min-w-[850px]">
         <form className="flex justify-center p-4 " onSubmit={handleSubmit}>
@@ -591,13 +578,13 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={assets.length === 0 ?? isLoading}
+            isLoading={assets.length === 0 && isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={assets.length === 0 ?? isLoading}
+            isLoading={assets.length === 0 && isLoading}
             assets={assets}
             onClick={handleMoveAsset}
           />
@@ -611,6 +598,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       ) : (
         <div id="observer" className="h-2"></div>
       )}
+
+      <MoveOnTop />
     </div>
   );
 }

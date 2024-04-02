@@ -12,13 +12,25 @@
   }
 }
 
-.timeInput::-webkit-outer-spin-button,
-.timeInput::-webkit-inner-spin-button {
+.progress {
   -webkit-appearance: none;
 }
 
+.progress:focus {
+  outline: none;
+}
+
+.progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #000000;
+  cursor: pointer;
+  height: 100vh;
+  width: 2px;
+  border-radius: 0;
+}
+
 .progressBar::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0px;
   left: 50%;
@@ -30,4 +42,17 @@
 
 #active-tab {
   background-color: rgb(51 65 85);
+}
+
+/* input 화살표 없애기 */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox  */
+input[type='number'] {
+  -moz-appearance: textfield;
 }

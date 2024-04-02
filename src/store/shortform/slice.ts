@@ -11,6 +11,7 @@ const initialState: ShortFormState = {
     totalCount: 0,
     totalPage: 0,
   },
+  extraTypes: [],
 };
 
 export default createSlice({

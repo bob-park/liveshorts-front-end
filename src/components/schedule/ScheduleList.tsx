@@ -6,6 +6,9 @@ import Image from 'next/image';
 
 // react icons
 import { SiYoutubeshorts } from 'react-icons/si';
+import { VscRecord } from 'react-icons/vsc';
+import { BiVideoRecording } from 'react-icons/bi';
+import { IoWarning } from 'react-icons/io5';
 
 // dayjs
 import dayjs from 'dayjs';
@@ -82,15 +85,32 @@ const ScheduleListItem = ({
       </div>
       {/* thumbnail */}
       <div className="flex-none ">
-        <figure className="w-48 h-32 flex justify-center">
-          <Image
-            className="w-auto h-full rounded-md object-contain"
-            src={assetImageSrc}
-            alt="thumbnail"
-            width={400}
-            height={300}
-            onError={() => setAssetImageSrc('/default_thumbnail.png')}
-          />
+        <figure className="w-48 h-28 flex justify-center items-center">
+          {schedule.status === 'FAILURE' && (
+            <div>
+              <IoWarning className="w-10 h-10 text-yellow-600" />
+            </div>
+          )}
+          {schedule.status === 'WAITING' && (
+            <div>
+              <VscRecord className="w-10 h-10" />
+            </div>
+          )}
+          {schedule.status === 'RECORDING' && (
+            <div>
+              <BiVideoRecording className="w-10 h-10 text-red-600 animate-bounce" />
+            </div>
+          )}
+          {schedule.asset.assetStatus === 'REGISTERED' && (
+            <Image
+              className="w-auto h-full rounded-xl object-contain"
+              src={assetImageSrc}
+              alt="thumbnail"
+              width={400}
+              height={300}
+              onError={() => setAssetImageSrc('/default_thumbnail.png')}
+            />
+          )}
         </figure>
       </div>
       {/* 정보 */}
@@ -103,8 +123,8 @@ const ScheduleListItem = ({
                 <SiYoutubeshorts className="w-5 h-5" />
               </div>
             )}
-            <div className="tooltip w-full" data-tip={schedule.title}>
-              <h2 className="w-full text-start truncate text-xl font-bold">
+            <div className="tooltip max-w-full" data-tip={schedule.title}>
+              <h2 className="text-start truncate text-xl font-bold">
                 {schedule.title}
               </h2>
             </div>

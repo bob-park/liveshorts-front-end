@@ -30,6 +30,11 @@ type Asset = {
   shortFormCount: number;
   uploadSnsCount: number;
   assetMetadataList: AssetMeta[];
+  resolution?: string;
+  fps?: number;
+  ratio?: string;
+  frameCount?: number;
+  durationOfClip?: number;
 };
 
 type AssetType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';

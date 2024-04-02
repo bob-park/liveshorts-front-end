@@ -19,6 +19,16 @@ const reducers = {
   failureSearchShortFormTask: (state: ShortFormState) => {
     state.isLoading = false;
   },
+
+  // get shortform extra types
+  requestGetExtraTypes: (state: ShortFormState) => {},
+  successGetExtraTypes: (
+    state: ShortFormState,
+    action: PayloadAction<{ extraTypes: ShortFormExtraType[] }>,
+  ) => {
+    
+  },
+  failureGetExtraTypes: (state: ShortFormState) => {},
 };
 
 export default reducers;

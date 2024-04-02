@@ -1,16 +1,13 @@
 'use client';
 
 // react
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useEffect } from 'react';
 
 // nextjs
 import { useRouter } from 'next/navigation';
 
 // daisyui
 import { Menu } from 'react-daisyui';
-
-// react icon
-import { FaArrowUp } from 'react-icons/fa';
 
 // hooks
 import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
@@ -24,6 +21,7 @@ import { scheduleActions } from '@/store/schedule';
 import ScheduleDateSelector from '@/components/schedule/ScheduleDateSelector';
 import ScheduleList from '@/components/schedule/ScheduleList';
 import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
+import MoveOnTop from '@/components/common/MoveOnTop';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -56,16 +54,9 @@ export default function BroadcastScheduleContent(
   const dispatch = useAppDispatch();
   const { isLoading, schedules } = useAppSelector((state) => state.schedule);
 
-  // useEffect
   useLayoutEffect(() => {
     handleGetSchedule();
   }, [selectChannelId, selectDate]);
-
-  useLayoutEffect(() => {
-    screen.height;
-
-    setShowMoveTop(document.body.offsetHeight > screen.availHeight);
-  }, [schedules]);
 
   // handle
   const handleGetSchedule = () => {
@@ -98,10 +89,6 @@ export default function BroadcastScheduleContent(
     }
 
     router.push(`/asset/${schedule.asset.assetId}`);
-  };
-
-  const handleScrollTop = () => {
-    scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleReserveShortFormSchedule = (
@@ -186,21 +173,7 @@ export default function BroadcastScheduleContent(
           </div>
         </div>
 
-        {showMoveTop && (
-          <div className="sticky bottom-5">
-            <div className="flex justify-end">
-              <div className="tooltip" data-tip="맨 위로">
-                <button
-                  className="btn btn-circle btn-neutral transition delay-300 hover:scale-110 duration-300"
-                  type="button"
-                  onClick={handleScrollTop}
-                >
-                  <FaArrowUp className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <MoveOnTop />
       </div>
       <ReservShortFormView
         show={showReserveShortForm}
