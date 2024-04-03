@@ -1,27 +1,22 @@
-import { WorkMenu } from "./EditShorts";
+import { WorkMenu } from "./type";
 
 interface TabMenuProps {
   selectedWorkMenu: WorkMenu;
-  handleClick: (workMenu: WorkMenu) => void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
 }
 
 interface TabMenuItemProps {
   value: string;
   isSelected: boolean;
-  handleClick: () => void;
   handleClickWorkMenu(): void;
 }
 
-export default function TabMenu({ selectedWorkMenu, handleClick, handleClickWorkMenu }: TabMenuProps) {
+export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMenuProps) {
   return (
     <div role="tablist" className="w-full tab tabs-boxed p-0 border-slate-700">
       <TabMenuItem
         value="템플릿"
         isSelected={selectedWorkMenu === "template"}
-        handleClick={() => {
-          handleClick("template");
-        }}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("template");
         }}
@@ -29,9 +24,6 @@ export default function TabMenu({ selectedWorkMenu, handleClick, handleClickWork
       <TabMenuItem
         value="제목"
         isSelected={selectedWorkMenu === "title"}
-        handleClick={() => {
-          handleClick("title");
-        }}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("title");
         }}
@@ -39,9 +31,6 @@ export default function TabMenu({ selectedWorkMenu, handleClick, handleClickWork
       <TabMenuItem
         value="자막"
         isSelected={selectedWorkMenu === "subtitle"}
-        handleClick={() => {
-          handleClick("subtitle");
-        }}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("subtitle");
         }}
@@ -49,9 +38,6 @@ export default function TabMenu({ selectedWorkMenu, handleClick, handleClickWork
       <TabMenuItem
         value="BGM"
         isSelected={selectedWorkMenu === "bgm"}
-        handleClick={() => {
-          handleClick("bgm");
-        }}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("bgm");
         }}
@@ -60,13 +46,12 @@ export default function TabMenu({ selectedWorkMenu, handleClick, handleClickWork
   );
 }
 
-function TabMenuItem({ value, isSelected, handleClick, handleClickWorkMenu }: TabMenuItemProps) {
+function TabMenuItem({ value, isSelected, handleClickWorkMenu }: TabMenuItemProps) {
   return (
     <a
       id={`${isSelected && "active-tab"}`}
       role="tab"
       onClick={() => {
-        handleClick();
         handleClickWorkMenu();
       }}
       className={`

@@ -32,7 +32,7 @@ export default function ControlBar({
   shrinkProgress,
 }: ControlBarProps) {
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full p-3">
       <div className="flex items-center gap-3">
         <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} />
         <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} />

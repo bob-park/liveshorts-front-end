@@ -32,7 +32,7 @@ export interface Template {
   lastModifiedBy: string;
 }
 
-export type ActivePanel = "video" | "bgm" | "title" | "subtitle";
+export type ActivePanel = "video" | "template" | "title" | "subtitle" | "bgm";
 export type WorkMenu = "template" | "title" | "subtitle" | "bgm";
 
 // non export type

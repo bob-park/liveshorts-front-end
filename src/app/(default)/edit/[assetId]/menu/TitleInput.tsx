@@ -1,4 +1,4 @@
-import { ActivePanel, TitleContent, WorkMenu } from "../EditShorts";
+import { TitleContent, WorkMenu } from "../type";
 import { hexToRgba } from "../util";
 
 interface TitleInputProps {

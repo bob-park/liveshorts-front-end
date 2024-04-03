@@ -39,9 +39,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const prevEndX = useRef<number>(0);
   const prevProgressWidth = useRef<number>(0);
   const prevProgressWidthPercent = useRef<number>(0);
+  const templateImageRef = useRef<HTMLDivElement>(null);
 
   // useState
   // const [videoProgress, setVideoProgress] = useState<number>(0);
+  const [loaded, setLoaded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isPlay, setIsPlay] = useState(false);
   const [progressBarX, setProgressBarX] = useState(0);
@@ -61,6 +63,8 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
+  const [nonTemplateSectionSize, setNonTemplateSectionSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -243,7 +247,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
-        // handleMouseDownProgress함수와 연관된 버그 해결
+        // TODO handleMouseDownProgress함수와 연관된 버그 해결
 
         const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
@@ -313,6 +317,42 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     prevEndX.current = newEndX;
   }, [startTimeInput, endTimeInput, videoDuration]);
 
+  useEffect(() => {
+    function handleWindowResize() {
+      if (selectedTemplate?.videoPosition.y1 && templateImageRef.current) {
+        setTemplateSize({
+          width: ((videoRef.current?.clientHeight ?? 0) * 9) / 16,
+          height: videoRef.current?.clientHeight ?? 0,
+        });
+      }
+    }
+
+    handleWindowResize();
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [selectedTemplate, videoRef, templateImageRef]);
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setNonTemplateSectionSize({
+        width: videoRef.current?.clientWidth ?? 0,
+        height: videoRef.current?.clientHeight ?? 0,
+      });
+    }
+
+    handleWindowResize();
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [videoRef.current?.clientWidth, videoRef.current?.clientHeight]);
+
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (progressRef.current) {
@@ -341,6 +381,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
     setVideoDuration(e.currentTarget.duration);
+    setLoaded(true);
     // setVideoProgress(0);
   }
 
@@ -455,11 +496,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           }}
           className="border-r flex flex-col"
         >
-          <TabMenu
-            selectedWorkMenu={selectedWorkMenu}
-            handleClick={handleClickWorkMenu}
-            handleClickWorkMenu={handleClickWorkMenu}
-          />
+          <TabMenu selectedWorkMenu={selectedWorkMenu} handleClickWorkMenu={handleClickWorkMenu} />
           {selectedWorkMenu === "template" && (
             <TemplateMenu
               templateList={templateList}
@@ -485,9 +522,46 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           onClick={() => {
             handleClickPanel("video");
           }}
-          className="flex flex-col gap-4 justify-center items-center p-2"
+          className="flex flex-col items-center p-2"
         >
-          <div className="relative h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
+          <div className="relative aspect-auto m-auto">
+            {!loaded && (
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
+            )}
+            {selectedTemplate ? (
+              <div
+                ref={templateImageRef}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickPanel("template");
+                  handleClickWorkMenu("template");
+                }}
+                style={{
+                  width: templateSize.width,
+                  height: templateSize.height,
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+              >
+                <img
+                  src={`/api/v1/shorts/template/${selectedTemplate.templateId}/file?t=${new Date().getTime()}`}
+                  alt="template-img"
+                  className="w-full h-full"
+                />
+              </div>
+            ) : (
+              // TODO 추후에 작업할 것
+              <div
+                style={{
+                  width: nonTemplateSectionSize.width,
+                  height: nonTemplateSectionSize.height,
+                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex justify-between m-auto"
+              >
+                <div className="bg-slate-500 flex-1 bg-opacity-70"></div>
+                <div style={{ width: ((videoRef.current?.clientHeight ?? 0) * 9) / 16 }} className=""></div>
+                <div className="bg-slate-500 flex-1 bg-opacity-70"></div>
+              </div>
+            )}
             {titleContent && (
               <TitleInput
                 title={titleContent}
@@ -506,7 +580,15 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
               onPlay={() => setIsPlay(true)}
-              className="w-full h-full"
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              // TODO 이 부분을 위해서 relative div에 Ref 잡아야할듯
+              // style={{width:}}
+              className={`aspect-auto max-w-[calc(100vh-100px)] max-h-[calc(100vh-100px)] 
+              ${loaded ? "block" : "hidden"}
+              ${selectedTemplate && "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"}
+              `}
             ></video>
           </div>
 
