@@ -56,7 +56,7 @@ export default function NavbarMenu(props: { token: string }) {
 
   return (
     <>
-      <div className="sticky top-0 z-30 flex h-20 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm">
+      <div className="sticky top-0 z-50 flex h-20 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm">
         <Navbar className="">
           <Navbar.Start className="flex-none">
             <div className="px-2 mx-2 text-2xl font-bold">
