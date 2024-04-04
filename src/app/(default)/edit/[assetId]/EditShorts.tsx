@@ -65,7 +65,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
-  const [nonTemplateSectionSize, setNonTemplateSectionSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -334,23 +333,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       window.removeEventListener("resize", handleWindowResize);
     };
   }, [selectedTemplate, videoAreaRef.current?.clientHeight]);
-
-  useEffect(() => {
-    function handleWindowResize() {
-      setNonTemplateSectionSize({
-        width: videoAreaRef.current?.clientWidth ?? 0,
-        height: videoAreaRef.current?.clientHeight ?? 0,
-      });
-    }
-
-    handleWindowResize();
-
-    window.addEventListener("resize", handleWindowResize);
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, [selectedTemplate, videoAreaRef.current?.clientWidth, videoAreaRef.current?.clientHeight]);
 
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
