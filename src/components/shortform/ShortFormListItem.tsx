@@ -5,7 +5,7 @@ import Image from 'next/image';
 // react icon
 import { TbTransferIn } from 'react-icons/tb';
 import { SiYoutube } from 'react-icons/si';
-import { FaRegEdit } from 'react-icons/fa';
+import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import { LuCopyPlus } from 'react-icons/lu';
 
 // timeago
@@ -20,16 +20,32 @@ timeago.register('ko', ko);
 
 type ShortFormListItemProps = {
   task: ShortFormTask;
+  onEdit?: (id: string) => void;
+  onRemove?: (id: string) => void;
+  onCopy?: (id: string) => void;
 };
 
 export default function ShortFormListItem(props: ShortFormListItemProps) {
   // props
-  const { task } = props;
+  const { task, onEdit, onRemove, onCopy } = props;
 
   // state
   const [thumbSrc, setThumbSrc] = useState<string>(
     `/api/v1/asset/${task.asset.assetId}/resource?fileType=THUMBNAIL`,
   );
+
+  // handle
+  const handleEdit = () => {
+    onEdit && onEdit(task.id);
+  };
+
+  const handleRemove = () => {
+    onRemove && onRemove(task.id);
+  };
+
+  const handleCopy = () => {
+    onCopy && onCopy(task.id);
+  };
 
   return (
     <div className="flex gap-5 items-center rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300">
@@ -84,14 +100,31 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                 e.stopPropagation();
               }}
             >
-              <div className="tooltip" data-tip="숏폼 편집">
-                <button className="btn btn-sm btn-neutral" type="button">
+              <div className="tooltip" data-tip="편집">
+                <button
+                  className="btn btn-sm btn-neutral"
+                  type="button"
+                  onClick={handleEdit}
+                >
                   <FaRegEdit className="w-4 h-4" />
                 </button>
               </div>
-              <div className="tooltip" data-tip="숏폼 복사">
-                <button className="btn btn-sm btn-neutral" type="button">
+              <div className="tooltip" data-tip="복사">
+                <button
+                  className="btn btn-sm btn-neutral"
+                  type="button"
+                  onClick={handleCopy}
+                >
                   <LuCopyPlus className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="tooltip" data-tip="삭제">
+                <button
+                  className="btn btn-sm btn-neutral"
+                  type="button"
+                  onClick={handleRemove}
+                >
+                  <FaTrashAlt className="w-4 h-4" />
                 </button>
               </div>
             </div>
