@@ -523,52 +523,54 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           }}
           className="grid grid-rows-[1fr,70px]"
         >
-          <div ref={videoAreaRef} className={`relative aspect-auto flex justify-center items-center m-auto`}>
+          <div
+            ref={videoAreaRef}
+            style={{ minWidth: videoRef.current?.clientWidth }}
+            className={`relative aspect-auto w-full h-full flex justify-center items-center m-auto `}
+          >
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
             )}
-            {selectedTemplate ? (
-              <div
-                ref={templateImageRef}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClickPanel("template");
-                  handleClickWorkMenu("template");
-                }}
-              >
-                <img
-                  src={`/api/v1/shorts/template/${selectedTemplate.templateId}/file?t=${new Date().getTime()}`}
-                  alt="template-img"
-                  onLoad={(e) => {
-                    setTemplateSize({ width: e.currentTarget.clientWidth, height: e.currentTarget.clientHeight });
-                  }}
-                  className="max-h-[calc(100vh-450px)]"
-                />
-              </div>
-            ) : (
-              // TODO 추후에 작업할 것
+
+            <div
+              ref={templateImageRef}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClickPanel("template");
+                handleClickWorkMenu("template");
+              }}
+              style={{ width: ((templateImageRef.current?.clientHeight ?? 0) * 9) / 16 }}
+              className={`relative h-full border border-green-500 ${loaded ? "block" : "hidden"}`}
+            >
               <div
                 style={{
-                  width: nonTemplateSectionSize.width,
-                  height: nonTemplateSectionSize.height,
+                  height:
+                    (templateImageRef.current?.clientHeight ?? 0) *
+                    ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0)),
+                  top: (videoAreaRef.current?.clientHeight ?? 0) * (selectedTemplate?.videoPosition.y1 ?? 0),
                 }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex justify-between m-auto"
-              >
-                <div className="bg-slate-500 flex-1 bg-opacity-70"></div>
-                <div style={{ width: ((videoRef.current?.clientHeight ?? 0) * 9) / 16 }} className=""></div>
-                <div className="bg-slate-500 flex-1 bg-opacity-70"></div>
-              </div>
-            )}
-            {titleContent && (
-              <TitleInput
-                title={titleContent}
-                handleChangeTitle={handleChangeTitle}
-                handleClickPanel={() => {
-                  handleClickPanel("title");
+                className="absolute w-full border border-red-500 z-10"
+              ></div>
+              <img
+                src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
+                alt="template-img"
+                onLoad={(e) => {
+                  setTemplateSize({ width: e.currentTarget.clientWidth, height: e.currentTarget.clientHeight });
                 }}
-                handleClickWorkMenu={handleClickWorkMenu}
+                className="w-full h-full"
               />
-            )}
+              {titleContent && (
+                <TitleInput
+                  title={titleContent}
+                  handleChangeTitle={handleChangeTitle}
+                  handleClickPanel={() => {
+                    handleClickPanel("title");
+                  }}
+                  handleClickWorkMenu={handleClickWorkMenu}
+                />
+              )}
+            </div>
+
             <video
               controls
               ref={videoRef}
@@ -581,17 +583,15 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
                 e.preventDefault();
               }}
               style={{
-                width: selectedTemplate ? `${(templateSize.height * 16) / 9}px` : "auto",
-                height: selectedTemplate
-                  ? `${
-                      (templateSize.height ?? 0) *
-                      (selectedTemplate.videoPosition.y2 - selectedTemplate.videoPosition.y1)
-                    }px`
-                  : "auto",
+                height: `${
+                  (templateSize.height ?? 0) *
+                  ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0))
+                }px`,
+
+                width: `${((videoRef.current?.clientHeight ?? 0) * 16) / 9}px`,
               }}
-              className={`aspect-auto
+              className={`aspect-auto absolute min-w-fit
               ${loaded ? "block" : "hidden"}
-              ${selectedTemplate ? "absolute max-w-[calc(100vh-450px)]" : "max-w-[calc(100vh-100px)]"}
               `}
             ></video>
           </div>

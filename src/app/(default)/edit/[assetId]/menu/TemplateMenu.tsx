@@ -32,11 +32,7 @@ export default function TemplateMenu({ templateList, selectedTemplateId, handleC
           >
             <div className="card-body">
               <span className="card-title">{v.title}</span>
-              <img
-                src={`/api/v1/shorts/template/${v.templateId}/file?t=${new Date().getTime()}`}
-                alt="template-img"
-                className="w-1/2"
-              />
+              <img src={`/api/v1/shorts/template/${v.templateId}/file`} alt="template-img" className="w-1/2" />
             </div>
           </div>
         ))}
