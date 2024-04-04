@@ -2,24 +2,24 @@
 import { useEffect } from 'react';
 
 // react icon
-import { LuCopyPlus } from 'react-icons/lu';
+import { FaTrashAlt } from 'react-icons/fa';
 import { IoCloseCircleOutline } from 'react-icons/io5';
 
-type CopyShortFormConfirmProps = {
+type RemoveShortFormConfirmProps = {
   show: boolean;
   shortform?: ShortFormTask;
   onBackdrop?: () => void;
   onConfirm?: () => void;
 };
 
-const id = 'copy_shortform_confirm_modal';
+const id = 'remove_shortform_confirm_modal';
 
-export default function CopyShortFormConfirm({
+export default function RemoveShortFormConfirm({
   show,
   shortform,
   onBackdrop,
   onConfirm,
-}: CopyShortFormConfirmProps) {
+}: RemoveShortFormConfirmProps) {
   // state
 
   // useEffect
@@ -57,10 +57,10 @@ export default function CopyShortFormConfirm({
       onKeyDownCapture={handleKeyboardDown}
     >
       <div className="modal-box">
-        <h3 className="font-bold text-lg">숏폼 복사</h3>
+        <h3 className="font-bold text-lg">숏폼 삭제</h3>
         <p className="py-4">
           "<strong className="text-lg">{shortform?.title}</strong>" 을(를)
-          복사하시겠습니까?
+          삭제하시겠습니까?
         </p>
         <div className="modal-action">
           <form method="dialog">
@@ -71,11 +71,11 @@ export default function CopyShortFormConfirm({
 
             <button
               type="button"
-              className="btn btn-neutral ml-3"
+              className="btn btn-error bg-red-600 text-white ml-3"
               onClick={handleConfirm}
             >
-              <LuCopyPlus className="w-6 h-6" />
-              복사
+              <FaTrashAlt className="w-6 h-6" />
+              삭제
             </button>
           </form>
         </div>

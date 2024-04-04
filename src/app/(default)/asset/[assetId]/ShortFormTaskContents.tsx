@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 import { shortFormActions } from '@/store/shortform';
 import ShortFormList from '@/components/shortform/ShortFormList';
 import CopyShortFormConfirm from './CopyShortFormConfirm';
+import RemoveShortFormConfirm from './RemoveShortFormConfirm';
 
 // action
 const {
@@ -160,6 +161,15 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
         show={showCopyConfirm}
         shortform={tasks.find((item) => item.id === copyTaskId)}
         onBackdrop={() => setShowCopyConfirm(false)}
+        onConfirm={handleCopyShortForm}
+      />
+
+      {/* remove confirm modal */}
+      <RemoveShortFormConfirm
+        show={showRemoveConfirm}
+        shortform={tasks.find((item) => item.id === removeTaskId)}
+        onBackdrop={() => setShowRemoveConfirm(false)}
+        onConfirm={handleRemoveShortForm}
       />
     </>
   );

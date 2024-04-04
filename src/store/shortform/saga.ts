@@ -126,9 +126,7 @@ function* callRemoveShortForm(
     return;
   }
 
-  if (result.data) {
-    yield put(successRemoveShortForm({ taskId: result.data.id }));
-  }
+  yield put(successRemoveShortForm({ taskId }));
 }
 
 function* watchRemoveShortForm() {
