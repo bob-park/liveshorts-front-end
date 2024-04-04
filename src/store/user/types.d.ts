@@ -12,4 +12,5 @@ type User = {
   email?: string;
   role: string;
   authorities: string[];
+  department?: string;
 };

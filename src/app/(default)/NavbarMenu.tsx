@@ -26,7 +26,7 @@ import routes from './routes';
 import { getRoleType } from '@/utils/parseUtils';
 import { TitleContent } from './edit/[assetId]/EditShorts';
 
-const { requestUpdateMe, requestLoggedOut } = userActions;
+const { requestUpdateMe, requestLoggedOut, requestGetUser } = userActions;
 
 export default function NavbarMenu(props: { token: string }) {
   // router
@@ -41,6 +41,10 @@ export default function NavbarMenu(props: { token: string }) {
   useLayoutEffect(() => {
     dispatch(requestUpdateMe(props.token));
   }, []);
+
+  useLayoutEffect(() => {
+    me && dispatch(requestGetUser({ id: me.id }));
+  }, [me != null]);
 
   // handle
   const handleLogout = () => {
@@ -92,10 +96,15 @@ export default function NavbarMenu(props: { token: string }) {
           <Navbar.End className="lg:w-full">
             <div className="mr-7">
               {me && (
-                <p>
-                  <strong className="text-xl">{me.name}</strong> (
-                  <span>@{me.userId}</span>)
-                </p>
+                <>
+                  <p>
+                    <strong className="text-xl">{me.name}</strong> (
+                    <span>@{me.userId}</span>)
+                  </p>
+                  <p className="mt-1 text-center text-gray-500 text-sm h-5">
+                    <strong>{me.department}</strong>
+                  </p>
+                </>
               )}
             </div>
             <Dropdown className="mr-10" hover end>

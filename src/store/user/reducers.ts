@@ -44,6 +44,21 @@ const reducers = {
     state.me = action.payload;
     state.isLoggedIn = true;
   },
+
+  // get user
+  requestGetUser: (
+    state: UserState,
+    action: PayloadAction<{ id: number }>,
+  ) => {},
+  successGetUser: (state: UserState, action: PayloadAction<User>) => {
+    const user = action.payload;
+
+    state.me = {
+      ...state.me,
+      ...user,
+    };
+  },
+  failureGetUser: (state: UserState) => {},
 };
 
 export default reducers;
