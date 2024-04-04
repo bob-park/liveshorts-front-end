@@ -47,7 +47,14 @@ const reducers = {
   successCopyShortForm: (
     state: ShortFormState,
     action: PayloadAction<ShortFormTask>,
-  ) => {},
+  ) => {
+    const shortFormTask = action.payload;
+
+    const newTasks = state.tasks.slice();
+    newTasks.unshift(shortFormTask);
+
+    state.tasks = newTasks;
+  },
   failureCopyShortForm: (state: ShortFormState) => {},
 
   // remove
@@ -58,7 +65,19 @@ const reducers = {
   successRemoveShortForm: (
     state: ShortFormState,
     action: PayloadAction<{ taskId: string }>,
-  ) => {},
+  ) => {
+    const { taskId } = action.payload;
+
+    const newTasks = state.tasks.slice();
+
+    const index = newTasks.findIndex((item) => item.id === taskId);
+
+    if (index >= 0) {
+      newTasks.splice(index, 1);
+    }
+
+    state.tasks = newTasks;
+  },
   faliureRemoveShortForm: (state: ShortFormState) => {},
 };
 
