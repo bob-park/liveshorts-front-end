@@ -40,6 +40,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const prevProgressWidth = useRef<number>(0);
   const prevProgressWidthPercent = useRef<number>(0);
   const templateImageRef = useRef<HTMLDivElement>(null);
+  const videoAreaRef = useRef<HTMLDivElement>(null);
 
   // useState
   // const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -319,28 +320,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleWindowResize() {
-      if (selectedTemplate?.videoPosition.y1 && templateImageRef.current) {
-        setTemplateSize({
-          width: ((videoRef.current?.clientHeight ?? 0) * 9) / 16,
-          height: videoRef.current?.clientHeight ?? 0,
-        });
-      }
-    }
-
-    handleWindowResize();
-
-    window.addEventListener("resize", handleWindowResize);
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, [selectedTemplate, videoRef, templateImageRef]);
-
-  useEffect(() => {
-    function handleWindowResize() {
-      setNonTemplateSectionSize({
-        width: videoRef.current?.clientWidth ?? 0,
-        height: videoRef.current?.clientHeight ?? 0,
+      setTemplateSize({
+        width: ((videoAreaRef.current?.clientHeight ?? 0) * 9) / 16,
+        height: videoAreaRef.current?.clientHeight ?? 0,
       });
     }
 
@@ -351,7 +333,24 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     return () => {
       window.removeEventListener("resize", handleWindowResize);
     };
-  }, [videoRef.current?.clientWidth, videoRef.current?.clientHeight]);
+  }, [selectedTemplate, videoAreaRef.current?.clientHeight]);
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setNonTemplateSectionSize({
+        width: videoAreaRef.current?.clientWidth ?? 0,
+        height: videoAreaRef.current?.clientHeight ?? 0,
+      });
+    }
+
+    handleWindowResize();
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [selectedTemplate, videoAreaRef.current?.clientWidth, videoAreaRef.current?.clientHeight]);
 
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -522,9 +521,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           onClick={() => {
             handleClickPanel("video");
           }}
-          className="flex flex-col items-center p-2"
+          className="grid grid-rows-[1fr,70px]"
         >
-          <div className="relative aspect-auto m-auto">
+          <div ref={videoAreaRef} className={`relative aspect-auto flex justify-center items-center m-auto`}>
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
             )}
@@ -536,16 +535,14 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
                   handleClickPanel("template");
                   handleClickWorkMenu("template");
                 }}
-                style={{
-                  width: templateSize.width,
-                  height: templateSize.height,
-                }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
               >
                 <img
                   src={`/api/v1/shorts/template/${selectedTemplate.templateId}/file?t=${new Date().getTime()}`}
                   alt="template-img"
-                  className="w-full h-full"
+                  onLoad={(e) => {
+                    setTemplateSize({ width: e.currentTarget.clientWidth, height: e.currentTarget.clientHeight });
+                  }}
+                  className="max-h-[calc(100vh-450px)]"
                 />
               </div>
             ) : (
@@ -583,11 +580,18 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
               onClick={(e) => {
                 e.preventDefault();
               }}
-              // TODO 이 부분을 위해서 relative div에 Ref 잡아야할듯
-              // style={{width:}}
-              className={`aspect-auto max-w-[calc(100vh-100px)] max-h-[calc(100vh-100px)] 
+              style={{
+                width: selectedTemplate ? `${(templateSize.height * 16) / 9}px` : "auto",
+                height: selectedTemplate
+                  ? `${
+                      (templateSize.height ?? 0) *
+                      (selectedTemplate.videoPosition.y2 - selectedTemplate.videoPosition.y1)
+                    }px`
+                  : "auto",
+              }}
+              className={`aspect-auto
               ${loaded ? "block" : "hidden"}
-              ${selectedTemplate && "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"}
+              ${selectedTemplate ? "absolute max-w-[calc(100vh-450px)]" : "max-w-[calc(100vh-100px)]"}
               `}
             ></video>
           </div>
