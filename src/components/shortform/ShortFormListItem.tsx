@@ -48,7 +48,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
   };
 
   return (
-    <div className="flex gap-5 items-center rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300">
+    <div className="flex gap-5 items-center rounded-box shadow-lg transition ease-in-out delay-150 hover:shadow-2xl mb-2 p-2 hover:-translate-y-1 hover:scale-100 duration-300 cursor-pointer">
       <div className="pl-2 max-w-48 ">
         <Image
           className="w-full max-h-48 object-contain aspect-auto rounded-xl "
@@ -88,7 +88,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
               {task.uploadInstances && task.uploadInstances.length > 0 && (
                 <div className="">
                   <div className="tooltip w-full" data-tip="업로드 됨">
-                    <SiYoutube className="w-6 h-6 text-red-600 font-extrabold transition ease-in-out delay-150 hover:scale-110 duration-300" />
+                    <SiYoutube className="w-6 h-6 text-red-600 font-extrabold transition ease-in-out delay-150 hover:scale-110 duration-300 " />
                   </div>
                 </div>
               )}
