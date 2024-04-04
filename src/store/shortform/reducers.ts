@@ -25,10 +25,19 @@ const reducers = {
   successGetExtraTypes: (
     state: ShortFormState,
     action: PayloadAction<{ extraTypes: ShortFormExtraType[] }>,
-  ) => {
-    
-  },
+  ) => {},
   failureGetExtraTypes: (state: ShortFormState) => {},
+
+  // request copy
+  requestCopyShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<{ taskId: string }>,
+  ) => {},
+  successCopyShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<{ result: ShortFormTask }>,
+  ) => {},
+  failureCopyShortForm: (state: ShortFormState) => {},
 };
 
 export default reducers;

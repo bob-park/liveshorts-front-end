@@ -23,6 +23,8 @@ import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 import { userActions } from '@/store/user';
 
 import routes from './routes';
+import { getRoleType } from '@/utils/parseUtils';
+import { TitleContent } from './edit/[assetId]/EditShorts';
 
 const { requestUpdateMe, requestLoggedOut } = userActions;
 
@@ -105,7 +107,14 @@ export default function NavbarMenu(props: { token: string }) {
                 shape="circle"
                 border
               />
+
               <Dropdown.Menu className="w-48 bg-base-100 shadow-xl ">
+                <li className="disabled">
+                  <h3 className="text-black">
+                    {me && <strong>{getRoleType(me.role).name}</strong>}
+                  </h3>
+                </li>
+
                 <li>
                   <a href="#">
                     <CgProfile />

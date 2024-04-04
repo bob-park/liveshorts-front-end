@@ -63,6 +63,8 @@ function* callLoggedIn(action: ReturnType<typeof requestLoggedIn>) {
     userId: jwtPayload['userId'],
     name: jwtPayload['name'],
     email: jwtPayload['email'],
+    role: jwtPayload['role'],
+    authorities: jwtPayload['authorities'],
   };
 
   yield put(successLoggedIn(user));
@@ -99,6 +101,8 @@ function* updateMe(action: ReturnType<typeof requestUpdateMe>) {
     userId: jwtPayload['userId'],
     name: jwtPayload['name'],
     email: jwtPayload['email'],
+    role: jwtPayload['role'],
+    authorities: jwtPayload['authorities'],
   };
 
   yield put(successUpdateMe(user));
