@@ -24,7 +24,6 @@ import { userActions } from '@/store/user';
 
 import routes from './routes';
 import { getRoleType } from '@/utils/parseUtils';
-import { TitleContent } from './edit/[assetId]/EditShorts';
 
 const { requestUpdateMe, requestLoggedOut, requestGetUser } = userActions;
 
@@ -97,12 +96,12 @@ export default function NavbarMenu(props: { token: string }) {
             <div className="mr-7">
               {me && (
                 <>
+                  <p className="text-center text-gray-500 text-sm">
+                    <strong>{me.department}</strong>
+                  </p>
                   <p>
                     <strong className="text-xl">{me.name}</strong> (
                     <span>@{me.userId}</span>)
-                  </p>
-                  <p className="mt-1 text-center text-gray-500 text-sm h-5">
-                    <strong>{me.department}</strong>
                   </p>
                 </>
               )}

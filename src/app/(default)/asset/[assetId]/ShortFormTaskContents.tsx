@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useEffect } from 'react';
 
 // nextjs
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,7 @@ import RemoveShortFormConfirm from './RemoveShortFormConfirm';
 const {
   requestSearchShortFormTask,
   requestCreateShortForm,
+  requestUpdateShortForm,
   requestCopyShortForm,
   requestRemoveShortForm,
 } = shortFormActions;
@@ -58,7 +59,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // store
   const dispatch = useAppDispatch();
-  const { isLoading, tasks } = useAppSelector((state) => state.shortForm);
+  const { isLoading, tasks, copiedTaskId } = useAppSelector(
+    (state) => state.shortForm,
+  );
 
   // state
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
@@ -74,6 +77,25 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   useLayoutEffect(() => {
     handleGetShortFormTask();
   }, []);
+
+  useEffect(() => {
+    if (!copiedTaskId || !copyTaskId) {
+      return;
+    }
+
+    const shortform = tasks.find((item) => item.id === copyTaskId);
+
+    if (!shortform) {
+      return;
+    }
+
+    dispatch(
+      requestUpdateShortForm({
+        taskId: copiedTaskId,
+        title: `${shortform.title} - 복사본`,
+      }),
+    );
+  }, [copiedTaskId, copyTaskId]);
 
   // handle
   const handleGetShortFormTask = () => {

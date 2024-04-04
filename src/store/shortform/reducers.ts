@@ -39,11 +39,40 @@ const reducers = {
   ) => {},
   failureCreateShortForm: (state: ShortFormState) => {},
 
+  // update
+  requestUpdateShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<{
+      taskId: string;
+      title: string;
+      templateId?: string;
+    }>,
+  ) => {},
+  successUpdateShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<ShortFormTask>,
+  ) => {
+    const shortform = action.payload;
+
+    const newTasks = state.tasks.slice();
+
+    const index = newTasks.findIndex((item) => item.id === shortform.id);
+
+    if (index >= 0) {
+      newTasks[index] = shortform;
+    }
+
+    state.tasks = newTasks;
+  },
+  failureUpdateShortForm: (state: ShortFormState) => {},
+
   // copy
   requestCopyShortForm: (
     state: ShortFormState,
     action: PayloadAction<{ taskId: string }>,
-  ) => {},
+  ) => {
+    state.copiedTaskId = undefined;
+  },
   successCopyShortForm: (
     state: ShortFormState,
     action: PayloadAction<ShortFormTask>,
@@ -54,8 +83,11 @@ const reducers = {
     newTasks.unshift(shortFormTask);
 
     state.tasks = newTasks;
+    state.copiedTaskId = shortFormTask.id;
   },
-  failureCopyShortForm: (state: ShortFormState) => {},
+  failureCopyShortForm: (state: ShortFormState) => {
+    state.copiedTaskId = undefined;
+  },
 
   // remove
   requestRemoveShortForm: (

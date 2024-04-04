@@ -113,6 +113,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
                 <button
                   className="btn btn-sm btn-neutral"
                   type="button"
+                  disabled={task.status !== 'SUCCESS'}
                   onClick={handleCopy}
                 >
                   <LuCopyPlus className="w-4 h-4" />
