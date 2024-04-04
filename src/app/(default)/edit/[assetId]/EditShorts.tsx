@@ -34,9 +34,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const progressBarXRef = useRef<number | null>(null);
   const startXRef = useRef<number | null>(null);
   const endXRef = useRef<number | null>(null);
+  const videoXRef = useRef<number | null>(null);
   const prevProgressBarX = useRef<number>(0);
   const prevStartX = useRef<number>(0);
   const prevEndX = useRef<number>(0);
+  const prevVideoX = useRef<number>(0);
   const prevProgressWidth = useRef<number>(0);
   const prevProgressWidthPercent = useRef<number>(0);
   const templateImageRef = useRef<HTMLDivElement>(null);
@@ -50,12 +52,14 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [progressBarX, setProgressBarX] = useState(0);
   const [startX, setStartX] = useState(0);
   const [endX, setEndX] = useState(0);
+  const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
   const [isExpandDragging, setIsExpandDragging] = useState({
     startTime: false,
     endTime: false,
   });
+  const [isVideoDragging, setIsVideoDragging] = useState(false);
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
   const [activePanel, setActivePanel] = useState<ActivePanel>("video");
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
@@ -78,6 +82,21 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
     setEndX(prevEndX.current);
   }, [videoDuration]);
+
+  useEffect(() => {
+    if (videoAreaRef.current && videoRef.current) {
+      const centerX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
+      prevVideoX.current = centerX;
+      setVideoX(centerX);
+    }
+  }, [videoRef.current?.clientWidth]);
+
+  useEffect(() => {
+    setTemplateSize({
+      width: ((videoAreaRef.current?.clientHeight ?? 0) * 9) / 16,
+      height: videoAreaRef.current?.clientHeight ?? 0,
+    });
+  }, [templateImageRef]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -200,6 +219,32 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [isExpandDragging]);
 
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      if (isVideoDragging && videoXRef.current !== null) {
+        const newX = e.clientX - videoXRef.current;
+
+        setVideoX(newX);
+        prevStartX.current = newX;
+      }
+    }
+
+    function handleMouseUp() {
+      setIsVideoDragging(false);
+      videoXRef.current = null;
+    }
+
+    if (isVideoDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isVideoDragging]);
+
   prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
 
   useEffect(() => {
@@ -320,12 +365,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   useEffect(() => {
     function handleWindowResize() {
       setTemplateSize({
-        width: ((videoAreaRef.current?.clientHeight ?? 0) * 9) / 16,
-        height: videoAreaRef.current?.clientHeight ?? 0,
+        width: templateImageRef.current?.clientWidth ?? 0,
+        height: templateImageRef.current?.clientHeight ?? 0,
       });
     }
-
-    handleWindowResize();
 
     window.addEventListener("resize", handleWindowResize);
 
@@ -392,6 +435,13 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     setIsExpandDragging({ ...isExpandDragging, endTime: true });
 
     endXRef.current = e.clientX - endX;
+  }
+
+  function handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>) {
+    e.stopPropagation();
+    setIsVideoDragging(true);
+
+    videoXRef.current = e.clientX - videoX;
   }
 
   function handlePlay() {
@@ -508,7 +558,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           <div
             ref={videoAreaRef}
             style={{ minWidth: videoRef.current?.clientWidth }}
-            className={`relative aspect-auto w-full h-full flex justify-center items-center m-auto `}
+            className={`relative aspect-auto w-full h-full flex justify-center items-center m-auto overflow-hidden`}
           >
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
@@ -536,9 +586,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
               <img
                 src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
                 alt="template-img"
-                onLoad={(e) => {
-                  setTemplateSize({ width: e.currentTarget.clientWidth, height: e.currentTarget.clientHeight });
-                }}
                 className="w-full h-full"
               />
               {titleContent && (
@@ -564,13 +611,13 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
               onClick={(e) => {
                 e.preventDefault();
               }}
+              onMouseDown={handleMouseDownVideo}
               style={{
                 height: `${
-                  (templateSize.height ?? 0) *
+                  (templateImageRef.current?.clientHeight ?? 0) *
                   ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0))
                 }px`,
-
-                width: `${((videoRef.current?.clientHeight ?? 0) * 16) / 9}px`,
+                left: `${videoX}px`,
               }}
               className={`aspect-auto absolute min-w-fit
               ${loaded ? "block" : "hidden"}
