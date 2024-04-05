@@ -84,7 +84,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }, [videoDuration]);
 
   useEffect(() => {
-    prevVideoAreaWidth.current = videoAreaRef.current?.clientWidth ?? 0;
+    if (videoAreaRef.current) {
+      prevVideoAreaWidth.current = videoAreaRef.current.clientWidth;
+    }
   }, []);
 
   useEffect(() => {
@@ -328,22 +330,20 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [progressWidthPercent]);
 
-  prevVideoAreaWidth.current = videoAreaRef.current?.clientWidth ?? 0;
-
   // useEffect(() => {
-  //   function handleWindowResize() {
-  //     if (videoAreaRef.current && videoRef.current) {
-  //       const videoAreaWidth = videoAreaRef.current.clientWidth;
-  //       const videoWidth = videoRef.current.clientWidth;
-  //       console.log(videoWidth, prevVideoAreaWidth.current);
+  //   function handleWindowResize(e: UIEvent) {
+  //     if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+  //       const newVideoAreaWidth = videoAreaRef.current.clientWidth;
+  //       const newVideoWidth = videoRef.current.clientWidth;
 
-  //       const resizeRatio = videoAreaWidth / prevVideoAreaWidth.current;
+  //       if (prevVideoAreaWidth.current) {
+  //         const widthChangeRatio = newVideoAreaWidth / prevVideoAreaWidth.current;
+  //         const newTemplateWidth = (((templateImageRef.current.clientHeight ?? 0) * 9) / 16) * widthChangeRatio;
 
-  //       const newVideoX = prevVideoX.current * resizeRatio;
+  //         templateImageRef.current.style.width = `${newTemplateWidth}px`;
+  //       }
 
-  //       setVideoX(newVideoX);
-
-  //       prevVideoX.current = newVideoX;
+  //       prevVideoAreaWidth.current = newVideoAreaWidth;
   //     }
   //   }
 
