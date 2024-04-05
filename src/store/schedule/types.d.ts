@@ -53,6 +53,7 @@ type RecordSchedule = {
   title: string;
   asset: Asset;
   status: ScheduleStauts;
+  channel: RecordChannel;
   startDateTime: Date;
   endDateTime: Date;
   recordStartDate?: Date;

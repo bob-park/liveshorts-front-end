@@ -68,6 +68,11 @@ export default function AssetViewItem(props: AssetItemProps) {
                   <SiYoutube className="w-5 h-5 text-red-600" />
                 </div>
               )}
+            {asset.recordSchedule && (
+              <div className="badge badge-outline badge-lg font-semibold text-sm">
+                {asset.recordSchedule.channel.channelName}
+              </div>
+            )}
             {asset.category && (
               <div className="badge badge-outline badge-lg font-semibold text-sm">
                 {asset.category.name}
