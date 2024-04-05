@@ -84,19 +84,12 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }, [videoDuration]);
 
   useEffect(() => {
-    if (videoAreaRef.current && videoRef.current) {
+    if (loaded && videoAreaRef.current && videoRef.current) {
       const centerX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
       prevVideoX.current = centerX;
       setVideoX(centerX);
     }
-  }, [videoRef.current?.clientWidth]);
-
-  useEffect(() => {
-    setTemplateSize({
-      width: ((videoAreaRef.current?.clientHeight ?? 0) * 9) / 16,
-      height: videoAreaRef.current?.clientHeight ?? 0,
-    });
-  }, [templateImageRef]);
+  }, [loaded, selectedTemplate, videoRef.current?.clientWidth]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -361,21 +354,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     prevStartX.current = newStartX;
     prevEndX.current = newEndX;
   }, [startTimeInput, endTimeInput, videoDuration]);
-
-  useEffect(() => {
-    function handleWindowResize() {
-      setTemplateSize({
-        width: templateImageRef.current?.clientWidth ?? 0,
-        height: templateImageRef.current?.clientHeight ?? 0,
-      });
-    }
-
-    window.addEventListener("resize", handleWindowResize);
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, [selectedTemplate, videoAreaRef.current?.clientHeight]);
 
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
