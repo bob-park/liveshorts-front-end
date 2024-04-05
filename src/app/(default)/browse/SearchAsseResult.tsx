@@ -511,7 +511,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                   }`}
                 >
                   <div className="col-span-1 flex justify-end items-center">
-                    <h2 className="font-extrabold">내가 만든 작업</h2>
+                    <h2 className="font-extrabold">내가 만든 숏폼</h2>
                   </div>
                   <div className="col-span-2">
                     <div className="flex justify-start items-center h-full">
