@@ -31,7 +31,14 @@ const reducers = {
   // create
   requestCreateShortForm: (
     state: ShortFormState,
-    action: PayloadAction<{ assetId: number; title: string }>,
+    action: PayloadAction<{
+      assetId: number;
+      body: {
+        title: string;
+        templateId?: string;
+      };
+      handleAfter?: (newShortFormId: string) => void;
+    }>,
   ) => {},
   successCreateShortForm: (
     state: ShortFormState,
@@ -44,8 +51,11 @@ const reducers = {
     state: ShortFormState,
     action: PayloadAction<{
       taskId: string;
-      title: string;
-      templateId?: string;
+      body: {
+        title: string;
+        templateId?: string;
+      };
+      handleAfter?: () => void;
     }>,
   ) => {},
   successUpdateShortForm: (

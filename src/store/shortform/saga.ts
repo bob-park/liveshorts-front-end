@@ -70,12 +70,12 @@ function* watchSearchShortFormTask() {
 function* callCreateShortForm(
   action: ReturnType<typeof requestCreateShortForm>,
 ) {
-  const { assetId, title } = action.payload;
+  const { assetId, body, handleAfter } = action.payload;
 
   const result: ApiResult<ShortFormTask> = yield call(
     post,
     `/api/v1/shorts/task`,
-    { assetId, title },
+    { assetId, title: body.title },
   );
 
   if (result.state === 'FAILURE') {
@@ -85,6 +85,8 @@ function* callCreateShortForm(
 
   if (result.data) {
     yield put(successCreateShortForm(result.data));
+
+    handleAfter && handleAfter(result.data.id);
   }
 }
 
@@ -96,12 +98,12 @@ function* watchCreateShortForm() {
 function* callUpdateShortForm(
   action: ReturnType<typeof requestUpdateShortForm>,
 ) {
-  const { taskId, title, templateId } = action.payload;
+  const { taskId, body, handleAfter } = action.payload;
 
   const result: ApiResult<ShortFormTask> = yield call(
     putCall,
     `/api/v1/shorts/task/${taskId}`,
-    { title, templateId },
+    body,
   );
 
   if (result.state === 'FAILURE') {
@@ -111,6 +113,8 @@ function* callUpdateShortForm(
 
   if (result.data) {
     yield put(successUpdateShortForm(result.data));
+
+    handleAfter && handleAfter();
   }
 }
 
