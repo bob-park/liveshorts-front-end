@@ -1,7 +1,7 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import NavbarMenu from './NavbarMenu';
-import './globals.css';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import NavbarMenu from "./NavbarMenu";
+import "./globals.css";
 
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
@@ -11,15 +11,15 @@ export default async function DefaultLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const touchReponse = await fetch(MAM_API_HOST + '/api/user/session/touch', {
-    method: 'post',
+  const touchReponse = await fetch(MAM_API_HOST + "/api/user/session/touch", {
+    method: "post",
     headers: {
-      Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+      Authorization: `Bearer ${cookies().get("accessToken")?.value || ""}`,
     },
   });
 
   if (!touchReponse.ok) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const touchResult = await touchReponse.json();

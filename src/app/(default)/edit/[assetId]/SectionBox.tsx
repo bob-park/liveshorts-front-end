@@ -1,4 +1,4 @@
-import { ActivePanel } from "./EditShorts";
+import { ActivePanel } from "./type";
 
 interface SectionBoxProps {
   sectionBoxRef: React.RefObject<HTMLDivElement>;

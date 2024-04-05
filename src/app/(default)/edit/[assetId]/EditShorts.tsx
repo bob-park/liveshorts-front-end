@@ -15,39 +15,24 @@ import TitleMenu from './menu/TitleMenu';
 import SubtitleMenu from './menu/SubtitleMenu';
 import BgmMenu from './menu/BgmMenu';
 import TitleInput from './menu/TitleInput';
+import TemplateMenu from './menu/TemplateMenu';
+import { TitleContent, ActivePanel, WorkMenu, Template } from './type';
 
 interface EditShortsProps {
-  assetId: number;
-  templateList: any;
+  videoSrc: string;
+  templateList: Template[];
 }
-
-export interface TitleContent {
-  text: string;
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  font: string;
-  size: number;
-  color: string;
-  background: string;
-  textOpacity: number;
-  bgOpacity: number;
-}
-
-export type ActivePanel = 'video' | 'bgm' | 'title' | 'subtitle';
-export type WorkMenu = 'title' | 'subtitle' | 'bgm';
 
 export const WIDTH_PERCENT_STEP = 25;
-// const TEST_ASSET_ID = '20';
 const MAX_PERCENT = 200;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
 
-export default function EditShorts({ assetId, templateList }: EditShortsProps) {
-  console.log(templateList);
-
+export default function EditShorts({
+  videoSrc,
+  templateList,
+}: EditShortsProps) {
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -56,25 +41,32 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   const progressBarXRef = useRef<number | null>(null);
   const startXRef = useRef<number | null>(null);
   const endXRef = useRef<number | null>(null);
+  const videoXRef = useRef<number | null>(null);
   const prevProgressBarX = useRef<number>(0);
   const prevStartX = useRef<number>(0);
   const prevEndX = useRef<number>(0);
+  const prevVideoX = useRef<number>(0);
   const prevProgressWidth = useRef<number>(0);
   const prevProgressWidthPercent = useRef<number>(0);
+  const templateImageRef = useRef<HTMLDivElement>(null);
+  const videoAreaRef = useRef<HTMLDivElement>(null);
 
   // useState
   // const [videoProgress, setVideoProgress] = useState<number>(0);
+  const [loaded, setLoaded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isPlay, setIsPlay] = useState(false);
   const [progressBarX, setProgressBarX] = useState(0);
   const [startX, setStartX] = useState(0);
   const [endX, setEndX] = useState(0);
+  const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
   const [isExpandDragging, setIsExpandDragging] = useState({
     startTime: false,
     endTime: false,
   });
+  const [isVideoDragging, setIsVideoDragging] = useState(false);
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
   const [activePanel, setActivePanel] = useState<ActivePanel>('video');
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(
@@ -86,8 +78,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
   const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(
     DEFAULT_INTERVAL_COUNT,
   );
-  const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>('title');
+  const [selectedWorkMenu, setSelectedWorkMenu] =
+    useState<WorkMenu>('template');
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
+    null,
+  );
+  const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = [
@@ -105,6 +102,15 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
     setEndX(prevEndX.current);
   }, [videoDuration]);
+
+  useEffect(() => {
+    if (loaded && videoAreaRef.current && videoRef.current) {
+      const centerX =
+        (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
+      prevVideoX.current = centerX;
+      setVideoX(centerX);
+    }
+  }, [loaded, selectedTemplate, videoRef.current?.clientWidth]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -243,6 +249,32 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     };
   }, [isExpandDragging]);
 
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      if (isVideoDragging && videoXRef.current !== null) {
+        const newX = e.clientX - videoXRef.current;
+
+        setVideoX(newX);
+        prevStartX.current = newX;
+      }
+    }
+
+    function handleMouseUp() {
+      setIsVideoDragging(false);
+      videoXRef.current = null;
+    }
+
+    if (isVideoDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isVideoDragging]);
+
   prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
 
   useEffect(() => {
@@ -303,7 +335,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
-        // handleMouseDownProgress함수와 연관된 버그 해결
+        // TODO handleMouseDownProgress함수와 연관된 버그 해결
 
         const newStartX = Math.max(
           0,
@@ -420,6 +452,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
     setVideoDuration(e.currentTarget.duration);
+    setLoaded(true);
     // setVideoProgress(0);
   }
 
@@ -449,6 +482,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     setIsExpandDragging({ ...isExpandDragging, endTime: true });
 
     endXRef.current = e.clientX - endX;
+  }
+
+  function handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>) {
+    e.stopPropagation();
+    setIsVideoDragging(true);
+
+    videoXRef.current = e.clientX - videoX;
   }
 
   function handlePlay() {
@@ -527,9 +567,13 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
     }
   }
 
+  function handleClickTemplate(template?: Template) {
+    setSelectedTemplate(template ?? null);
+  }
+
   return (
     <div className="grid grid-rows-[1fr,240px] h-full">
-      <div className="grid grid-cols-[300px,1fr] border-b">
+      <div className="grid grid-cols-[340px,1fr] border-b">
         <div
           onClick={() => {
             handleClickPanel('title');
@@ -538,8 +582,15 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
         >
           <TabMenu
             selectedWorkMenu={selectedWorkMenu}
-            handleClick={handleClickWorkMenu}
+            handleClickWorkMenu={handleClickWorkMenu}
           />
+          {selectedWorkMenu === 'template' && (
+            <TemplateMenu
+              templateList={templateList}
+              selectedTemplateId={selectedTemplate?.templateId ?? ''}
+              handleClickTemplate={handleClickTemplate}
+            />
+          )}
           {selectedWorkMenu === 'title' && (
             <TitleMenu
               titleContent={titleContent}
@@ -547,6 +598,7 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
+              handleClickWorkMenu={handleClickWorkMenu}
             />
           )}
           {selectedWorkMenu === 'subtitle' && <SubtitleMenu />}
@@ -557,27 +609,83 @@ export default function EditShorts({ assetId, templateList }: EditShortsProps) {
           onClick={() => {
             handleClickPanel('video');
           }}
-          className="flex flex-col gap-4 justify-center items-center p-2"
+          className="grid grid-rows-[1fr,70px]"
         >
-          <div className="relative h-[calc(100lvh-500px)] max-h-[calc(100lvh-500px)]">
-            {titleContent && (
-              <TitleInput
-                title={titleContent}
-                handleChangeTitle={handleChangeTitle}
-                handleClickPanel={() => {
-                  handleClickPanel('title');
-                }}
-              />
+          <div
+            ref={videoAreaRef}
+            style={{ minWidth: videoRef.current?.clientWidth }}
+            className={`relative aspect-auto w-full h-full flex justify-center items-center m-auto overflow-hidden`}
+          >
+            {!loaded && (
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
             )}
+
+            <div
+              ref={templateImageRef}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClickPanel('template');
+                handleClickWorkMenu('template');
+              }}
+              style={{
+                width: ((templateImageRef.current?.clientHeight ?? 0) * 9) / 16,
+              }}
+              className={`relative h-full border border-green-500 ${
+                loaded ? 'block' : 'hidden'
+              }`}
+            >
+              <div
+                style={{
+                  height:
+                    (templateImageRef.current?.clientHeight ?? 0) *
+                    ((selectedTemplate?.videoPosition.y2 ?? 1) -
+                      (selectedTemplate?.videoPosition.y1 ?? 0)),
+                  top:
+                    (videoAreaRef.current?.clientHeight ?? 0) *
+                    (selectedTemplate?.videoPosition.y1 ?? 0),
+                }}
+                className="absolute w-full border border-red-500 z-10"
+              ></div>
+              <img
+                src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
+                alt="template-img"
+                className="w-full h-full"
+              />
+              {titleContent && (
+                <TitleInput
+                  title={titleContent}
+                  handleChangeTitle={handleChangeTitle}
+                  handleClickPanel={() => {
+                    handleClickPanel('title');
+                  }}
+                  handleClickWorkMenu={handleClickWorkMenu}
+                />
+              )}
+            </div>
+
             <video
               controls
               ref={videoRef}
-              src={`/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime()}`}
+              src={videoSrc}
               // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
               onPlay={() => setIsPlay(true)}
-              className="w-full h-full"
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              onMouseDown={handleMouseDownVideo}
+              style={{
+                height: `${
+                  (templateImageRef.current?.clientHeight ?? 0) *
+                  ((selectedTemplate?.videoPosition.y2 ?? 1) -
+                    (selectedTemplate?.videoPosition.y1 ?? 0))
+                }px`,
+                left: `${videoX}px`,
+              }}
+              className={`aspect-auto absolute min-w-fit
+              ${loaded ? 'block' : 'hidden'}
+              `}
             ></video>
           </div>
 

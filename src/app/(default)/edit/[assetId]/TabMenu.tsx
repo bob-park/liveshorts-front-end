@@ -1,52 +1,61 @@
-import { WorkMenu } from "./EditShorts";
+import { WorkMenu } from "./type";
 
 interface TabMenuProps {
   selectedWorkMenu: WorkMenu;
-  handleClick: (workMenu: WorkMenu) => void;
+  handleClickWorkMenu(workMenu: WorkMenu): void;
 }
 
 interface TabMenuItemProps {
   value: string;
   isSelected: boolean;
-  handleClick: () => void;
+  handleClickWorkMenu(): void;
 }
 
-export default function TabMenu({ selectedWorkMenu, handleClick }: TabMenuProps) {
+export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMenuProps) {
   return (
     <div role="tablist" className="w-full tab tabs-boxed p-0 border-slate-700">
       <TabMenuItem
-        value="Title"
-        isSelected={selectedWorkMenu === "title"}
-        handleClick={() => {
-          handleClick("title");
+        value="템플릿"
+        isSelected={selectedWorkMenu === "template"}
+        handleClickWorkMenu={() => {
+          handleClickWorkMenu("template");
         }}
       />
       <TabMenuItem
-        value="Subtitle"
+        value="제목"
+        isSelected={selectedWorkMenu === "title"}
+        handleClickWorkMenu={() => {
+          handleClickWorkMenu("title");
+        }}
+      />
+      <TabMenuItem
+        value="자막"
         isSelected={selectedWorkMenu === "subtitle"}
-        handleClick={() => {
-          handleClick("subtitle");
+        handleClickWorkMenu={() => {
+          handleClickWorkMenu("subtitle");
         }}
       />
       <TabMenuItem
         value="BGM"
         isSelected={selectedWorkMenu === "bgm"}
-        handleClick={() => {
-          handleClick("bgm");
+        handleClickWorkMenu={() => {
+          handleClickWorkMenu("bgm");
         }}
       />
     </div>
   );
 }
 
-function TabMenuItem({ value, isSelected, handleClick }: TabMenuItemProps) {
+function TabMenuItem({ value, isSelected, handleClickWorkMenu }: TabMenuItemProps) {
   return (
     <a
       id={`${isSelected && "active-tab"}`}
       role="tab"
-      onClick={handleClick}
+      onClick={() => {
+        handleClickWorkMenu();
+      }}
       className={`
-        tab w-1/3
+        tab w-1/4
         ${isSelected && "tab-active "}
       `}
     >
