@@ -103,9 +103,9 @@ export default function ShortformPlayer(props: ShortformPlayerProps) {
           onClick={handlePlay}
         >
           {isPlay ? (
-            <IoPause className="w-5 h-5" />
+            <IoPause className="w-8 h-8" />
           ) : (
-            <IoPlay className="w-5 h-5" />
+            <IoPlay className="w-8 h-8" />
           )}
         </button>
 
@@ -115,9 +115,9 @@ export default function ShortformPlayer(props: ShortformPlayerProps) {
           onClick={handleMute}
         >
           {isMute ? (
-            <IoVolumeMute className="w-5 h-5" />
+            <IoVolumeMute className="w-8 h-8" />
           ) : (
-            <IoVolumeHigh className="w-5 h-5" />
+            <IoVolumeHigh className="w-8 h-8" />
           )}
         </button>
       </div>

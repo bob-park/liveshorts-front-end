@@ -23,8 +23,9 @@ import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 import { userActions } from '@/store/user';
 
 import routes from './routes';
+import { getRoleType } from '@/utils/parseUtils';
 
-const { requestUpdateMe, requestLoggedOut } = userActions;
+const { requestUpdateMe, requestLoggedOut, requestGetUser } = userActions;
 
 export default function NavbarMenu(props: { token: string }) {
   // router
@@ -39,6 +40,10 @@ export default function NavbarMenu(props: { token: string }) {
   useLayoutEffect(() => {
     dispatch(requestUpdateMe(props.token));
   }, []);
+
+  useLayoutEffect(() => {
+    me && dispatch(requestGetUser({ id: me.id }));
+  }, [me != null]);
 
   // handle
   const handleLogout = () => {
@@ -56,7 +61,7 @@ export default function NavbarMenu(props: { token: string }) {
 
   return (
     <>
-      <div className="sticky top-0 z-30 flex h-20 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm">
+      <div className="sticky top-0 z-50 flex h-20 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm">
         <Navbar className="">
           <Navbar.Start className="flex-none">
             <div className="px-2 mx-2 text-2xl font-bold">
@@ -90,10 +95,15 @@ export default function NavbarMenu(props: { token: string }) {
           <Navbar.End className="lg:w-full">
             <div className="mr-7">
               {me && (
-                <p>
-                  <strong className="text-xl">{me.name}</strong> (
-                  <span>@{me.userId}</span>)
-                </p>
+                <>
+                  <p className="text-center text-gray-500 text-sm">
+                    <strong>{me.department}</strong>
+                  </p>
+                  <p>
+                    <strong className="text-xl">{me.name}</strong> (
+                    <span>@{me.userId}</span>)
+                  </p>
+                </>
               )}
             </div>
             <Dropdown className="mr-10" hover end>
@@ -105,7 +115,14 @@ export default function NavbarMenu(props: { token: string }) {
                 shape="circle"
                 border
               />
+
               <Dropdown.Menu className="w-48 bg-base-100 shadow-xl ">
+                <li className="disabled">
+                  <h3 className="text-black">
+                    {me && <strong>{getRoleType(me.role).name}</strong>}
+                  </h3>
+                </li>
+
                 <li>
                   <a href="#">
                     <CgProfile />
