@@ -4,6 +4,7 @@ type ShortFormState = {
   page: Pagination;
   extraTypes: ShortFormExtraType[];
   copiedTaskId?: string;
+  shortform?: ShortFormTask;
 };
 
 type ShortFormTask = {

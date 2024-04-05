@@ -121,6 +121,41 @@ const reducers = {
     state.tasks = newTasks;
   },
   faliureRemoveShortForm: (state: ShortFormState) => {},
+
+  // create task extra
+  requestCreateExtra: (
+    state: ShortFormState,
+    action: PayloadAction<{ taskId: string; extraTypeIds: string[] }>,
+  ) => {},
+  successCreateExtra: (
+    state: ShortFormState,
+    action: PayloadAction<ShortFormTask>,
+  ) => {
+    const shortform = action.payload;
+
+    state.shortform = shortform;
+  },
+  failureCreateExtra: (state: ShortFormState) => {},
+
+  // get shortform task
+  requestGetShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<{ taskId: string }>,
+  ) => {
+    state.isLoading = true;
+  },
+  successGetShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<ShortFormTask>,
+  ) => {
+    const shortform = action.payload;
+
+    state.isLoading = false;
+    state.shortform = shortform;
+  },
+  failureGetShortForm: (state: ShortFormState) => {
+    state.isLoading = false;
+  },
 };
 
 export default reducers;
