@@ -20,6 +20,7 @@ import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
 import { shortFormActions } from '@/store/shortform';
 import CreateShortformExtraModal from './CreateShortformExtraModal';
+import { parseStatus } from '@/utils/common';
 
 // action
 const { requestGetShortForm, requestCreateExtra } = shortFormActions;
@@ -217,20 +218,20 @@ export default function ShortformContents(props: ShortformContentsProps) {
                   <h2 className="text-lg font-bold">{item.name}</h2>
                   <div className="mt-2">
                     <div className="flex justify-between items-center">
-                      {shortform.taskExtras?.find(
+                      {storeShortForm?.taskExtras?.find(
                         (taskExtra) => taskExtra.extraType.id === item.id,
                       )?.status === 'SUCCESS' && (
                         <div className="tooltip" data-tip="다운로드">
                           <a
                             className={`btn btn-circle btn-neutral ${
-                              shortform.taskExtras?.find(
+                              storeShortForm.taskExtras?.find(
                                 (taskExtra) =>
                                   taskExtra.extraType.id === item.id,
                               )?.status !== 'SUCCESS' && 'btn-disabled'
                             }`}
                             type="button"
                             href={`/api/v1/shorts/task/extra/${
-                              shortform.taskExtras?.find(
+                              storeShortForm.taskExtras?.find(
                                 (taskExtra) =>
                                   taskExtra.extraType.id === item.id,
                               )?.id
@@ -240,34 +241,46 @@ export default function ShortformContents(props: ShortformContentsProps) {
                           </a>
                         </div>
                       )}
-                      {shortform.taskExtras?.find(
+                      {storeShortForm?.taskExtras?.find(
                         (taskExtra) => taskExtra.extraType.id === item.id,
                       ) ? (
-                        shortform.taskExtras?.find(
+                        storeShortForm.taskExtras.find(
                           (taskExtra) => taskExtra.extraType.id === item.id,
                         )?.status !== 'SUCCESS' && (
-                          <button
-                            className="btn btn-circle btn-neutral btn-disabled"
-                            type="button"
+                          <div
+                            className="tooltip"
+                            data-tip={parseStatus(
+                              storeShortForm.taskExtras.find(
+                                (taskExtra) =>
+                                  taskExtra.extraType.id === item.id,
+                              )?.status,
+                            )}
                           >
-                            <span className="loading loading-spinner loading-sm"></span>
-                          </button>
+                            <button
+                              className="btn btn-circle btn-neutral btn-disabled"
+                              type="button"
+                            >
+                              <span className="loading loading-spinner loading-sm"></span>
+                            </button>
+                          </div>
                         )
                       ) : (
-                        <button
-                          className="btn btn-circle"
-                          type="button"
-                          disabled
-                        >
-                          <TbDownloadOff className="w-5 h-5" />
-                        </button>
+                        <div className="tooltip" data-tip="없음">
+                          <button
+                            className="btn btn-circle"
+                            type="button"
+                            disabled
+                          >
+                            <TbDownloadOff className="w-5 h-5" />
+                          </button>
+                        </div>
                       )}
                       <div className="tooltip" data-tip="생성 요청">
                         <button
                           className="btn btn-circle btn-neutral"
                           type="button"
                           disabled={
-                            !!shortform.taskExtras?.find(
+                            !!storeShortForm?.taskExtras?.find(
                               (taskExtra) => taskExtra.extraType.id === item.id,
                             )
                           }
@@ -287,7 +300,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
         <div className="absolute top-0 right-5 h-full">
           <div className="grid grid-col-1 h-full justify-center content-between">
             {/* prev button */}
-            <div>
+            <div className={`${!prev && 'invisible'}`}>
               {prev && (
                 <div className="tooltip" data-tip="이전 숏폼 영상">
                   <button
@@ -301,8 +314,8 @@ export default function ShortformContents(props: ShortformContentsProps) {
               )}
             </div>
 
-            {/* prev button */}
-            <div>
+            {/* next button */}
+            <div className={`${!next && 'invisible'}`}>
               {next && (
                 <div className="tooltip" data-tip="다음 숏폼 영상">
                   <button

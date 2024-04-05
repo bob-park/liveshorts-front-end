@@ -41,7 +41,7 @@ const statusList: Status[] = [
   },
   {
     id: 'PROCEEDING',
-    name: '진행',
+    name: '진행중',
     color: 'secondary',
   },
   {
@@ -206,7 +206,7 @@ export function secondToTimecode(totalSeconds: number) {
   );
 }
 
-export function parseStatus(status: string) {
+export function parseStatus(status?: string) {
   const result = statusList.find((item) => item.id === status);
 
   return result?.name;
