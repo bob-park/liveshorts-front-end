@@ -229,9 +229,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         templateImageRef.current &&
         videoAreaRef.current
       ) {
+        const initialX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
+
         const newDivX = e.clientX - videoXRef.current;
         const maxX = (videoAreaRef.current.clientWidth - templateImageRef.current.clientWidth) / 2;
-        const minX = videoRef.current.clientWidth - templateImageRef.current.clientWidth;
+        const minX = initialX - (videoRef.current.clientWidth - templateImageRef.current.clientWidth) / 2;
 
         const newX = Math.max(minX, Math.min(newDivX, maxX));
 
