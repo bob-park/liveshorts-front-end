@@ -47,8 +47,13 @@ export default function NavbarMenu(props: { token: string }) {
 
   // handle
   const handleLogout = () => {
-    dispatch(requestLoggedOut());
-    router.push('/logout');
+    dispatch(
+      requestLoggedOut({
+        handleAfter: () => {
+          router.push('/login');
+        },
+      }),
+    );
   };
 
   const activeMenuItem = (menuPath: string) => {
