@@ -1,5 +1,5 @@
-import { TitleContent, WorkMenu } from "../type";
-import { hexToRgba } from "../util";
+import { TitleContent, WorkMenu } from '../type';
+import { hexToRgba } from '../util';
 
 interface TitleInputProps {
   title: TitleContent;
@@ -14,7 +14,19 @@ export default function TitleInput({
   handleClickPanel,
   handleClickWorkMenu,
 }: TitleInputProps) {
-  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
+  const {
+    text,
+    x1,
+    y1,
+    x2,
+    y2,
+    font,
+    size,
+    color,
+    background,
+    textOpacity,
+    bgOpacity,
+  } = title;
 
   return (
     <input
@@ -35,7 +47,7 @@ export default function TitleInput({
       onClick={(e) => {
         e.stopPropagation();
         handleClickPanel();
-        handleClickWorkMenu("title");
+        handleClickWorkMenu('title');
       }}
       onChange={handleChangeTitle}
       className={`

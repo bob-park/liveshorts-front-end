@@ -115,7 +115,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   const handleCreateShortForm = () => {
     // TODO 숏폼 작업 생성 후 이동
 
-    router.push(`/edit/${assetId}`);
+    router.push(`/edit/${assetId}/shortform/${'test'}`);
   };
 
   const handleEditShortForm = (taskId: string) => {};
