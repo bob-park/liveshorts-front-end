@@ -52,6 +52,7 @@ type SearchAssetParams = {
   title: string;
   channelId?: number;
   isShortForm?: boolean;
+  onlyCreateShortFormByMe: boolean;
   broadcastDate: string;
   page: number;
   size: number;
@@ -254,6 +255,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
             searchAssetParams.isShortForm == undefined
               ? ''
               : searchAssetParams.isShortForm,
+          onlyCreateShortFormByMe: searchAssetParams.onlyCreateShortFormByMe,
         },
         isAppend,
       }),
@@ -282,6 +284,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       title: '',
       channelId: undefined,
       isShortForm: undefined,
+      onlyCreateShortFormByMe: false,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
       size: 30,
@@ -330,19 +333,103 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                           })
                         }
                       />
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="w-4 h-4 opacity-70"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <HiOutlineSearch className="w-4 h-4 opacity-70" />
                     </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* 방송일 */}
+              <div className="col-span-1">
+                <div className="grid grid-cols-3 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">방송일</h2>
+                  </div>
+                  <div className="col-span-2">
+                    <Datepicker
+                      placeholder="날짜 선택"
+                      useRange={false}
+                      inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
+                      asSingle
+                      value={{
+                        startDate: dayjs(
+                          searchAssetParams.broadcastDate,
+                          DEFAULT_DATE_FORMAT,
+                        ).toDate(),
+                        endDate: dayjs(
+                          searchAssetParams.broadcastDate,
+                          DEFAULT_DATE_FORMAT,
+                        ).toDate(),
+                      }}
+                      showFooter
+                      onChange={(value) =>
+                        setSearchAssetParams({
+                          ...searchAssetParams,
+                          broadcastDate: dayjs(value?.endDate).format(
+                            DEFAULT_DATE_FORMAT,
+                          ),
+                        })
+                      }
+                      i18n="ko"
+                      configs={{
+                        footer: {
+                          cancel: '취소',
+                          apply: '적용',
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 채널 목록 */}
+              <div className="col-span-2">
+                <div className="grid grid-cols-6 gap-5 h-12">
+                  <div className="col-span-1 flex justify-end items-center">
+                    <h2 className="font-extrabold">채널</h2>
+                  </div>
+                  <div className="col-span-5">
+                    <div className="join">
+                      <Button
+                        className="join-item w-24"
+                        type="button"
+                        active={!!!searchAssetParams.channelId}
+                        color={
+                          !!!searchAssetParams.channelId ? 'neutral' : undefined
+                        }
+                        onClick={() =>
+                          setSearchAssetParams({
+                            ...searchAssetParams,
+                            channelId: undefined,
+                          })
+                        }
+                      >
+                        전체
+                      </Button>
+                      {channels.map((channel) => (
+                        <Button
+                          key={`channel-key-${channel.channelId}`}
+                          className="join-item"
+                          type="button"
+                          active={
+                            channel.channelId == searchAssetParams.channelId
+                          }
+                          color={
+                            channel.channelId == searchAssetParams.channelId
+                              ? 'neutral'
+                              : undefined
+                          }
+                          onClick={() =>
+                            setSearchAssetParams({
+                              ...searchAssetParams,
+                              channelId: channel.channelId,
+                            })
+                          }
+                        >
+                          {channel.name}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -413,102 +500,43 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                 </div>
               </div>
 
-              {/* 채널 목록 */}
-              <div className="col-span-2">
-                <div className="grid grid-cols-6 gap-5 h-12">
+              {/* 내가 생성한 작업 */}
+              <div className="col-span-1">
+                <div
+                  className={`grid grid-cols-3 gap-5 h-12 transition-all duration-150 ${
+                    searchAssetParams.isShortForm
+                      ? 'opacity-100'
+                      : '-translate-x-1 opacity-0'
+                  }`}
+                >
                   <div className="col-span-1 flex justify-end items-center">
-                    <h2 className="font-extrabold">채널</h2>
+                    <h2 className="font-extrabold">내가 만든 작업</h2>
                   </div>
-                  <div className="col-span-5">
-                    <div className="join">
-                      <Button
-                        className="join-item w-24"
-                        type="button"
-                        active={!!!searchAssetParams.channelId}
-                        color={
-                          !!!searchAssetParams.channelId ? 'neutral' : undefined
-                        }
-                        onClick={() =>
-                          setSearchAssetParams({
-                            ...searchAssetParams,
-                            channelId: undefined,
-                          })
-                        }
-                      >
-                        전체
-                      </Button>
-                      {channels.map((channel) => (
-                        <Button
-                          key={`channel-key-${channel.channelId}`}
-                          className="join-item"
-                          type="button"
-                          active={
-                            channel.channelId == searchAssetParams.channelId
-                          }
-                          color={
-                            channel.channelId == searchAssetParams.channelId
-                              ? 'neutral'
-                              : undefined
-                          }
-                          onClick={() =>
-                            setSearchAssetParams({
-                              ...searchAssetParams,
-                              channelId: channel.channelId,
-                            })
-                          }
-                        >
-                          {channel.name}
-                        </Button>
-                      ))}
+                  <div className="col-span-2">
+                    <div className="flex justify-start items-center h-full">
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="toggle"
+                            checked={searchAssetParams.onlyCreateShortFormByMe}
+                            onChange={(e) =>
+                              setSearchAssetParams({
+                                ...searchAssetParams,
+                                onlyCreateShortFormByMe: e.target.checked,
+                              })
+                            }
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 방송일 */}
-              <div className="col-span-1">
-                <div className="grid grid-cols-3 gap-5 h-12">
-                  <div className="col-span-1 flex justify-end items-center">
-                    <h2 className="font-extrabold">방송일</h2>
-                  </div>
-                  <div className="col-span-2">
-                    <Datepicker
-                      placeholder="날짜 선택"
-                      useRange={false}
-                      inputClassName="input w-full input-neutral input-bordered focus:outline-offset-0 z-100"
-                      asSingle
-                      value={{
-                        startDate: dayjs(
-                          searchAssetParams.broadcastDate,
-                          DEFAULT_DATE_FORMAT,
-                        ).toDate(),
-                        endDate: dayjs(
-                          searchAssetParams.broadcastDate,
-                          DEFAULT_DATE_FORMAT,
-                        ).toDate(),
-                      }}
-                      showFooter
-                      onChange={(value) =>
-                        setSearchAssetParams({
-                          ...searchAssetParams,
-                          broadcastDate: dayjs(value?.endDate).format(
-                            DEFAULT_DATE_FORMAT,
-                          ),
-                        })
-                      }
-                      i18n="ko"
-                      configs={{
-                        footer: {
-                          cancel: '취소',
-                          apply: '적용',
-                        },
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
               <div className="col-span-1"></div>
-              <div className="col-span-1"></div>
+
+              {/* 버튼 */}
               <div className="col-span-1 flex justify-end mr-10">
                 <Button
                   className="mr-4"

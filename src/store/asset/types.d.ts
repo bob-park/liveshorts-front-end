@@ -35,6 +35,7 @@ type Asset = {
   ratio?: string;
   frameCount?: number;
   durationOfClip?: number;
+  recordSchedule?: RecordChannel;
 };
 
 type AssetType = 'VIDEO' | 'AUDIO' | 'IMAGE' | 'FILE';
@@ -54,6 +55,7 @@ type SearchAssetParams = {
   metas?: string[];
   title?: string;
   existShortForm: boolean | string;
+  onlyCreateShortFormByMe: boolean;
 };
 
 type Pagination = {
