@@ -132,9 +132,10 @@ const ListAssetView = (props: {
   return (
     <div className="grid grid-cols-1 min-w-[900px] gap-4">
       {/* header */}
-      <div className="col-span-1 grid grid-cols-7 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 justify-center items-center">
+      <div className="col-span-1 grid grid-cols-8 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 justify-center items-center">
         <div className="col-span-1"></div>
         <div className="col-span-2">제목</div>
+        <div className="col-span-1">채널</div>
         <div className="col-span-1">대분류</div>
         <div className="col-span-1">크기</div>
         <div className="col-span-1">생성일</div>
