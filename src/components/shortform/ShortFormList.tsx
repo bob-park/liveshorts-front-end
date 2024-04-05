@@ -3,10 +3,13 @@ import ShortFormListItem from './ShortFormListItem';
 type ShortFormListProps = {
   tasks: ShortFormTask[];
   onRowClick?: (taskId: string) => void;
+  onRowEdit?: (taskId: string) => void;
+  onRowCopy?: (taskId: string) => void;
+  onRowRemove?: (taskId: string) => void;
 };
 
 export default function ShortFormList(props: ShortFormListProps) {
-  const { tasks, onRowClick } = props;
+  const { tasks, onRowClick, onRowEdit, onRowCopy, onRowRemove } = props;
 
   // handle
   const handleRowClick = (taskId: string) => {
@@ -21,7 +24,12 @@ export default function ShortFormList(props: ShortFormListProps) {
           key={`short-form-task-${task.id}`}
           onClick={() => handleRowClick(task.id)}
         >
-          <ShortFormListItem task={task} />
+          <ShortFormListItem
+            task={task}
+            onEdit={onRowEdit}
+            onCopy={onRowCopy}
+            onRemove={onRowRemove}
+          />
         </div>
       ))}
     </div>

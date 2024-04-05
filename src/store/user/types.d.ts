@@ -10,4 +10,7 @@ type User = {
   userId: string;
   name: string;
   email?: string;
+  role: string;
+  authorities: string[];
+  department?: string;
 };

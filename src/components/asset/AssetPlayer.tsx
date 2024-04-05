@@ -251,7 +251,7 @@ export default function AssetPlayer(props: AssetPlayerProps) {
       <div className="col-span-1 ">
         <div className="flex justify-center items-center relative aspect-auto">
           {!loaded && (
-            <div className="flex justify-center items-center absolute top-0 left-0 p-2 size-full z-50 bg-slate-900 bg-opacity-50 rounded-xl">
+            <div className="flex justify-center items-center absolute top-0 left-0 p-2 size-full z-10 bg-slate-900 bg-opacity-50 rounded-xl">
               <span className="loading loading-spinner loading-lg text-white" />
             </div>
           )}
