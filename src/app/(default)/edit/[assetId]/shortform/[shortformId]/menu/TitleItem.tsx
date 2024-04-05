@@ -1,4 +1,4 @@
-import { TitleContent, WorkMenu } from '../EditShorts';
+import { TitleContent, WorkMenu } from '../type';
 
 interface TitleItemProps {
   title: TitleContent;
