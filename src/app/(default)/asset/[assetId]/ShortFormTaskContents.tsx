@@ -129,7 +129,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       );
   };
 
-  const handleEditShortForm = (taskId: string) => {};
+  const handleEditShortForm = (taskId: string) => {
+    router.push(`/edit/${assetId}/shortform/${taskId}`);
+  };
 
   const handleCopyShortForm = () => {
     copyTaskId && dispatch(requestCopyShortForm({ taskId: copyTaskId }));
