@@ -68,7 +68,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [videoSize, setVideoSize] = useState({ width: 0, height: 0 });
+  const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -84,16 +84,12 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }, [videoDuration]);
 
   useEffect(() => {
-    if (loaded && videoAreaRef.current) {
-      const videoHeight =
-        (templateImageRef.current?.clientHeight ?? 0) *
-        ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0));
-      const videoWidth = (videoHeight * 16) / 9;
-      const centerX = (videoAreaRef.current.clientWidth - videoWidth) / 2;
+    if (loaded && videoAreaRef.current && videoRef.current) {
+      const centerX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
       prevVideoX.current = centerX;
       setVideoX(centerX);
     }
-  }, [loaded, selectedTemplate]);
+  }, [loaded, selectedTemplate, videoRef.current?.clientWidth]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {

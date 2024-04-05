@@ -27,6 +27,11 @@ const {
   // update me
   requestUpdateMe,
   successUpdateMe,
+
+  // get user
+  requestGetUser,
+  successGetUser,
+  failureGetUser,
 } = userActions;
 
 // logged in
@@ -63,6 +68,8 @@ function* callLoggedIn(action: ReturnType<typeof requestLoggedIn>) {
     userId: jwtPayload['userId'],
     name: jwtPayload['name'],
     email: jwtPayload['email'],
+    role: jwtPayload['role'],
+    authorities: jwtPayload['authorities'],
   };
 
   yield put(successLoggedIn(user));
@@ -99,6 +106,8 @@ function* updateMe(action: ReturnType<typeof requestUpdateMe>) {
     userId: jwtPayload['userId'],
     name: jwtPayload['name'],
     email: jwtPayload['email'],
+    role: jwtPayload['role'],
+    authorities: jwtPayload['authorities'],
   };
 
   yield put(successUpdateMe(user));
@@ -108,6 +117,31 @@ function* watchUpdateMe() {
   yield takeLatest(requestUpdateMe, updateMe);
 }
 
+// get user
+function* callGetUser(action: ReturnType<typeof requestGetUser>) {
+  const { id } = action.payload;
+
+  const result: ApiResult<User> = yield call(get, `/api/user/${id}`);
+
+  if (result.state === 'FAILURE') {
+    yield put(failureGetUser());
+    return;
+  }
+
+  if (result.data) {
+    yield put(successGetUser(result.data));
+  }
+}
+
+function* watchGetUser() {
+  yield takeLatest(requestGetUser, callGetUser);
+}
+
 export default function* userSagas() {
-  yield all([fork(watchLoggedIn), fork(watchLoggedOut), fork(watchUpdateMe)]);
+  yield all([
+    fork(watchLoggedIn),
+    fork(watchLoggedOut),
+    fork(watchUpdateMe),
+    fork(watchGetUser),
+  ]);
 }

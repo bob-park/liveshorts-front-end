@@ -26,7 +26,7 @@ export default function AssetListItem(props: AssetListItemProps) {
   );
 
   return (
-    <div className="grid grid-cols-7 gap-4 mx-10 my-2 px-2 py-3 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300">
+    <div className="grid grid-cols-7 gap-4 mx-10 my-2 px-2 py-3 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300 cursor-pointer">
       <div className="col-span-1 h-24 flex justify-center items-center">
         <Image
           className="w-auto h-full rounded-xl object-contain"
