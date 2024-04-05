@@ -95,33 +95,73 @@ export default function NavbarMenu(props: { token: string }) {
           <Navbar.End className="lg:w-full">
             <div className="mr-7">
               {me && (
-                <>
-                  <p className="text-center text-gray-500 text-sm">
-                    <strong>{me.department}</strong>
-                  </p>
-                  <p>
-                    <strong className="text-xl">{me.name}</strong> (
-                    <span>@{me.userId}</span>)
-                  </p>
-                </>
+                <p className="align-middle">
+                  <strong className="text-xl">{me.name}</strong> (
+                  <span>@{me.userId}</span>)
+                </p>
               )}
             </div>
-            <Dropdown className="mr-10" hover end>
-              <Avatar
-                src={
-                  me ? `/api/user/${me.id}/avatar` : '/default_user_avatar.webp'
-                }
-                size="sm"
-                shape="circle"
-                border
-              />
+            <Dropdown className="mr-10" end>
+              <div className="" tabIndex={0}>
+                <Avatar
+                  src={
+                    me
+                      ? `/api/user/${me.id}/avatar`
+                      : '/default_user_avatar.webp'
+                  }
+                  size="sm"
+                  shape="circle"
+                  border
+                />
+              </div>
 
-              <Dropdown.Menu className="w-48 bg-base-100 shadow-xl ">
-                <li className="disabled">
-                  <h3 className="text-black">
-                    {me && <strong>{getRoleType(me.role).name}</strong>}
-                  </h3>
+              <Dropdown.Menu
+                className="bg-base-100 shadow-xl w-[250px]"
+                tabIndex={0}
+              >
+                <li className="disabled ">
+                  <div className="flex gap-3 py-2 items-start">
+                    <div className="flex-none pt-3">
+                      <Avatar
+                        src={
+                          me
+                            ? `/api/user/${me.id}/avatar`
+                            : '/default_user_avatar.webp'
+                        }
+                        size="xs"
+                        shape="circle"
+                        border
+                      />
+                    </div>
+                    <div className="flex-1 ml-2">
+                      <div className="flex flex-col gap-1 text-black text-base ">
+                        <div>
+                          <p>
+                            <span className="font-bold tex-sm text-gray-500">
+                              {me?.department}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="font-bold text-lg">
+                              {me?.name}
+                            </span>
+                          </p>
+                          <p>
+                            <span className="tex-sm text-gray-500">
+                              @{me?.userId}
+                            </span>
+                          </p>
+                        </div>
+
+                        <h3 className="py-2">
+                          {me && <strong>{getRoleType(me.role).name}</strong>}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
                 </li>
+
+                <hr />
 
                 <li>
                   <a href="#">
