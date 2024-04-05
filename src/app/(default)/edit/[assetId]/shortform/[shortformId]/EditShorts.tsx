@@ -43,6 +43,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const prevProgressWidthPercent = useRef<number>(0);
   const templateImageRef = useRef<HTMLDivElement>(null);
   const videoAreaRef = useRef<HTMLDivElement>(null);
+  const prevVideoAreaWidth = useRef<number>(0);
 
   // useState
   // const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -68,7 +69,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [templateSize, setTemplateSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -84,12 +84,20 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }, [videoDuration]);
 
   useEffect(() => {
-    if (loaded && videoAreaRef.current && videoRef.current) {
-      const centerX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
-      prevVideoX.current = centerX;
-      setVideoX(centerX);
+    prevVideoAreaWidth.current = videoAreaRef.current?.clientWidth ?? 0;
+  }, []);
+
+  useEffect(() => {
+    if (loaded && videoAreaRef.current) {
+      const videoHeight =
+        (templateImageRef.current?.clientHeight ?? 0) *
+        ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0));
+      const videoWidth = (videoHeight * 16) / 9;
+      const initialX = (videoAreaRef.current.clientWidth - videoWidth) / 2;
+      prevVideoX.current = initialX;
+      setVideoX(initialX);
     }
-  }, [loaded, selectedTemplate, videoRef.current?.clientWidth]);
+  }, [loaded, selectedTemplate]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -214,11 +222,21 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isVideoDragging && videoXRef.current !== null) {
-        const newX = e.clientX - videoXRef.current;
+      if (
+        isVideoDragging &&
+        videoXRef.current !== null &&
+        videoRef.current &&
+        templateImageRef.current &&
+        videoAreaRef.current
+      ) {
+        const newDivX = e.clientX - videoXRef.current;
+        const maxX = (videoAreaRef.current.clientWidth - templateImageRef.current.clientWidth) / 2;
+        const minX = videoRef.current.clientWidth - templateImageRef.current.clientWidth;
+
+        const newX = Math.max(minX, Math.min(newDivX, maxX));
 
         setVideoX(newX);
-        prevStartX.current = newX;
+        prevVideoX.current = newX;
       }
     }
 
@@ -307,6 +325,32 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       handleChangeWitdhPercent();
     };
   }, [progressWidthPercent]);
+
+  prevVideoAreaWidth.current = videoAreaRef.current?.clientWidth ?? 0;
+
+  // useEffect(() => {
+  //   function handleWindowResize() {
+  //     if (videoAreaRef.current && videoRef.current) {
+  //       const videoAreaWidth = videoAreaRef.current.clientWidth;
+  //       const videoWidth = videoRef.current.clientWidth;
+  //       console.log(videoWidth, prevVideoAreaWidth.current);
+
+  //       const resizeRatio = videoAreaWidth / prevVideoAreaWidth.current;
+
+  //       const newVideoX = prevVideoX.current * resizeRatio;
+
+  //       setVideoX(newVideoX);
+
+  //       prevVideoX.current = newVideoX;
+  //     }
+  //   }
+
+  //   window.addEventListener("resize", handleWindowResize);
+
+  //   return () => {
+  //     window.removeEventListener("resize", handleWindowResize);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const handlePlayerKeyDown = (e: KeyboardEvent) => {

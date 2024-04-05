@@ -1,12 +1,10 @@
-import { TitleContent, WorkMenu } from '../EditShorts';
+import { TitleContent, WorkMenu } from "../type";
 
 interface TitleItemProps {
   title: TitleContent;
   optionArray: string[];
   handleClickDeleteTitle: () => void;
-  handleChangeTitle: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
+  handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
 }
 
@@ -31,85 +29,29 @@ export default function TitleItem({
   handleChangeTitle,
   handleClickWorkMenu,
 }: TitleItemProps) {
-  const {
-    text,
-    x1,
-    y1,
-    x2,
-    y2,
-    font,
-    size,
-    color,
-    background,
-    textOpacity,
-    bgOpacity,
-  } = title;
+  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
 
   return (
     <div className="flex flex-col gap-2">
-      <LabelInput
-        name="text"
-        value={text}
-        handleChangeTitle={handleChangeTitle}
-      />
+      <LabelInput name="text" value={text} handleChangeTitle={handleChangeTitle} />
 
       <div className="flex gap-2">
-        <LabelInput
-          label="X1"
-          name="x1"
-          value={x1}
-          handleChangeTitle={handleChangeTitle}
-        />
-        <LabelInput
-          label="X2"
-          name="x2"
-          value={x2}
-          handleChangeTitle={handleChangeTitle}
-        />
+        <LabelInput label="X1" name="x1" value={x1} handleChangeTitle={handleChangeTitle} />
+        <LabelInput label="X2" name="x2" value={x2} handleChangeTitle={handleChangeTitle} />
       </div>
 
       <div className="flex gap-2">
-        <LabelInput
-          label="Y1"
-          name="y1"
-          value={y1}
-          handleChangeTitle={handleChangeTitle}
-        />
-        <LabelInput
-          label="Y2"
-          name="y2"
-          value={y2}
-          handleChangeTitle={handleChangeTitle}
-        />
+        <LabelInput label="Y1" name="y1" value={y1} handleChangeTitle={handleChangeTitle} />
+        <LabelInput label="Y2" name="y2" value={y2} handleChangeTitle={handleChangeTitle} />
       </div>
 
       <div>
         <span className="text-slate-400 text-xs">Text</span>
         <div className="flex flex-col gap-2">
-          <Select
-            optionArray={optionArray}
-            value={font}
-            handleChangeTitle={handleChangeTitle}
-          />
-          <LabelInput
-            label="Size"
-            name="size"
-            value={size}
-            handleChangeTitle={handleChangeTitle}
-          />
-          <LabelInput
-            label="Color"
-            name="color"
-            value={color}
-            type="color"
-            handleChangeTitle={handleChangeTitle}
-          />
-          <LabelInput
-            label="Opacity"
-            name="textOpacity"
-            value={textOpacity}
-            handleChangeTitle={handleChangeTitle}
-          />
+          <Select optionArray={optionArray} value={font} handleChangeTitle={handleChangeTitle} />
+          <LabelInput label="Size" name="size" value={size} handleChangeTitle={handleChangeTitle} />
+          <LabelInput label="Color" name="color" value={color} type="color" handleChangeTitle={handleChangeTitle} />
+          <LabelInput label="Opacity" name="textOpacity" value={textOpacity} handleChangeTitle={handleChangeTitle} />
         </div>
       </div>
 
@@ -123,12 +65,7 @@ export default function TitleItem({
             type="color"
             handleChangeTitle={handleChangeTitle}
           />
-          <LabelInput
-            label="Opacity"
-            name="bgOpacity"
-            value={bgOpacity}
-            handleChangeTitle={handleChangeTitle}
-          />
+          <LabelInput label="Opacity" name="bgOpacity" value={bgOpacity} handleChangeTitle={handleChangeTitle} />
         </div>
       </div>
 
@@ -142,31 +79,12 @@ export default function TitleItem({
   );
 }
 
-function LabelInput({
-  label,
-  value,
-  name,
-  type,
-  handleChangeTitle,
-}: LabelInputProps) {
+function LabelInput({ label, value, name, type, handleChangeTitle }: LabelInputProps) {
   return label ? (
     <label className="input input-bordered input-sm w-full min-w-1 flex items-center gap-2">
       <span className="text-slate-400 text-xs">{label}</span>
-      <input
-        type="text"
-        name={name}
-        value={value}
-        onChange={handleChangeTitle}
-        className="grow"
-      />
-      {type === 'color' && (
-        <input
-          name={name}
-          type="color"
-          value={value}
-          onChange={handleChangeTitle}
-        />
-      )}
+      <input type="text" name={name} value={value} onChange={handleChangeTitle} className="grow" />
+      {type === "color" && <input name={name} type="color" value={value} onChange={handleChangeTitle} />}
     </label>
   ) : (
     <input
