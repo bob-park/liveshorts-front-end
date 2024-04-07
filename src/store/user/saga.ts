@@ -81,6 +81,8 @@ function* watchLoggedIn() {
 
 // logged out
 function* callLoggedOut(action: ReturnType<typeof requestLoggedOut>) {
+  const { handleAfter } = action.payload;
+
   const result: ApiResult<{}> = yield call(get, '/api/user/logout');
 
   if (result.state !== 'SUCCESS') {
@@ -89,6 +91,8 @@ function* callLoggedOut(action: ReturnType<typeof requestLoggedOut>) {
   }
 
   yield put(successLoggedOut());
+
+  handleAfter && handleAfter();
 }
 
 function* watchLoggedOut() {

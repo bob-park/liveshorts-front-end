@@ -38,6 +38,16 @@ const {
   requestRemoveShortForm,
   successRemoveShortForm,
   faliureRemoveShortForm,
+
+  // create extra
+  requestCreateExtra,
+  successCreateExtra,
+  failureCreateExtra,
+
+  // get shortform
+  requestGetShortForm,
+  successGetShortForm,
+  failureGetShortForm,
 } = shortFormActions;
 
 // search shortFormTask
@@ -70,12 +80,12 @@ function* watchSearchShortFormTask() {
 function* callCreateShortForm(
   action: ReturnType<typeof requestCreateShortForm>,
 ) {
-  const { assetId, title } = action.payload;
+  const { assetId, body, handleAfter } = action.payload;
 
   const result: ApiResult<ShortFormTask> = yield call(
     post,
     `/api/v1/shorts/task`,
-    { assetId, title },
+    { assetId, title: body.title },
   );
 
   if (result.state === 'FAILURE') {
@@ -85,6 +95,8 @@ function* callCreateShortForm(
 
   if (result.data) {
     yield put(successCreateShortForm(result.data));
+
+    handleAfter && handleAfter(result.data.id);
   }
 }
 
@@ -96,12 +108,12 @@ function* watchCreateShortForm() {
 function* callUpdateShortForm(
   action: ReturnType<typeof requestUpdateShortForm>,
 ) {
-  const { taskId, title, templateId } = action.payload;
+  const { taskId, body, handleAfter } = action.payload;
 
   const result: ApiResult<ShortFormTask> = yield call(
     putCall,
     `/api/v1/shorts/task/${taskId}`,
-    { title, templateId },
+    body,
   );
 
   if (result.state === 'FAILURE') {
@@ -111,6 +123,8 @@ function* callUpdateShortForm(
 
   if (result.data) {
     yield put(successUpdateShortForm(result.data));
+
+    handleAfter && handleAfter();
   }
 }
 
@@ -164,6 +178,53 @@ function* watchRemoveShortForm() {
   yield takeLatest(requestRemoveShortForm, callRemoveShortForm);
 }
 
+// create extra
+function* callCreateExtra(action: ReturnType<typeof requestCreateExtra>) {
+  const { taskId, extraTypeIds } = action.payload;
+
+  const response: ApiResult<ShortFormTask> = yield call(
+    post,
+    `/api/v1/shorts/task/${taskId}/extra`,
+    { extraTypeIds },
+  );
+
+  if (response.state === 'FAILURE') {
+    yield put(failureCreateExtra());
+    return;
+  }
+
+  if (response.data) {
+    yield put(successCreateExtra(response.data));
+  }
+}
+
+function* watchCreateExtra() {
+  yield takeLatest(requestCreateExtra, callCreateExtra);
+}
+
+// get shortform
+function* callGetShortForm(action: ReturnType<typeof requestGetShortForm>) {
+  const { taskId } = action.payload;
+
+  const response: ApiResult<ShortFormTask> = yield call(
+    get,
+    `/api/v1/shorts/task/${taskId}`,
+  );
+
+  if (response.state === 'FAILURE') {
+    yield put(failureGetShortForm());
+    return;
+  }
+
+  if (response.data) {
+    yield put(successGetShortForm(response.data));
+  }
+}
+
+function* watchGetShortForm() {
+  yield takeLatest(requestGetShortForm, callGetShortForm);
+}
+
 export default function* shortFormSagas() {
   yield all([
     fork(watchSearchShortFormTask),
@@ -171,5 +232,7 @@ export default function* shortFormSagas() {
     fork(watchUpdateShortForm),
     fork(watchCopyShortForm),
     fork(watchRemoveShortForm),
+    fork(watchCreateExtra),
+    fork(watchGetShortForm),
   ]);
 }

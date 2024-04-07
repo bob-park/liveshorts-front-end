@@ -8,6 +8,7 @@ import { Button } from 'react-daisyui';
 
 // react icons
 import { RiUserFill, RiLock2Fill } from 'react-icons/ri';
+import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
 
 type LoginFormProps = {
   msg?: string;
@@ -23,6 +24,7 @@ export default function LoginForm(props: LoginFormProps) {
   // state
   const [userId, setUserId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   // handle
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -53,12 +55,23 @@ export default function LoginForm(props: LoginFormProps) {
         <label className="input input-bordered flex items-center gap-2">
           <RiLock2Fill />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             className="grow input-secondary"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <button
+            className="btn btn-ghost btn-circle mr-[-10px]"
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <AiOutlineEyeInvisible className="w-6 h-6" />
+            ) : (
+              <AiOutlineEye className="w-6 h-6" />
+            )}
+          </button>
         </label>
       </div>
       <div className="col-span-4">

@@ -30,7 +30,10 @@ const reducers = {
     state.failLoggedInMessage = failureMessage;
   },
   // logged out
-  requestLoggedOut: (state: UserState) => {},
+  requestLoggedOut: (
+    state: UserState,
+    action: PayloadAction<{ handleAfter?: () => void }>,
+  ) => {},
   successLoggedOut: (state: UserState) => {
     state.me = undefined;
     state.isLoggedIn = false;

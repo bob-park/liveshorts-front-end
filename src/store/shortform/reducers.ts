@@ -31,7 +31,14 @@ const reducers = {
   // create
   requestCreateShortForm: (
     state: ShortFormState,
-    action: PayloadAction<{ assetId: number; title: string }>,
+    action: PayloadAction<{
+      assetId: number;
+      body: {
+        title: string;
+        templateId?: string;
+      };
+      handleAfter?: (newShortFormId: string) => void;
+    }>,
   ) => {},
   successCreateShortForm: (
     state: ShortFormState,
@@ -44,8 +51,11 @@ const reducers = {
     state: ShortFormState,
     action: PayloadAction<{
       taskId: string;
-      title: string;
-      templateId?: string;
+      body: {
+        title: string;
+        templateId?: string;
+      };
+      handleAfter?: () => void;
     }>,
   ) => {},
   successUpdateShortForm: (
@@ -111,6 +121,41 @@ const reducers = {
     state.tasks = newTasks;
   },
   faliureRemoveShortForm: (state: ShortFormState) => {},
+
+  // create task extra
+  requestCreateExtra: (
+    state: ShortFormState,
+    action: PayloadAction<{ taskId: string; extraTypeIds: string[] }>,
+  ) => {},
+  successCreateExtra: (
+    state: ShortFormState,
+    action: PayloadAction<ShortFormTask>,
+  ) => {
+    const shortform = action.payload;
+
+    state.shortform = shortform;
+  },
+  failureCreateExtra: (state: ShortFormState) => {},
+
+  // get shortform task
+  requestGetShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<{ taskId: string }>,
+  ) => {
+    state.isLoading = true;
+  },
+  successGetShortForm: (
+    state: ShortFormState,
+    action: PayloadAction<ShortFormTask>,
+  ) => {
+    const shortform = action.payload;
+
+    state.isLoading = false;
+    state.shortform = shortform;
+  },
+  failureGetShortForm: (state: ShortFormState) => {
+    state.isLoading = false;
+  },
 };
 
 export default reducers;

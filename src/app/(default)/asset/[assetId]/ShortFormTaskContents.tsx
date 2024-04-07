@@ -19,6 +19,7 @@ import { shortFormActions } from '@/store/shortform';
 import ShortFormList from '@/components/shortform/ShortFormList';
 import CopyShortFormConfirm from './CopyShortFormConfirm';
 import RemoveShortFormConfirm from './RemoveShortFormConfirm';
+import CreateShortFormModal from './CreateShortFormModal';
 
 // action
 const {
@@ -65,7 +66,6 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // state
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-  const [createTitle, setCreateTitle] = useState<string>();
 
   const [showCopyConfirm, setShowCopyConfirm] = useState<boolean>(false);
   const [copyTaskId, setCopyTaskId] = useState<string>();
@@ -92,7 +92,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     dispatch(
       requestUpdateShortForm({
         taskId: copiedTaskId,
-        title: `${shortform.title} - 복사본`,
+        body: {
+          title: `${shortform.title} - 복사본`,
+        },
       }),
     );
   }, [copiedTaskId, copyTaskId]);
@@ -112,13 +114,24 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     router.push(`/asset/${assetId}/shortform/${taskId}`);
   };
 
-  const handleCreateShortForm = () => {
-    // TODO 숏폼 작업 생성 후 이동
-
-    router.push(`/edit/${assetId}/shortform/${'test'}`);
+  const handleCreateShortForm = (title: string | undefined) => {
+    title &&
+      dispatch(
+        requestCreateShortForm({
+          assetId,
+          body: {
+            title,
+          },
+          handleAfter: (newShortformId) => {
+            router.push(`/edit/${assetId}/shortform/${newShortformId}`);
+          },
+        }),
+      );
   };
 
-  const handleEditShortForm = (taskId: string) => {};
+  const handleEditShortForm = (taskId: string) => {
+    router.push(`/edit/${assetId}/shortform/${taskId}`);
+  };
 
   const handleCopyShortForm = () => {
     copyTaskId && dispatch(requestCopyShortForm({ taskId: copyTaskId }));
@@ -140,7 +153,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
               <button
                 className="btn btn-sm btn-neutral transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-blue-950 duration-300"
                 type="button"
-                onClick={handleCreateShortForm}
+                onClick={() => setShowCreateModal(true)}
               >
                 <IoAddCircleSharp className="w-6 h-6" />
                 숏폼 생성
@@ -179,6 +192,13 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
           )}
         </div>
       </div>
+
+      {/* create shortform modal */}
+      <CreateShortFormModal
+        show={showCreateModal}
+        onBackdrop={() => setShowCreateModal(false)}
+        onCreate={handleCreateShortForm}
+      />
 
       {/* copy confirm modal */}
       <CopyShortFormConfirm

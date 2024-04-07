@@ -17,6 +17,7 @@ const initialState: AssetState = {
     isDeleted: false,
     assetStatus: 'REGISTERED',
     existShortForm: '',
+    onlyCreateShortFormByMe: false,
   },
 };
 
