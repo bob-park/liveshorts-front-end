@@ -5,7 +5,6 @@ interface TitleItemProps {
   optionArray: string[];
   handleClickDeleteTitle: () => void;
   handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  handleClickWorkMenu(workMenu: WorkMenu): void;
 }
 
 interface LabelInputProps {
@@ -22,13 +21,7 @@ interface SelectProps {
   handleChangeTitle: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export default function TitleItem({
-  title,
-  optionArray,
-  handleClickDeleteTitle,
-  handleChangeTitle,
-  handleClickWorkMenu,
-}: TitleItemProps) {
+export default function TitleItem({ title, optionArray, handleClickDeleteTitle, handleChangeTitle }: TitleItemProps) {
   const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
 
   return (
@@ -69,7 +62,7 @@ export default function TitleItem({
         </div>
       </div>
 
-      <div className="flex gap-2 self-end mt-10">
+      <div className="flex gap-2 self-end mt-6">
         <button className="btn">저장</button>
         <button className="btn" onClick={handleClickDeleteTitle}>
           삭제
@@ -83,7 +76,7 @@ function LabelInput({ label, value, name, type, handleChangeTitle }: LabelInputP
   return label ? (
     <label className="input input-bordered input-sm w-full min-w-1 flex items-center gap-2">
       <span className="text-slate-400 text-xs">{label}</span>
-      <input type="text" name={name} value={value} onChange={handleChangeTitle} className="grow" />
+      <input type="text" name={name} value={value} onChange={handleChangeTitle} className="grow w-[100px]" />
       {type === "color" && <input name={name} type="color" value={value} onChange={handleChangeTitle} />}
     </label>
   ) : (

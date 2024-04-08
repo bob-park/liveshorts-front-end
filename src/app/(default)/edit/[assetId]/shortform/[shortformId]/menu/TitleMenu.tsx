@@ -19,23 +19,26 @@ export default function TitleMenu({
   handleClickWorkMenu,
 }: TitleMenuProps) {
   return (
-    <div className="relative h-full p-2">
-      {!titleContent && (
-        <button disabled={!!titleContent} onClick={handleClickAddTitle} className="btn w-full">
-          + 제목 추가
-        </button>
-      )}
-      {titleContent && (
-        <TitleItem
-          title={titleContent}
-          optionArray={optionArray}
-          handleClickDeleteTitle={handleClickDeleteTitle}
-          handleChangeTitle={handleChangeTitle}
-          handleClickWorkMenu={() => {
-            handleClickWorkMenu("title");
-          }}
-        />
-      )}
+    <div
+      onClick={() => {
+        handleClickWorkMenu("title");
+      }}
+      className="relative h-full p-2 flex flex-col gap-2"
+    >
+      <button disabled={!!titleContent} onClick={handleClickAddTitle} className="btn w-full">
+        + 제목 추가
+      </button>
+
+      <div className="h-[calc(100vh-440px)] overflow-y-scroll">
+        {titleContent && (
+          <TitleItem
+            title={titleContent}
+            optionArray={optionArray}
+            handleClickDeleteTitle={handleClickDeleteTitle}
+            handleChangeTitle={handleChangeTitle}
+          />
+        )}
+      </div>
     </div>
   );
 }
