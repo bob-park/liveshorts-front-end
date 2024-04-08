@@ -358,6 +358,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         });
 
         setVideoX((prev) => {
+          // TODO 거리 계산 다시 할 것
           const newX = prev * widthChangeRatio;
 
           prevVideoX.current = newX;
