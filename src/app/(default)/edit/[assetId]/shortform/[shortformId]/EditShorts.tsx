@@ -20,7 +20,7 @@ interface EditShortsProps {
 }
 
 export const WIDTH_PERCENT_STEP = 25;
-const MAX_PERCENT = 200;
+const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
@@ -319,11 +319,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
-        // TODO handleMouseDownProgress함수와 연관된 버그 해결
+        // TODO section box와 연관된 버그 해결
 
         const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
-        const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
+        const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, progressBarX * resizeRatio));
 
         setStartX(newStartX);
         setEndX(newEndX);
