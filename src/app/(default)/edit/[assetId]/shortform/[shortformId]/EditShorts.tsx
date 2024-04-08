@@ -44,6 +44,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const templateImageRef = useRef<HTMLDivElement>(null);
   const videoAreaRef = useRef<HTMLDivElement>(null);
   const prevVideoAreaWidth = useRef<number>(0);
+  const prevVideoAreaHeight = useRef<number>(0);
 
   // useState
   // const [videoProgress, setVideoProgress] = useState<number>(0);
@@ -69,6 +70,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -86,20 +88,31 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   useEffect(() => {
     if (videoAreaRef.current) {
       prevVideoAreaWidth.current = videoAreaRef.current.clientWidth;
+      prevVideoAreaHeight.current = videoAreaRef.current.clientHeight;
     }
   }, []);
 
   useEffect(() => {
+    if (videoAreaRef.current) {
+      setTemplateImageSize({
+        width: (videoAreaRef.current.clientHeight * 9) / 16,
+        height: videoAreaRef.current.clientHeight,
+      });
+    }
+  }, [templateImageRef.current, selectedTemplate]);
+
+  useEffect(() => {
     if (loaded && videoAreaRef.current) {
       const videoHeight =
-        (templateImageRef.current?.clientHeight ?? 0) *
+        templateImageSize.height *
         ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0));
       const videoWidth = (videoHeight * 16) / 9;
       const initialX = (videoAreaRef.current.clientWidth - videoWidth) / 2;
-      prevVideoX.current = initialX;
+
       setVideoX(initialX);
+      prevVideoX.current = initialX;
     }
-  }, [loaded, selectedTemplate]);
+  }, [loaded]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -232,10 +245,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         videoAreaRef.current
       ) {
         const initialX = (videoAreaRef.current.clientWidth - videoRef.current.clientWidth) / 2;
-
         const newDivX = e.clientX - videoXRef.current;
-        const maxX = (videoAreaRef.current.clientWidth - templateImageRef.current.clientWidth) / 2;
-        const minX = initialX - (videoRef.current.clientWidth - templateImageRef.current.clientWidth) / 2;
+        const maxX = (videoAreaRef.current.clientWidth - templateImageSize.width) / 2;
+        const minX = initialX - (videoRef.current.clientWidth - templateImageSize.width) / 2;
 
         const newX = Math.max(minX, Math.min(newDivX, maxX));
 
@@ -330,29 +342,39 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [progressWidthPercent]);
 
-  // useEffect(() => {
-  //   function handleWindowResize(e: UIEvent) {
-  //     if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
-  //       const newVideoAreaWidth = videoAreaRef.current.clientWidth;
-  //       const newVideoWidth = videoRef.current.clientWidth;
+  useEffect(() => {
+    function handleWindowResize() {
+      if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+        const newVideoAreaWidth = videoAreaRef.current.clientWidth;
+        const newVideoAreaHeight = videoAreaRef.current.clientHeight;
 
-  //       if (prevVideoAreaWidth.current) {
-  //         const widthChangeRatio = newVideoAreaWidth / prevVideoAreaWidth.current;
-  //         const newTemplateWidth = (((templateImageRef.current.clientHeight ?? 0) * 9) / 16) * widthChangeRatio;
+        const widthChangeRatio = newVideoAreaWidth / prevVideoAreaWidth.current;
+        const heightChangeRatio = newVideoAreaHeight / prevVideoAreaHeight.current;
 
-  //         templateImageRef.current.style.width = `${newTemplateWidth}px`;
-  //       }
+        setTemplateImageSize((prev) => {
+          const newHeight = prev.height * heightChangeRatio;
+          const newWidth = (newHeight * 9) / 16;
+          return { width: newWidth, height: newHeight };
+        });
 
-  //       prevVideoAreaWidth.current = newVideoAreaWidth;
-  //     }
-  //   }
+        setVideoX((prev) => {
+          const newX = prev * widthChangeRatio;
 
-  //   window.addEventListener("resize", handleWindowResize);
+          prevVideoX.current = newX;
+          return newX;
+        });
 
-  //   return () => {
-  //     window.removeEventListener("resize", handleWindowResize);
-  //   };
-  // }, []);
+        prevVideoAreaWidth.current = newVideoAreaWidth;
+        prevVideoAreaHeight.current = newVideoAreaHeight;
+      }
+    }
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, []);
 
   useEffect(() => {
     const handlePlayerKeyDown = (e: KeyboardEvent) => {
@@ -582,7 +604,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           <div
             ref={videoAreaRef}
             style={{ minWidth: videoRef.current?.clientWidth }}
-            className={`relative aspect-auto w-full h-full flex justify-center items-center m-auto overflow-hidden`}
+            className={`relative w-full h-[calc(100vh-500px)] min-h-[100px] flex justify-center items-center m-auto overflow-hidden`}
           >
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
@@ -595,13 +617,13 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
                 handleClickPanel("template");
                 handleClickWorkMenu("template");
               }}
-              style={{ width: ((templateImageRef.current?.clientHeight ?? 0) * 9) / 16 }}
-              className={`relative h-full border border-green-500 ${loaded ? "block" : "hidden"}`}
+              style={{ width: templateImageSize.width, height: templateImageSize.height }}
+              className={`relative border border-green-500 ${loaded ? "block" : "hidden"}`}
             >
               <div
                 style={{
                   height:
-                    (templateImageRef.current?.clientHeight ?? 0) *
+                    templateImageSize.height *
                     ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0)),
                   top: (videoAreaRef.current?.clientHeight ?? 0) * (selectedTemplate?.videoPosition.y1 ?? 0),
                 }}
@@ -638,12 +660,13 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
               onMouseDown={handleMouseDownVideo}
               style={{
                 height: `${
-                  (templateImageRef.current?.clientHeight ?? 0) *
+                  templateImageSize.height *
                   ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0))
                 }px`,
                 left: `${videoX}px`,
               }}
-              className={`aspect-auto absolute min-w-fit
+              className={`aspect-auto absolute
+              /-translate-x-1/2
               ${loaded ? "block" : "hidden"}
               `}
             ></video>
