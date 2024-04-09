@@ -20,6 +20,7 @@ interface EditShortsProps {
 }
 
 export const WIDTH_PERCENT_STEP = 25;
+export const MINIMUM_UNIT_WIDTH = 60;
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
@@ -74,6 +75,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
+  const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
   // useEffect
   useEffect(() => {
@@ -83,6 +85,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   useEffect(() => {
     prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
     setEndX(prevEndX.current);
+    prevProgressWidth.current = progressRef.current?.scrollWidth ?? 0;
   }, [videoDuration]);
 
   useEffect(() => {
@@ -116,11 +119,18 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current) {
-        const progressWidth = progressRef.current.clientWidth;
-        const progressBarWidth = progressBarRef.current!.clientWidth;
-        const newDivX = e.clientX - progressBarXRef.current;
-        const maxX = progressWidth - progressBarWidth;
+      if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current && progressBarRef.current) {
+        // TODO 이부분 수정
+        const progressWidth = progressRef.current.scrollWidth;
+
+        const progressBarWidth = progressBarRef.current.clientWidth;
+
+        const scrollLeft = progressRef.current.scrollLeft;
+
+        // const newDivX = e.clientX + scrollLeft - progressBarXRef.current;
+        const newDivX = e.clientX + scrollLeft;
+        const maxX = prevProgressWidth.current - progressBarWidth;
+        console.log(newDivX, maxX);
 
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
 
@@ -272,45 +282,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [isVideoDragging]);
 
-  prevProgressWidth.current = progressRef.current?.clientWidth ?? 0;
-
-  useEffect(() => {
-    function handleWindowResize() {
-      if (progressRef.current && sectionBoxRef.current && progressBarRef.current) {
-        const progressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
-        const preogressBarWidth = progressBarRef.current.clientWidth;
-
-        const resizeRatio = progressWidth / prevProgressWidth.current;
-        const startMaxX = progressWidth - sectionBoxWidth;
-        const endMaxX = progressWidth;
-        const progressBarMaxX = progressWidth - preogressBarWidth;
-
-        const newStartX = Math.min(startMaxX, prevStartX.current * resizeRatio);
-        const newEndX = Math.min(endMaxX, prevEndX.current * resizeRatio);
-        const newProgressBarX = Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio);
-
-        setStartX(newStartX);
-        setEndX(newEndX);
-        setProgressBarX(newProgressBarX);
-
-        prevStartX.current = newStartX;
-        prevEndX.current = newEndX;
-        prevProgressBarX.current = newProgressBarX;
-      }
-    }
-
-    window.addEventListener("resize", handleWindowResize);
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, []);
-
   useEffect(() => {
     function handleChangeWitdhPercent() {
       if (progressRef.current && sectionBoxRef.current && progressBarRef.current && prevProgressWidthPercent.current) {
-        const progressWidth = progressRef.current.clientWidth;
+        const progressWidth = progressRef.current.scrollWidth;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
         const preogressBarWidth = progressBarRef.current.clientWidth;
 
@@ -436,6 +411,19 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     }
   }
 
+  function handleMouseDownProgressBar(e: React.MouseEvent<HTMLDivElement>) {
+    e.stopPropagation();
+    setIsProgressBarDragging(true);
+
+    if (progressRef.current) {
+      const rect = progressRef.current.getBoundingClientRect();
+      const scrollLeft = progressRef.current.scrollLeft;
+      const x = e.clientX - rect.left + scrollLeft;
+
+      progressBarXRef.current = x;
+    }
+  }
+
   function expandProgress() {
     setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
@@ -454,13 +442,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     setVideoDuration(e.currentTarget.duration);
     setLoaded(true);
     // setVideoProgress(0);
-  }
-
-  function handleMouseDownProgressBar(e: React.MouseEvent<HTMLDivElement>) {
-    e.stopPropagation();
-    setIsProgressBarDragging(true);
-
-    progressBarXRef.current = e.clientX - progressBarX;
   }
 
   function handleMouseDownSectionBox(e: React.MouseEvent<HTMLDivElement>) {
@@ -508,11 +489,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }
 
   function timeToPx(time: number) {
-    return Math.round((time / videoDuration) * (progressRef.current?.clientWidth ?? 0));
+    return (time * unitWidth) / 60;
   }
 
   function pxToTime(px: number) {
-    return Math.round((px * videoDuration) / (progressRef.current?.clientWidth ?? 0));
+    return (px / unitWidth) * 60;
   }
 
   function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -600,7 +581,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           onClick={() => {
             handleClickPanel("video");
           }}
-          className="grid grid-rows-[1fr,70px]"
+          className="grid grid-rows-[1fr,70px] max-w-[calc(100vw-340px)]"
         >
           <div
             ref={videoAreaRef}
@@ -691,11 +672,17 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
       <div
         ref={progressRef}
-        style={{ width: `${progressWidthPercent}%` }}
+        // style={{ width: `calc(${progressWidthPercent / 100} * 100vw)` }}
         onMouseDown={handleMouseDownProgress}
-        className="relative grid grid-rows-[32px,8px,200px] overflow-x-scroll"
+        className="relative grid grid-rows-[32px,8px,200px] max-w-[3000px] overflow-x-scroll"
       >
-        <TimeLine timeLineIntervalCount={timeLineIntervalCount} timeArray={timeArray} videoDuration={videoDuration} />
+        <TimeLine
+          timeLineIntervalCount={timeLineIntervalCount}
+          timeArray={timeArray}
+          videoDuration={videoDuration}
+          progressWidthPercent={progressWidthPercent}
+          unitWidth={unitWidth}
+        />
 
         <div className="w-full h-2 bg-slate-200"></div>
 
