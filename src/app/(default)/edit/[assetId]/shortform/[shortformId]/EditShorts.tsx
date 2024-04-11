@@ -304,8 +304,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
-        // TODO section box와 연관된 버그 해결
-
         const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
         const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
@@ -421,6 +419,16 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       handleTimeUpdate();
     };
   }, [videoProgress]);
+
+  useEffect(() => {
+    if (progressRef.current) {
+      const progressWidth = progressRef.current.clientWidth;
+      const progressBarX = timeToPx(videoProgress);
+      const left = progressBarX - progressWidth / 2;
+
+      progressRef.current?.scrollTo({ left, behavior: "smooth" });
+    }
+  }, [progressWidthPercent]);
 
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
