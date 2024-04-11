@@ -48,11 +48,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const prevVideoAreaHeight = useRef<number>(0);
 
   // useState
-  // const [videoProgress, setVideoProgress] = useState<number>(0);
   const [loaded, setLoaded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [videoProgress, setVideoProgress] = useState(0);
   const [isPlay, setIsPlay] = useState(false);
-  const [progressBarX, setProgressBarX] = useState(0);
   const [startX, setStartX] = useState(0);
   const [endX, setEndX] = useState(0);
   const [videoX, setVideoX] = useState(0);
@@ -119,22 +118,24 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isProgressBarDragging && progressBarXRef.current !== null && progressRef.current && progressBarRef.current) {
-        // TODO 이부분 수정
-        const progressWidth = progressRef.current.scrollWidth;
-
-        const progressBarWidth = progressBarRef.current.clientWidth;
-
+      if (
+        isProgressBarDragging &&
+        progressBarXRef.current !== null &&
+        progressRef.current &&
+        progressBarRef.current &&
+        videoRef.current
+      ) {
         const scrollLeft = progressRef.current.scrollLeft;
 
-        // const newDivX = e.clientX + scrollLeft - progressBarXRef.current;
         const newDivX = e.clientX + scrollLeft;
-        const maxX = prevProgressWidth.current - progressBarWidth;
-        console.log(newDivX, maxX);
+        const maxX = (videoDuration * progressWidthPercent) / 100;
 
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
+        const time = (newStartX / progressWidthPercent) * 100;
 
-        setProgressBarX(newStartX);
+        videoRef.current.currentTime = time;
+        setVideoProgress(time);
+        progressBarRef.current.style.left = `${newStartX}px`;
         prevProgressBarX.current = newStartX;
       }
     }
@@ -284,7 +285,13 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleChangeWitdhPercent() {
-      if (progressRef.current && sectionBoxRef.current && progressBarRef.current && prevProgressWidthPercent.current) {
+      if (
+        progressRef.current &&
+        sectionBoxRef.current &&
+        progressBarRef.current &&
+        prevProgressWidthPercent.current &&
+        videoRef.current
+      ) {
         const progressWidth = progressRef.current.scrollWidth;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
         const preogressBarWidth = progressBarRef.current.clientWidth;
@@ -298,14 +305,19 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
         const newStartX = Math.max(0, Math.min(startMaxX, prevStartX.current * resizeRatio));
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
-        const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, progressBarX * resizeRatio));
+        const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
+
+        const time = (newProgressBarX / progressWidthPercent) * 100;
 
         setStartX(newStartX);
         setEndX(newEndX);
-        setProgressBarX(newProgressBarX);
 
         prevStartX.current = newStartX;
         prevEndX.current = newEndX;
+
+        videoRef.current.currentTime = time;
+        setVideoProgress(time);
+        progressBarRef.current.style.left = `${newProgressBarX}px`;
         prevProgressBarX.current = newProgressBarX;
       }
     }
@@ -378,14 +390,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   }, [activePanel]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      const time = pxToTime(progressBarX);
-      videoRef.current.currentTime = time;
-      // setVideoProgress(time);
-    }
-  }, [progressBarX]);
-
-  useEffect(() => {
     const newStartTime = timeObjectToSeconds(startTimeInput);
     const newEndTime = timeObjectToSeconds(endTimeInput);
 
@@ -399,14 +403,37 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     prevEndX.current = newEndX;
   }, [startTimeInput, endTimeInput, videoDuration]);
 
+  useEffect(() => {
+    function handleTimeUpdate() {
+      const newX = (videoProgress * progressWidthPercent) / 100;
+      if (progressBarRef.current) {
+        progressBarRef.current.style.left = `${newX}px`;
+        prevProgressBarX.current = newX;
+      }
+    }
+
+    handleTimeUpdate();
+
+    return () => {
+      handleTimeUpdate();
+    };
+  }, [videoProgress]);
+
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (progressRef.current) {
+    if (progressRef.current && progressBarRef.current && videoRef.current) {
+      const maxX = (videoDuration * progressWidthPercent) / 100;
+
       const rect = progressRef.current.getBoundingClientRect();
       const scrollLeft = progressRef.current.scrollLeft;
       const x = e.clientX - rect.left + scrollLeft;
+      const time = (x / progressWidthPercent) * 100;
 
-      setProgressBarX(x);
+      if (x > maxX) return;
+
+      videoRef.current.currentTime = time;
+      setVideoProgress(time);
+      progressBarRef.current.style.left = `${x}px`;
       prevProgressBarX.current = x;
     }
   }
@@ -441,7 +468,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
     setVideoDuration(e.currentTarget.duration);
     setLoaded(true);
-    // setVideoProgress(0);
   }
 
   function handleMouseDownSectionBox(e: React.MouseEvent<HTMLDivElement>) {
@@ -630,9 +656,12 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
             <video
               controls
+              playsInline
               ref={videoRef}
               src={videoSrc}
-              // onTimeUpdate={(e) => setVideoProgress((e.currentTarget.currentTime / videoDuration) * 100)}
+              onTimeUpdate={(e) => {
+                setVideoProgress(e.currentTarget.currentTime);
+              }}
               onLoadedMetadataCapture={handleLoadedMetadata}
               onPause={() => setIsPlay(false)}
               onPlay={() => setIsPlay(true)}
@@ -715,9 +744,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
         <div
           ref={progressBarRef}
-          style={{
-            left: `${progressBarX}px`,
-          }}
           onMouseDown={handleMouseDownProgressBar}
           className={`
 					w-1 absolute top-0 bottom-0
