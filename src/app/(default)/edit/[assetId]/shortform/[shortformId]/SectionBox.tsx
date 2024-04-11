@@ -39,22 +39,22 @@ export default function SectionBox({
     >
       <div
         onMouseDown={handleMouseDownStartExpand}
-        // style={{ width: `${(progressRef.current?.clientWidth ?? 0) / 50}px` }}
         className={`
           cursor-w-resize
           rounded-l-lg w-[24px] min-w-[24px]
-          ${activePanel !== "video" && "group-hover:opacity-50"}
-          ${activePanel === "video" ? " opacity-100" : "opacity-0"}
-          bg-slate-600
+          border-t-4 border-b-4 border-l-4
+          ${activePanel !== "video" && "group-hover:border-opacity-60"}
+          ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
+          border-slate-700
                 `}
       ></div>
       <div
         className={`
             w-full
-            inset-0 border-t-4 border-b-4 box-content border-opacity-0
-            ${activePanel !== "video" && "group-hover:border-opacity-50"}
-            ${activePanel === "video" ? " border-opacity-100" : "border-opacity-0"}
-          border-slate-600
+            inset-0 border-t-4 border-b-4 box-content
+            ${activePanel !== "video" && "group-hover:border-opacity-60"}
+            ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
+          border-slate-700
                 `}
       ></div>
       <div
@@ -62,9 +62,10 @@ export default function SectionBox({
         className={`
                 cursor-e-resize
                 rounded-r-lg w-[24px] min-w-[24px]
-                ${activePanel !== "video" && "group-hover:opacity-50"}
-                ${activePanel === "video" ? " opacity-100" : "opacity-0"}
-                bg-slate-600
+                border-t-4 border-b-4 border-r-4
+                ${activePanel !== "video" && "group-hover:border-opacity-60"}
+                ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
+                border-slate-700
                 `}
       ></div>
     </div>

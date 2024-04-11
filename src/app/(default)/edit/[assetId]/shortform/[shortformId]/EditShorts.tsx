@@ -713,7 +713,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
       <div
         ref={progressRef}
-        // style={{ width: `calc(${progressWidthPercent / 100} * 100vw)` }}
         onMouseDown={handleMouseDownProgress}
         className="relative grid grid-rows-[32px,8px,200px] max-w-[3000px] overflow-x-scroll"
       >
