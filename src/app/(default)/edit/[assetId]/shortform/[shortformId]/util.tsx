@@ -60,3 +60,11 @@ export function hexToRgba(hex: string, alpha?: number) {
     return "rgb(" + r + ", " + g + ", " + b + ")";
   }
 }
+
+export function generateTimeArray(startSeconds: number, endSeconds: number, stepSeconds: number) {
+  const timeArray = [];
+  for (let i = startSeconds; i <= endSeconds; i += stepSeconds) {
+    timeArray.push(secondsToHhmmss(i));
+  }
+  return timeArray;
+}

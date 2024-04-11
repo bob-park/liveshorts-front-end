@@ -74,7 +74,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
-  const timeArray = fillRangeWithInterval(timeLineIntervalCount, videoDuration);
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
@@ -724,13 +723,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         onMouseDown={handleMouseDownProgress}
         className="relative grid grid-rows-[32px,8px,200px] max-w-[3000px] overflow-x-scroll"
       >
-        <TimeLine
-          timeLineIntervalCount={timeLineIntervalCount}
-          timeArray={timeArray}
-          videoDuration={videoDuration}
-          progressWidthPercent={progressWidthPercent}
-          unitWidth={unitWidth}
-        />
+        <TimeLine unitWidth={unitWidth} />
 
         <div className="w-full h-2 bg-slate-200"></div>
 
