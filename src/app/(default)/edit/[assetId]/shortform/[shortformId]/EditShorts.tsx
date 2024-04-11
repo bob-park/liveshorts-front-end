@@ -201,33 +201,34 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isExpandDragging.startTime && startXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-        const newDivX = e.clientX - startXRef.current;
-        const maxX = ProgressWidth - sectionBoxWidth;
+      if (progressRef.current && sectionBoxRef.current) {
+        const scrollLeft = progressRef.current.scrollLeft;
+        const progressWidth = progressRef.current.scrollWidth;
+        if (isExpandDragging.startTime && startXRef.current !== null) {
+          const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+          const newDivX = e.clientX + scrollLeft - startXRef.current;
+          const maxX = progressWidth - sectionBoxWidth;
 
-        const newX = Math.max(0, Math.min(maxX, newDivX));
-        const newTime = pxToTime(newX);
-        const newTimeObject = secondsToTimeObject(newTime);
+          const newX = Math.max(0, Math.min(maxX, newDivX));
+          const newTime = pxToTime(newX);
+          const newTimeObject = secondsToTimeObject(newTime);
 
-        setStartTimeInput(newTimeObject);
-        setStartX(newX);
-        prevStartX.current = newX;
-      }
-      if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const newDivX = e.clientX - endXRef.current;
-        const maxX = ProgressWidth;
+          setStartTimeInput(newTimeObject);
+          setStartX(newX);
+          prevStartX.current = newX;
+        }
+        if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
+          const newDivX = e.clientX + scrollLeft - endXRef.current;
+          const maxX = progressWidth;
 
-        const newX = Math.max(0, Math.min(maxX, newDivX));
-        const newTime = pxToTime(newX);
-        const newTimeObject = secondsToTimeObject(newTime);
+          const newX = Math.max(0, Math.min(maxX, newDivX));
+          const newTime = pxToTime(newX);
+          const newTimeObject = secondsToTimeObject(newTime);
 
-        setEndTimeInput(newTimeObject);
-
-        setEndX(newX);
-        prevEndX.current = newX;
+          setEndTimeInput(newTimeObject);
+          setEndX(newX);
+          prevEndX.current = newX;
+        }
       }
     }
 
@@ -484,14 +485,22 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     e.stopPropagation();
     setIsExpandDragging({ ...isExpandDragging, startTime: true });
 
-    startXRef.current = e.clientX - startX;
+    if (progressRef.current) {
+      const scrollLeft = progressRef.current.scrollLeft;
+
+      startXRef.current = e.clientX - startX + scrollLeft;
+    }
   }
 
   function handleMouseDownEndExpand(e: React.MouseEvent<HTMLDivElement>) {
     e.stopPropagation();
     setIsExpandDragging({ ...isExpandDragging, endTime: true });
 
-    endXRef.current = e.clientX - endX;
+    if (progressRef.current) {
+      const scrollLeft = progressRef.current.scrollLeft;
+
+      endXRef.current = e.clientX - endX + scrollLeft;
+    }
   }
 
   function handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>) {
