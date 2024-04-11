@@ -158,7 +158,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [isProgressBarDragging]);
 
-  // 여기 수정 중
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
       if (isSectionBoxDragging && startXRef.current !== null && progressRef.current && sectionBoxRef.current) {
@@ -166,7 +165,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
 
         const newDivX = e.clientX + scrollLeft - startXRef.current;
-        const maxX = (videoDuration * progressWidthPercent) / 100;
+        const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
         const newEndX = newStartX + sectionBoxWidth;
 
