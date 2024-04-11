@@ -25,6 +25,8 @@ const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const DEFAULT_INTERVAL_COUNT = 6;
+const SIXTY_SECONDS = 60;
+const FORWARD_BACKWARD_STEP_SECONDS = 10;
 
 export default function EditShorts({ videoSrc, templateList }: EditShortsProps) {
   // useRef
@@ -127,11 +129,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       ) {
         const scrollLeft = progressRef.current.scrollLeft;
 
-        const newDivX = e.clientX + scrollLeft;
+        const newDivX = e.clientX + scrollLeft - progressBarXRef.current;
         const maxX = (videoDuration * progressWidthPercent) / 100;
 
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
-        const time = (newStartX / progressWidthPercent) * 100;
+        const time = pxToTime(newStartX);
 
         videoRef.current.currentTime = time;
         setVideoProgress(time);
@@ -156,14 +158,15 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     };
   }, [isProgressBarDragging]);
 
+  // 여기 수정 중
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isSectionBoxDragging && startXRef.current !== null && progressRef.current) {
-        const ProgressWidth = progressRef.current.clientWidth;
-        const sectionBoxWidth = sectionBoxRef.current!.clientWidth;
-        const newDivX = e.clientX - startXRef.current;
-        const maxX = ProgressWidth - sectionBoxWidth;
+      if (isSectionBoxDragging && startXRef.current !== null && progressRef.current && sectionBoxRef.current) {
+        const scrollLeft = progressRef.current.scrollLeft;
+        const sectionBoxWidth = sectionBoxRef.current.clientWidth;
 
+        const newDivX = e.clientX + scrollLeft - startXRef.current;
+        const maxX = (videoDuration * progressWidthPercent) / 100;
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
         const newEndX = newStartX + sectionBoxWidth;
 
@@ -307,7 +310,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
         const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
 
-        const time = (newProgressBarX / progressWidthPercent) * 100;
+        const time = pxToTime(newProgressBarX);
 
         setStartX(newStartX);
         setEndX(newEndX);
@@ -369,10 +372,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       if (videoRef.current && activePanel === "video") {
         if (e.key === "ArrowRight") {
           e.preventDefault();
-          videoRef.current.currentTime += 10;
+          videoRef.current.currentTime += FORWARD_BACKWARD_STEP_SECONDS;
         } else if (e.key === "ArrowLeft") {
           e.preventDefault();
-          videoRef.current.currentTime -= 10;
+          videoRef.current.currentTime -= FORWARD_BACKWARD_STEP_SECONDS;
         } else if (e.key === " ") {
           e.preventDefault();
           const paused = videoRef.current.paused;
@@ -427,7 +430,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
       const rect = progressRef.current.getBoundingClientRect();
       const scrollLeft = progressRef.current.scrollLeft;
       const x = e.clientX - rect.left + scrollLeft;
-      const time = (x / progressWidthPercent) * 100;
+      const time = pxToTime(x);
 
       if (x > maxX) return;
 
@@ -443,11 +446,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     setIsProgressBarDragging(true);
 
     if (progressRef.current) {
-      const rect = progressRef.current.getBoundingClientRect();
       const scrollLeft = progressRef.current.scrollLeft;
-      const x = e.clientX - rect.left + scrollLeft;
 
-      progressBarXRef.current = x;
+      progressBarXRef.current = e.clientX - timeToPx(videoProgress) + scrollLeft;
     }
   }
 
@@ -473,8 +474,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   function handleMouseDownSectionBox(e: React.MouseEvent<HTMLDivElement>) {
     e.stopPropagation();
     setIsSectionBoxDragging(true);
+    if (progressRef.current) {
+      const scrollLeft = progressRef.current.scrollLeft;
 
-    startXRef.current = e.clientX - startX;
+      startXRef.current = e.clientX - startX + scrollLeft;
+    }
   }
 
   function handleMouseDownStartExpand(e: React.MouseEvent<HTMLDivElement>) {
@@ -504,22 +508,22 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
 
   function handleBack() {
     if (videoRef.current) {
-      videoRef.current.currentTime -= 10;
+      videoRef.current.currentTime -= FORWARD_BACKWARD_STEP_SECONDS;
     }
   }
 
   function handleFoward() {
     if (videoRef.current) {
-      videoRef.current.currentTime += 10;
+      videoRef.current.currentTime += FORWARD_BACKWARD_STEP_SECONDS;
     }
   }
 
   function timeToPx(time: number) {
-    return (time * unitWidth) / 60;
+    return (time * unitWidth) / SIXTY_SECONDS;
   }
 
   function pxToTime(px: number) {
-    return (px / unitWidth) * 60;
+    return (px / unitWidth) * SIXTY_SECONDS;
   }
 
   function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
