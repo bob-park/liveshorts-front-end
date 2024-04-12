@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { TimeObject } from "@/components/edit/TimeInput";
 import VideoControlBar from "./VideoControlBar";
 import SectionBox from "./SectionBox";
-import { secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval, secondsToHhmmss } from "./util";
+import { secondsToTimeObject, timeObjectToSeconds } from "./util";
 import TimeLine from "./TimeLine";
 import TabMenu from "./TabMenu";
 import TitleMenu from "./menu/TitleMenu";
@@ -12,24 +12,24 @@ import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
 import TitleInput from "./menu/TitleInput";
 import TemplateMenu from "./menu/TemplateMenu";
-import { TitleContent, ActivePanel, WorkMenu, Template } from "./type";
+import { TitleContent, ActivePanel, WorkMenu, Template, Bgm } from "./type";
 import SectionControlBar from "./SectionControlBar";
 
 interface EditShortsProps {
   videoSrc: string;
   templateList: Template[];
+  bgmList: Bgm[];
 }
 
 export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
+export const FORWARD_BACKWARD_STEP_SECONDS = 10;
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
-const DEFAULT_INTERVAL_COUNT = 6;
 const SIXTY_SECONDS = 60;
-const FORWARD_BACKWARD_STEP_SECONDS = 10;
 
-export default function EditShorts({ videoSrc, templateList }: EditShortsProps) {
+export default function EditShorts({ videoSrc, templateList, bgmList }: EditShortsProps) {
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -69,10 +69,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   const [activePanel, setActivePanel] = useState<ActivePanel>("video");
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
-  const [timeLineIntervalCount, setTimeLineIntervalCount] = useState(DEFAULT_INTERVAL_COUNT);
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [selectedBgm, setSelectedBgm] = useState<Bgm | null>(null);
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
   const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
@@ -463,15 +463,11 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
   function expandProgress() {
     setProgressWidthPercent((prev) => (prev === MAX_PERCENT ? prev : prev + WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
-
-    setTimeLineIntervalCount((prev) => (progressWidthPercent === MAX_PERCENT ? prev : prev + 1));
   }
 
   function shrinkProgress() {
     setProgressWidthPercent((prev) => (prev === MIN_PERCENT ? prev : prev - WIDTH_PERCENT_STEP));
     prevProgressWidthPercent.current = progressWidthPercent;
-
-    setTimeLineIntervalCount((prev) => (progressWidthPercent === MIN_PERCENT ? prev : prev - 1));
   }
 
   function handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>) {
@@ -592,6 +588,10 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     setSelectedTemplate(template ?? null);
   }
 
+  function handleClickBgm(bgm?: Bgm) {
+    setSelectedBgm(bgm ?? null);
+  }
+
   function scrollToProgressBar() {
     if (progressRef.current) {
       const progressWidth = progressRef.current.clientWidth;
@@ -652,7 +652,9 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
             />
           )}
           {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
-          {selectedWorkMenu === "bgm" && <BgmMenu />}
+          {selectedWorkMenu === "bgm" && (
+            <BgmMenu bgmList={bgmList} selectedBgmId={selectedBgm?.bgmId ?? ""} handleClickBgm={handleClickBgm} />
+          )}
         </div>
 
         <div

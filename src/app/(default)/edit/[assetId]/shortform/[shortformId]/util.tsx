@@ -12,6 +12,16 @@ export function secondsToHhmmss(seconds: number) {
   return `${HH}:${MM}:${SS}`;
 }
 
+export function secondsToMmss(seconds: number) {
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+
+  const MM = String(min).padStart(2, "0");
+  const SS = String(sec).padStart(2, "0");
+
+  return `${MM}:${SS}`;
+}
+
 export function secondsToTimeObject(seconds: number) {
   const hour = Math.floor(seconds / 3600);
   const min = Math.floor((seconds % 3600) / 60);

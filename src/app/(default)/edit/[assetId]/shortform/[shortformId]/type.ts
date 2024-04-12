@@ -32,6 +32,16 @@ export interface Template {
   lastModifiedBy: string;
 }
 
+export interface Bgm {
+  bgmId: string;
+  audio: Audio;
+  title: string;
+  createdDate: string;
+  createdBy: string;
+  lastModifiedDate: string;
+  lastModifiedBy: string;
+}
+
 export type ActivePanel = "video" | "template" | "title" | "subtitle" | "bgm";
 export type WorkMenu = "template" | "title" | "subtitle" | "bgm";
 
@@ -87,4 +97,31 @@ interface VideoPosition {
 interface TemplateCategory {
   id: number;
   categoryId: number;
+}
+
+interface Audio {
+  assetId: number;
+  assetType: string;
+  title: string;
+  originalFileName: string;
+  fileExtension: string;
+  fileSize: number;
+  isDeleted: boolean;
+  isLock: boolean;
+  assetStatus: string;
+  category: {
+    categoryId: number;
+    name: string;
+    description: string;
+    isDeleted: boolean;
+    orderSeq: number;
+  };
+  storage: Storage;
+  assetFiles: BgmAssetFile[];
+}
+
+interface BgmAssetFile {
+  id: number;
+  fileType: string;
+  filePath: string;
 }

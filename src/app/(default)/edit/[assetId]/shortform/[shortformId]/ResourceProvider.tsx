@@ -12,8 +12,11 @@ export default async function ResourceProvider({ assetId }: { assetId: number })
 
   const videoSrc = `/api/v1/asset/${assetId}/resource?fileType=HI_RES&t=${new Date().getTime()}`;
 
-  const result = await fetch(`${MAM_API_HOST}${API_PREFIX}/v1/shorts/template/list`, { headers });
-  const templateList = await result.json();
+  const templateResult = await fetch(`${MAM_API_HOST}${API_PREFIX}/v1/shorts/template/list`, { headers });
+  const templateList = await templateResult.json();
 
-  return <EditShorts videoSrc={videoSrc} templateList={templateList.result} />;
+  const bgmResult = await fetch(`${MAM_API_HOST}${API_PREFIX}/v1/shorts/bgm/list`, { headers });
+  const bgmList = await bgmResult.json();
+
+  return <EditShorts videoSrc={videoSrc} templateList={templateList.result} bgmList={bgmList} />;
 }
