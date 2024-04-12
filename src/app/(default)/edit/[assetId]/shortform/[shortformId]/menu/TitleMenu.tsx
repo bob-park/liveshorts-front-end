@@ -20,6 +20,7 @@ export default function TitleMenu({
   handleChangeTitle,
   handleClickWorkMenu,
 }: TitleMenuProps) {
+  // TODO - titleContent가 null이 아니어도 제목 추가 버튼으로만 생성될 수 있게 보완 필요
   return (
     <div
       onClick={() => {
@@ -30,7 +31,6 @@ export default function TitleMenu({
       <button disabled={!!titleContent} onClick={handleClickAddTitle} className="btn w-full">
         + 제목 추가
       </button>
-
       <div className="h-[calc(100vh-500px)] overflow-y-scroll">
         {titleContent && (
           <TitleItem

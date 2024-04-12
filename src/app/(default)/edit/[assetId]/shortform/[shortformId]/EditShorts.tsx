@@ -433,22 +433,33 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   useEffect(() => {
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
-
       setTitleContent({
         text: "제목을 입력하세요.",
-        x1: selectedTemplate ? x1 : 0,
-        y1: selectedTemplate ? y1 : 0,
-        x2: selectedTemplate ? x2 : 1,
-        y2: selectedTemplate ? y2 : 0.2,
-        font: selectedTemplate ? font : fontArray[1],
-        size: selectedTemplate ? size : 60,
-        color: selectedTemplate ? color : "#ffffff",
-        background: selectedTemplate ? background : "#000000",
-        textOpacity: selectedTemplate ? textOpacity : 1,
-        bgOpacity: selectedTemplate ? bgOpacity : 0,
+        x1,
+        y1,
+        x2,
+        y2,
+        font,
+        size,
+        color,
+        background,
+        textOpacity,
+        bgOpacity,
       });
     } else {
-      setTitleContent(null);
+      setTitleContent({
+        text: "제목을 입력하세요.",
+        x1: 0,
+        y1: 0,
+        x2: 1,
+        y2: 0.2,
+        font: fontArray[1],
+        size: 60,
+        color: "#ffffff",
+        background: "#000000",
+        textOpacity: 1,
+        bgOpacity: 0,
+      });
     }
   }, [selectedTemplate]);
 
@@ -579,20 +590,36 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function handleClickAddTitle() {
-    const newTitle = {
-      text: "제목을 입력하세요.",
-      x1: 0,
-      y1: 0,
-      x2: 1,
-      y2: 0.2,
-      font: fontArray[1],
-      size: 60,
-      color: "#ffffff",
-      background: "#000000",
-      textOpacity: 1,
-      bgOpacity: 0,
-    };
-    setTitleContent(newTitle);
+    if (selectedTemplate) {
+      const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
+      setTitleContent({
+        text: "제목을 입력하세요.",
+        x1,
+        y1,
+        x2,
+        y2,
+        font,
+        size,
+        color,
+        background,
+        textOpacity,
+        bgOpacity,
+      });
+    } else {
+      setTitleContent({
+        text: "제목을 입력하세요.",
+        x1: 0,
+        y1: 0,
+        x2: 1,
+        y2: 0.2,
+        font: fontArray[1],
+        size: 60,
+        color: "#ffffff",
+        background: "#000000",
+        textOpacity: 1,
+        bgOpacity: 0,
+      });
+    }
   }
 
   function handleClickDeleteTitle() {
