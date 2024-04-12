@@ -25,7 +25,7 @@ export default function TitleItem({ title, optionArray, handleClickDeleteTitle, 
   const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 p-1">
       <LabelInput name="text" value={text} handleChangeTitle={handleChangeTitle} />
 
       <div className="flex gap-2">

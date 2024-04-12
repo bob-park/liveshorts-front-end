@@ -30,7 +30,7 @@ export default function SectionControlBar({
 }: SectionControlBarProps) {
   return (
     <div className="py-2 px-5 flex items-center justify-between">
-      <div className="flex">
+      <div className="flex gap-2">
         <IconButton toolTip="재생 위치로 이동" onClick={scrollToProgressBar} Icon={<RxAlignCenterVertically />} />
         <IconButton
           toolTip="재생 위치로 구간 설정"
@@ -39,13 +39,13 @@ export default function SectionControlBar({
         />
       </div>
 
-      <div className="flex gap-3">
-        <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} />
+      <div className="flex gap-3 items-center">
+        <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} /> /
         <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} />
       </div>
 
-      <div className="flex items-center select-none">
-        <span className="mr-2 border rounded-md px-2 py-1 border-slate-600 text-slate-600">
+      <div className="flex items-center select-none gap-2">
+        <span className="mr-2 border rounded-md px-2 py-1 border-slate-400 text-slate-400">
           {progressWidthPercent}%
         </span>
         <IconButton

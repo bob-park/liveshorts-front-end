@@ -22,12 +22,12 @@ export default function VideoControlBar({
 }: VideoControlBarProps) {
   return (
     <div className="flex items-center justify-between w-full py-2 px-5 border-t">
-      <div className="flex items-center gap-3">
-        <span>{secondsToHhmmss(videoProgress)}</span>
-        <span>{secondsToHhmmss(videoDuration)}</span>
+      <div className="flex items-center gap-3 font-semibold text-lg">
+        <span className={`text-slate-800`}>{secondsToHhmmss(videoProgress)}</span> /
+        <span className={`text-slate-500`}>{secondsToHhmmss(videoDuration)}</span>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <IconButton toolTip="10초 뒤로" onClick={handleBack} Icon={<IoPlayBack />}></IconButton>
         <IconButton
           toolTip={isPlay ? "정지" : "재생"}
@@ -36,6 +36,8 @@ export default function VideoControlBar({
         ></IconButton>
         <IconButton toolTip="10초 앞으로" onClick={handleFoward} Icon={<IoPlayForward />}></IconButton>
       </div>
+
+      <div>기타 비디오 제어 버튼들</div>
     </div>
   );
 }
