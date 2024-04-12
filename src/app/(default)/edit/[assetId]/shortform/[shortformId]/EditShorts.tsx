@@ -564,7 +564,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       x2: 1,
       y2: 0.2,
       font: fontArray[1],
-      size: 30,
+      size: 60,
       color: "#ffffff",
       background: "#000000",
       textOpacity: 1,
@@ -704,6 +704,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               {titleContent && (
                 <TitleInput
                   title={titleContent}
+                  templateWidth={templateImageSize.width}
                   handleChangeTitle={handleChangeTitle}
                   handleClickPanel={() => {
                     handleClickPanel("title");
