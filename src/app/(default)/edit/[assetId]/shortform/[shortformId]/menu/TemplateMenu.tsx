@@ -18,7 +18,7 @@ export default function TemplateMenu({ templateList, selectedTemplateId, handleC
         템플릿 사용 안함
       </button>
 
-      <div className="p-2 flex flex-col gap-4 h-[calc(100vh-440px)] overflow-y-scroll">
+      <div className="p-2 flex flex-col gap-4 h-[calc(100vh-500px)] overflow-y-scroll">
         {templateList.map((v, i) => (
           <div
             key={i}

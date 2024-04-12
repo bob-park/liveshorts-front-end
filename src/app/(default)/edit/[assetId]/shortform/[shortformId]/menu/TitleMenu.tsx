@@ -29,7 +29,7 @@ export default function TitleMenu({
         + 제목 추가
       </button>
 
-      <div className="h-[calc(100vh-440px)] overflow-y-scroll">
+      <div className="h-[calc(100vh-500px)] overflow-y-scroll">
         {titleContent && (
           <TitleItem
             title={titleContent}

@@ -41,11 +41,11 @@ export default function SectionBox({
         onMouseDown={handleMouseDownStartExpand}
         className={`
           cursor-w-resize
-          rounded-l-lg w-[24px] min-w-[24px]
+          rounded-l-lg w-[12px] min-w-[12px]
           border-t-4 border-b-4 border-l-4
           ${activePanel !== "video" && "group-hover:border-opacity-60"}
           ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-          border-slate-700
+          border-slate-700 bg-slate-200
                 `}
       ></div>
       <div
@@ -54,18 +54,18 @@ export default function SectionBox({
             inset-0 border-t-4 border-b-4 box-content
             ${activePanel !== "video" && "group-hover:border-opacity-60"}
             ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-          border-slate-700
+          border-slate-700 bg-slate-200
                 `}
       ></div>
       <div
         onMouseDown={handleMouseDownEndExpand}
         className={`
                 cursor-e-resize
-                rounded-r-lg w-[24px] min-w-[24px]
+                rounded-r-lg w-[12px] min-w-[12px]
                 border-t-4 border-b-4 border-r-4
                 ${activePanel !== "video" && "group-hover:border-opacity-60"}
                 ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-                border-slate-700
+                border-slate-700 bg-slate-200
                 `}
       ></div>
     </div>

@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TimeObject } from "@/components/edit/TimeInput";
-import ControlBar from "./ControlBar";
+import VideoControlBar from "./VideoControlBar";
 import SectionBox from "./SectionBox";
-import { secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval } from "./util";
+import { secondsToTimeObject, timeObjectToSeconds, fillRangeWithInterval, secondsToHhmmss } from "./util";
 import TimeLine from "./TimeLine";
 import TabMenu from "./TabMenu";
 import TitleMenu from "./menu/TitleMenu";
@@ -13,6 +13,7 @@ import BgmMenu from "./menu/BgmMenu";
 import TitleInput from "./menu/TitleInput";
 import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template } from "./type";
+import SectionControlBar from "./SectionControlBar";
 
 interface EditShortsProps {
   videoSrc: string;
@@ -591,8 +592,40 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
     setSelectedTemplate(template ?? null);
   }
 
+  function scrollToProgressBar() {
+    if (progressRef.current) {
+      const progressWidth = progressRef.current.clientWidth;
+      const progressBarX = timeToPx(videoProgress);
+      const left = progressBarX - progressWidth / 2;
+
+      progressRef.current?.scrollTo({ left, behavior: "smooth" });
+    }
+  }
+
+  function moveSectionBoxToProgressBar() {
+    if (sectionBoxRef.current) {
+      const sectionBoxWidth = sectionBoxRef.current.clientWidth;
+      const maxEndX = timeToPx(videoDuration);
+      const newStartX = timeToPx(videoProgress);
+      const newEndX = Math.min(newStartX + sectionBoxWidth, maxEndX);
+
+      const newEndTime = pxToTime(newEndX);
+
+      const newStartTimeObject = secondsToTimeObject(videoProgress);
+      const newEndTimeObject = secondsToTimeObject(newEndTime);
+
+      setStartTimeInput(newStartTimeObject);
+      setStartX(newStartX);
+      prevStartX.current = newStartX;
+
+      setEndTimeInput(newEndTimeObject);
+      setEndX(newEndX);
+      prevEndX.current = newEndX;
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[1fr,240px] h-full">
+    <div className="grid grid-rows-[1fr,60px,240px] h-full">
       <div className="grid grid-cols-[340px,1fr] border-b">
         <div
           onClick={() => {
@@ -626,7 +659,7 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
           onClick={() => {
             handleClickPanel("video");
           }}
-          className="grid grid-rows-[1fr,70px] max-w-[calc(100vw-340px)]"
+          className="grid grid-rows-[1fr,60px] max-w-[calc(100vw-340px)]"
         >
           <div
             ref={videoAreaRef}
@@ -674,7 +707,6 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
             </div>
 
             <video
-              controls
               playsInline
               ref={videoRef}
               src={videoSrc}
@@ -702,21 +734,28 @@ export default function EditShorts({ videoSrc, templateList }: EditShortsProps) 
             ></video>
           </div>
 
-          <ControlBar
-            startTimeInput={startTimeInput}
-            endTimeInput={endTimeInput}
+          <VideoControlBar
+            videoProgress={videoProgress}
+            videoDuration={videoDuration}
             isPlay={isPlay}
-            progressWidthPercent={progressWidthPercent}
-            handleChangeStartTimeInput={handleChangeStartTimeInput}
-            handleChangeEndTimeInput={handleChangeEndTimeInput}
             handleBack={handleBack}
             handleFoward={handleFoward}
             handlePlay={handlePlay}
-            expandProgress={expandProgress}
-            shrinkProgress={shrinkProgress}
           />
         </div>
       </div>
+
+      <SectionControlBar
+        startTimeInput={startTimeInput}
+        endTimeInput={endTimeInput}
+        progressWidthPercent={progressWidthPercent}
+        handleChangeStartTimeInput={handleChangeStartTimeInput}
+        handleChangeEndTimeInput={handleChangeEndTimeInput}
+        expandProgress={expandProgress}
+        shrinkProgress={shrinkProgress}
+        scrollToProgressBar={scrollToProgressBar}
+        moveSectionBoxToProgressBar={moveSectionBoxToProgressBar}
+      />
 
       <div
         ref={progressRef}

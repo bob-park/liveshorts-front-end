@@ -15,7 +15,7 @@ export function secondsToHhmmss(seconds: number) {
 export function secondsToTimeObject(seconds: number) {
   const hour = Math.floor(seconds / 3600);
   const min = Math.floor((seconds % 3600) / 60);
-  const sec = seconds % 60;
+  const sec = Math.round(seconds % 60);
 
   const formattedHour = String(hour).padStart(2, "0");
   const formattedMin = String(min).padStart(2, "0");

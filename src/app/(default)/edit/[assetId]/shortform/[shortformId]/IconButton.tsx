@@ -20,7 +20,7 @@ export default function IconButton({ toolTip, Icon, onClick }: IconButtonProps) 
        bg-opacity-0 hover:bg-opacity-100
       `}
       >
-        <div className="w-5 h-5 flex justify-center items-center">{Icon}</div>
+        <div className="w-5 h-5 flex justify-center items-center text-slate-700">{Icon}</div>
       </button>
     </div>
   );
