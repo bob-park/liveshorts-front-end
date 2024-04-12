@@ -4,6 +4,7 @@ import TitleItem from "./TitleItem";
 interface TitleMenuProps {
   titleContent: TitleContent | null;
   optionArray: string[];
+  disabled: boolean;
   handleClickAddTitle: () => void;
   handleClickDeleteTitle: () => void;
   handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
@@ -13,6 +14,7 @@ interface TitleMenuProps {
 export default function TitleMenu({
   titleContent,
   optionArray,
+  disabled,
   handleClickAddTitle,
   handleClickDeleteTitle,
   handleChangeTitle,
@@ -34,6 +36,7 @@ export default function TitleMenu({
           <TitleItem
             title={titleContent}
             optionArray={optionArray}
+            disabled={disabled}
             handleClickDeleteTitle={handleClickDeleteTitle}
             handleChangeTitle={handleChangeTitle}
           />

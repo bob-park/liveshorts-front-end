@@ -430,6 +430,28 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }, [progressWidthPercent]);
 
+  useEffect(() => {
+    if (selectedTemplate) {
+      const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
+
+      setTitleContent({
+        text: "제목을 입력하세요.",
+        x1: selectedTemplate ? x1 : 0,
+        y1: selectedTemplate ? y1 : 0,
+        x2: selectedTemplate ? x2 : 1,
+        y2: selectedTemplate ? y2 : 0.2,
+        font: selectedTemplate ? font : fontArray[1],
+        size: selectedTemplate ? size : 60,
+        color: selectedTemplate ? color : "#ffffff",
+        background: selectedTemplate ? background : "#000000",
+        textOpacity: selectedTemplate ? textOpacity : 1,
+        bgOpacity: selectedTemplate ? bgOpacity : 0,
+      });
+    } else {
+      setTitleContent(null);
+    }
+  }, [selectedTemplate]);
+
   // functions
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (progressRef.current && progressBarRef.current && videoRef.current) {
@@ -568,7 +590,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       color: "#ffffff",
       background: "#000000",
       textOpacity: 1,
-      bgOpacity: 1,
+      bgOpacity: 0,
     };
     setTitleContent(newTitle);
   }
@@ -645,6 +667,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             <TitleMenu
               titleContent={titleContent}
               optionArray={fontArray}
+              disabled={!!selectedTemplate}
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
