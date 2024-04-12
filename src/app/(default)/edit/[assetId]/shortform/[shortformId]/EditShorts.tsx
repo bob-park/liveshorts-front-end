@@ -653,7 +653,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           )}
           {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
           {selectedWorkMenu === "bgm" && (
-            <BgmMenu bgmList={bgmList} selectedBgmId={selectedBgm?.bgmId ?? ""} handleClickBgm={handleClickBgm} />
+            <BgmMenu
+              bgmList={bgmList}
+              selectedBgmId={selectedBgm?.bgmId ?? ""}
+              handleClickBgm={handleClickBgm}
+              handleClickWorkMenu={handleClickWorkMenu}
+            />
           )}
         </div>
 
