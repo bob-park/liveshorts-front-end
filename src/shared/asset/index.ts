@@ -14,7 +14,15 @@ export const createAssetSlice: SlicePattern<AssetState> = (set) => ({
       { type: 'asset/searchAfter' },
     ),
   initAssetPage: () =>
-    set((state) => ({ ...state, assetsPage: undefined }), false, {
-      type: 'asset/initPage',
-    }),
+    set(
+      (state) => {
+        console.log('init asset page...');
+
+        return { ...state, assetsPage: undefined };
+      },
+      false,
+      {
+        type: 'asset/initPage',
+      },
+    ),
 });
