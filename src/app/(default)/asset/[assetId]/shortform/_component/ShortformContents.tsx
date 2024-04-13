@@ -13,17 +13,14 @@ import { TbDownloadOff, TbDownload, TbUpload } from 'react-icons/tb';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { SiYoutubeshorts } from 'react-icons/si';
 
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
-
 import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
 import { shortFormActions } from '@/store/shortform';
 import CreateShortformExtraModal from './CreateShortformExtraModal';
 import { parseStatus } from '@/utils/common';
-
-// action
-const { requestGetShortForm, requestCreateExtra } = shortFormActions;
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getTask } from '@/entries/shortform/api/requestShortformTask';
+import { requestExtra } from '@/entries/shortform/api/requestShortformExtra';
 
 type ShortformContentsProps = {
   assetId: number;
@@ -47,13 +44,23 @@ export default function ShortformContents(props: ShortformContentsProps) {
   // router
   const router = useRouter();
 
-  // dispatch
-  const dispatch = useAppDispatch();
+  // react query
+  const {
+    data: storeShortForm,
+    isPending: isLoading,
+    refetch: onGetShortform,
+  } = useQuery<ShortFormTask>({
+    queryKey: ['shortforms', 'detail', shortform.id],
+    queryFn: () => getTask(shortform.id),
+    staleTime: 60 * 1_000,
+    gcTime: 120 & 1_000,
+    refetchInterval: 10 * 1_000,
+  });
 
-  // store
-  const { isLoading, shortform: storeShortForm } = useAppSelector(
-    (state) => state.shortForm,
-  );
+  const { mutate: onRequestExtra } = useMutation({
+    mutationKey: ['shortforms', 'request', shortform.id, 'extra'],
+    mutationFn: (typeId: string) => requestExtra(shortform.id, typeId),
+  });
 
   // state
   const [nowSrc, setNowSrc] = useState<string>(``);
@@ -69,8 +76,6 @@ export default function ShortformContents(props: ShortformContentsProps) {
     const now = list.find((item) => item.id === shortform.id);
 
     setNow(now);
-
-    now && handleGetShortForm(now.id);
   }, [shortform]);
 
   useEffect(() => {
@@ -97,10 +102,6 @@ export default function ShortformContents(props: ShortformContentsProps) {
     next && router.replace(`/asset/${assetId}/shortform/${next.id}`);
   };
 
-  const handleGetShortForm = (taskId: string) => {
-    dispatch(requestGetShortForm({ taskId }));
-  };
-
   const handleShowCreateExtra = (
     show: boolean,
     extraType?: ShortFormExtraType,
@@ -115,12 +116,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
       return;
     }
 
-    dispatch(
-      requestCreateExtra({
-        taskId: shortform.id,
-        extraTypeIds: [selectExtraType.id],
-      }),
-    );
+    onRequestExtra(selectExtraType.id);
   };
 
   return (
@@ -200,7 +196,7 @@ export default function ShortformContents(props: ShortformContentsProps) {
                 <div
                   className="tooltip w-full"
                   data-tip="새로고침"
-                  onClick={() => now && handleGetShortForm(now.id)}
+                  onClick={() => now && onGetShortform()}
                 >
                   <button className="btn btn-circle btn-ghost" type="button">
                     <TbReload className="w-6 h-6" />

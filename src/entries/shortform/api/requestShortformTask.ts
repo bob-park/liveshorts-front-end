@@ -25,6 +25,24 @@ export async function getTasksByAssetId(assetId: number) {
     .then((res: ApiResponse<ShortFormTask[]>) => res.result);
 }
 
+export async function getTask(taskId: string) {
+  const response = await fetch(`/api/v1/shorts/task/${taskId}`, {
+    method: 'get',
+    next: {
+      tags: ['shortforms', 'detail', taskId],
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  return response.json().then((res: ApiResponse<ShortFormTask>) => res.result);
+}
+
 export async function addTask(assetId: number, title: string) {
   const response = await fetch(`/api/v1/shorts/task`, {
     method: 'post',

@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import NavbarMenu from './NavbarMenu';
+import NavbarMenu from './_component/NavbarMenu';
 import './globals.css';
 
 import {

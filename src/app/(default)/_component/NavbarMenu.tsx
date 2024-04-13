@@ -18,10 +18,7 @@ import { CgProfile } from 'react-icons/cg';
 // daisyui
 import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 
-// action
-import { userActions } from '@/store/user';
-
-import routes from './routes';
+import routes from '../routes';
 import { getRoleType } from '@/utils/parseUtils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { logout, touch } from '@/entries/user/api/requestAuth';

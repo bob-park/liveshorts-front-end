@@ -12,10 +12,6 @@ import { CgPlayListRemove } from 'react-icons/cg';
 import { IoAddCircleSharp } from 'react-icons/io5';
 import { TbReload } from 'react-icons/tb';
 
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
-
-import { shortFormActions } from '@/store/shortform';
 import ShortFormList from '@/components/shortform/ShortFormList';
 import CopyShortFormConfirm from './CopyShortFormConfirm';
 import RemoveShortFormConfirm from './RemoveShortFormConfirm';
@@ -28,15 +24,6 @@ import {
   removeTask,
   updateTask,
 } from '@/entries/shortform/api/requestShortformTask';
-
-// action
-const {
-  requestSearchShortFormTask,
-  requestCreateShortForm,
-  requestUpdateShortForm,
-  requestCopyShortForm,
-  requestRemoveShortForm,
-} = shortFormActions;
 
 const ShortFormLoading = () => {
   return (
@@ -65,12 +52,6 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // router
   const router = useRouter();
-
-  // store
-  // const dispatch = useAppDispatch();
-  // const { isLoading, tasks, copiedTaskId } = useAppSelector(
-  //   (state) => state.shortForm,
-  // );
 
   // state
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
