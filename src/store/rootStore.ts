@@ -4,12 +4,6 @@ import { createWrapper } from 'next-redux-wrapper';
 
 import rootSaga from './rootSaga';
 
-// user
-import { userReducer } from './user';
-
-// asset
-import { assetReducer } from './asset';
-
 // shortForm
 import { shortFormReducer } from './shortform';
 
@@ -17,8 +11,6 @@ import { shortFormReducer } from './shortform';
 import { scheduleReducer } from './schedule';
 
 const rootReducer = combineReducers({
-  user: userReducer,
-  asset: assetReducer,
   shortForm: shortFormReducer,
   schedule: scheduleReducer,
 });

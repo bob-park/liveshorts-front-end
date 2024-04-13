@@ -20,6 +20,14 @@ import ShortFormList from '@/components/shortform/ShortFormList';
 import CopyShortFormConfirm from './CopyShortFormConfirm';
 import RemoveShortFormConfirm from './RemoveShortFormConfirm';
 import CreateShortFormModal from './CreateShortFormModal';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  addTask,
+  copyTask,
+  getTasksByAssetId,
+  removeTask,
+  updateTask,
+} from '@/entries/shortform/api/requestShortformTask';
 
 // action
 const {
@@ -59,10 +67,10 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   const router = useRouter();
 
   // store
-  const dispatch = useAppDispatch();
-  const { isLoading, tasks, copiedTaskId } = useAppSelector(
-    (state) => state.shortForm,
-  );
+  // const dispatch = useAppDispatch();
+  // const { isLoading, tasks, copiedTaskId } = useAppSelector(
+  //   (state) => state.shortForm,
+  // );
 
   // state
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
@@ -73,39 +81,78 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   const [showRemoveConfirm, setShowRemoveConfirm] = useState<boolean>(false);
   const [removeTaskId, setRemoveTaskId] = useState<string>();
 
+  // query client
+  const queryClient = useQueryClient();
+
+  const {
+    data: tasks,
+    isFetching,
+    refetch: onGetTasks,
+  } = useQuery<ShortFormTask[]>({
+    queryKey: ['shortforms', assetId],
+    queryFn: () => getTasksByAssetId(assetId),
+    staleTime: 60 * 1_000,
+    gcTime: 120 * 1_000,
+  });
+
+  const { mutate: onAddTask } = useMutation({
+    mutationKey: ['shortforms', 'add'],
+    mutationFn: (title: string) => addTask(assetId, title),
+    onSuccess: (data) => {
+      router.push(`/edit/${assetId}/shortform/${data.id}`);
+    },
+  });
+
+  const { mutate: onRemoveTask } = useMutation({
+    mutationKey: ['shortforms', 'remove'],
+    mutationFn: (taskId: string) => removeTask(taskId),
+    onSuccess: () => {
+      const prev = tasks?.slice() || [];
+      const index = prev.findIndex((item) => item.id === removeTaskId);
+      index >= 0 && prev.splice(index, 1);
+
+      queryClient.setQueryData(['shortforms', assetId], prev);
+    },
+  });
+
+  const { mutate: onUpdateTask } = useMutation({
+    mutationKey: ['shortforms', 'update'],
+    mutationFn: ({ taskId, title }: { taskId: string; title: string }) =>
+      updateTask(taskId, { title }),
+    onSuccess: (data) => {
+      const newTask = tasks?.slice() || [];
+      const index = newTask.findIndex((item) => item.id === data.id);
+
+      index >= 0 && newTask.splice(index, 1, data);
+
+      queryClient.setQueryData(['shortforms', assetId], newTask);
+    },
+  });
+
+  const { mutate: onCopyTask } = useMutation({
+    mutationKey: ['shortforms', 'copy'],
+    mutationFn: (taskId: string) => copyTask(taskId),
+    onSuccess: (data) => {
+      const newTask = tasks?.slice() || [];
+      newTask.unshift(data);
+      queryClient.setQueryData(['shortforms', assetId], newTask);
+
+      onUpdateTask({ taskId: data.id, title: data.title + ' - 복사본' });
+    },
+  });
+
   //useEffect
   useLayoutEffect(() => {
     handleGetShortFormTask();
   }, []);
 
-  useEffect(() => {
-    if (!copiedTaskId || !copyTaskId) {
-      return;
-    }
-
-    const shortform = tasks.find((item) => item.id === copyTaskId);
-
-    if (!shortform) {
-      return;
-    }
-
-    dispatch(
-      requestUpdateShortForm({
-        taskId: copiedTaskId,
-        body: {
-          title: `${shortform.title} - 복사본`,
-        },
-      }),
-    );
-  }, [copiedTaskId, copyTaskId]);
-
   // handle
   const handleGetShortFormTask = () => {
-    dispatch(requestSearchShortFormTask({ assetId }));
+    onGetTasks();
   };
 
   const handleMoveShortformView = (taskId: string) => {
-    const task = tasks.find((item) => item.id === taskId);
+    const task = tasks?.find((item) => item.id === taskId);
 
     if (!task || task.status !== 'SUCCESS') {
       return;
@@ -115,18 +162,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   };
 
   const handleCreateShortForm = (title: string | undefined) => {
-    title &&
-      dispatch(
-        requestCreateShortForm({
-          assetId,
-          body: {
-            title,
-          },
-          handleAfter: (newShortformId) => {
-            router.push(`/edit/${assetId}/shortform/${newShortformId}`);
-          },
-        }),
-      );
+    title && onAddTask(title);
   };
 
   const handleEditShortForm = (taskId: string) => {
@@ -134,11 +170,11 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   };
 
   const handleCopyShortForm = () => {
-    copyTaskId && dispatch(requestCopyShortForm({ taskId: copyTaskId }));
+    copyTaskId && onCopyTask(copyTaskId);
   };
 
   const handleRemoveShortForm = () => {
-    removeTaskId && dispatch(requestRemoveShortForm({ taskId: removeTaskId }));
+    removeTaskId && onRemoveTask(removeTaskId);
   };
 
   return (
@@ -173,9 +209,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
           </div>
         </div>
         <div className="col-span-1 mt-4">
-          {isLoading && <ShortFormLoading />}
-          {!isLoading && tasks.length === 0 && <EmptyShortFormList />}
-          {!isLoading && tasks && (
+          {isFetching && <ShortFormLoading />}
+          {!isFetching && tasks?.length === 0 && <EmptyShortFormList />}
+          {!isFetching && tasks && (
             <ShortFormList
               tasks={tasks}
               onRowClick={handleMoveShortformView}
@@ -203,7 +239,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* copy confirm modal */}
       <CopyShortFormConfirm
         show={showCopyConfirm}
-        shortform={tasks.find((item) => item.id === copyTaskId)}
+        shortform={tasks?.find((item) => item.id === copyTaskId)}
         onBackdrop={() => setShowCopyConfirm(false)}
         onConfirm={handleCopyShortForm}
       />
@@ -211,7 +247,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* remove confirm modal */}
       <RemoveShortFormConfirm
         show={showRemoveConfirm}
-        shortform={tasks.find((item) => item.id === removeTaskId)}
+        shortform={tasks?.find((item) => item.id === removeTaskId)}
         onBackdrop={() => setShowRemoveConfirm(false)}
         onConfirm={handleRemoveShortForm}
       />

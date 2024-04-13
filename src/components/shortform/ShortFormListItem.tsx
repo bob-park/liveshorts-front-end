@@ -62,7 +62,7 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
       <div className="flex-1">
         <div className="grid grid-cols-4 gap-4">
           <div className="col-span-4">
-            <div className="tooltip w-full" data-tip={task.title}>
+            <div className="tooltip max-w-full" data-tip={task.title}>
               <h2 className="font-bold font-xl truncate text-start">
                 {task.title}
               </h2>
