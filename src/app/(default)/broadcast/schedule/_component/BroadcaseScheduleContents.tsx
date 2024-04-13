@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useState, useLayoutEffect, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 
 // nextjs
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,7 +17,7 @@ import ScheduleList from '@/components/schedule/ScheduleList';
 import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
 import MoveOnTop from '@/components/common/MoveOnTop';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSchedules } from '@/entries/schedule';
+import { addShortformSchedule, getSchedules } from '@/entries/schedule/api';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -65,6 +65,47 @@ export default function BroadcastScheduleContent(
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['schedules'], data);
+    },
+  });
+
+  const { mutate: onAddShortformSchedule } = useMutation({
+    mutationKey: [
+      'schedules',
+      reserveRecordSchedule?.scheduleId,
+      'add',
+      'shortform',
+    ],
+    mutationFn: ({
+      scheduleId,
+      body,
+    }: {
+      scheduleId: number;
+      body: {
+        channelId: number;
+        ranges: {
+          itemId: string;
+          time: {
+            startTime: string;
+            endTime: string;
+          };
+        }[];
+      };
+    }) => addShortformSchedule(scheduleId, body),
+    onSuccess: (data) => {
+      const newSchedules = schedules?.slice() || [];
+
+      const index = newSchedules.findIndex(
+        (item) => item.scheduleId === data.schedule?.scheduleId,
+      );
+
+      if (index >= 0) {
+        newSchedules[index] = {
+          ...newSchedules[index],
+          shorts: data,
+        };
+      }
+
+      queryClient.setQueryData(['schedules'], newSchedules);
     },
   });
 
@@ -120,23 +161,19 @@ export default function BroadcastScheduleContent(
       return;
     }
 
-    // dispatch(
-    //   requestAddShortFormSchedule({
-    //     request: {
-    //       channelId: selectChannelId,
-    //       scheduleId: reserveRecordSchedule.scheduleId,
-    //       ranges: items.map((item) => {
-    //         return {
-    //           itemId: item.itemId,
-    //           time: {
-    //             startTime: item.startTime,
-    //             endTime: item.endTime,
-    //           },
-    //         };
-    //       }),
-    //     },
-    //   }),
-    // );
+    onAddShortformSchedule({
+      scheduleId: reserveRecordSchedule.scheduleId,
+      body: {
+        channelId: selectChannelId,
+        ranges: items.map((item) => ({
+          itemId: item.itemId,
+          time: {
+            startTime: item.startTime,
+            endTime: item.endTime,
+          },
+        })),
+      },
+    });
   };
 
   return (

@@ -21,7 +21,7 @@ export async function getSchedules(
   );
 
   const response = await fetch(
-    `/api/record/channel/${channelId}/schedule?` + urlSearchParams,
+    `/api/v1/record/channel/${channelId}/schedule?` + urlSearchParams,
     {
       method: 'get',
       next: {
@@ -40,4 +40,37 @@ export async function getSchedules(
   return response
     .json()
     .then((res: ApiResponse<RecordSchedule[]>) => res.result);
+}
+
+export async function addShortformSchedule(
+  scheduleId: number,
+  body: {
+    channelId: number;
+    ranges: {
+      itemId: string;
+      time: {
+        startTime: string;
+        endTime: string;
+      };
+    }[];
+  },
+) {
+  const response = await fetch(`/api/v1/shorts/task/record/schedule`, {
+    method: 'post',
+    next: {
+      tags: ['schedules', scheduleId + '', 'add', 'shortform'],
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ...body, scheduleId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  return response
+    .json()
+    .then((res: ApiResponse<ShortFormRecordSchedule>) => res.result);
 }
