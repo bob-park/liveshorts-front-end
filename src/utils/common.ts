@@ -103,6 +103,48 @@ export function secondToTimecode(totalSeconds: number) {
   );
 }
 
+export function parseShortFormTaskStatus(
+  status?: string,
+  overlayTasks?: ShortFormOverlayTask[],
+) {
+  let result = statusList.find((item) => item.id === status);
+
+  if (
+    result &&
+    result.id === 'WAITING' &&
+    overlayTasks &&
+    overlayTasks.length > 0
+  ) {
+    const overlayTask = overlayTasks[0];
+    let overlayStatusName = '대기중';
+
+    switch (overlayTask.status) {
+      case 'WAITING':
+      case 'PROCEEDING':
+        overlayStatusName = '작업 요청중';
+        break;
+    }
+
+    console.log(overlayTask.status);
+
+    result = {
+      id: 'PROCEEDING',
+      name: overlayStatusName,
+      color: 'secondary',
+    };
+  }
+
+  if (status === 'READY') {
+    result = {
+      id: 'PROCEEDING',
+      name: '작업 준비중',
+      color: 'secondary',
+    };
+  }
+
+  return result;
+}
+
 export function parseStatus(status?: string) {
   const result = statusList.find((item) => item.id === status);
 

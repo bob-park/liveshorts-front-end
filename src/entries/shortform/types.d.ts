@@ -7,6 +7,7 @@ interface ShortFormTask {
   asset: Asset;
   uploadInstances?: ShortFormUploadInstance[];
   taskExtras?: ShortFormExtra[];
+  overlayTasks?: ShortFormOverlayTask[];
   createdDate: Date;
   createdBy: string;
 }
@@ -39,4 +40,9 @@ interface ShortFormExtra {
 interface ShortFormExtraType {
   id: string;
   name: string;
+}
+
+interface ShortFormOverlayTask {
+  id: string;
+  status: TaskStatus;
 }

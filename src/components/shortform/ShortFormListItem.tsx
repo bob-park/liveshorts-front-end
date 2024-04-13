@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 
+import cx from 'classnames';
+
 // react icon
 import { TbTransferIn } from 'react-icons/tb';
 import { SiYoutube } from 'react-icons/si';
@@ -14,7 +16,11 @@ import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
 
 // common
-import { parseStatus, parseStatusColor } from '@/utils/common';
+import {
+  parseShortFormTaskStatus,
+  parseStatus,
+  parseStatusColor,
+} from '@/utils/common';
 
 timeago.register('ko', ko);
 
@@ -71,11 +77,21 @@ export default function ShortFormListItem(props: ShortFormListItemProps) {
           <div className="col-span-4 text-gray-500">
             <div className="flex gap-4 items-center">
               <div
-                className={`badge badge-lg badge-${parseStatusColor(
-                  task.status,
-                )}`}
+                className={cx(
+                  'badge',
+                  'badge-lg',
+                  `badge-${
+                    parseShortFormTaskStatus(
+                      task.status,
+                      task.overlayTasks || [],
+                    )?.color
+                  }`,
+                )}
               >
-                {parseStatus(task.status)}
+                {
+                  parseShortFormTaskStatus(task.status, task.overlayTasks || [])
+                    ?.name
+                }
               </div>
               {task.taskExtras && task.taskExtras.length > 0 && (
                 <div className="">
