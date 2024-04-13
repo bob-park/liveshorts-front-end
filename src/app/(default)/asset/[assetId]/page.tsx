@@ -2,9 +2,9 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { cookies } from 'next/headers';
 
-import AssetHeaderContents from './AssetHeaderContents';
-import AssetPlayeContents from './AssetPlayerContents';
-import ShortFormTaskContents from './ShortFormTaskContents';
+import AssetHeaderContents from './_component/AssetHeaderContents';
+import AssetPlayeContents from './_component/AssetPlayerContents';
+import ShortFormTaskContents from './_component/ShortFormTaskContents';
 
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
