@@ -1,7 +1,7 @@
 // nextjs
 import { cookies } from 'next/headers';
 
-import SearchAsseResult from './SearchAsseResult';
+import SearchAsseResult from './_component/SearchAsseResult';
 import dayjs from 'dayjs';
 
 const COOKIE_NAME_IS_LIST_VIEW = 'isListView';

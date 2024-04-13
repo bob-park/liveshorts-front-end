@@ -6,7 +6,7 @@ import { useLayoutEffect, useState } from 'react';
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-import { setIsListView } from './action';
+import { setIsListView } from '../action';
 
 // react icon
 import {
@@ -23,8 +23,8 @@ import dayjs from 'dayjs';
 
 import { Button, Loading } from 'react-daisyui';
 import MoveOnTop from '@/components/common/MoveOnTop';
-import ListAssetView from './_component/ListAssetView';
-import ThumbnailAssetView from './_component/ThumbAssetView';
+import ListAssetView from './ListAssetView';
+import ThumbnailAssetView from './ThumbAssetView';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { searchAsset } from '@/entries/asset/api/requestAsset';
 import { useStore } from '@/shared/rootStore';
