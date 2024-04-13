@@ -25,7 +25,7 @@ export default function ListAssetView(props: {
         <div className="col-span-1">채널</div>
         <div className="col-span-1">대분류</div>
         <div className="col-span-1">크기</div>
-        <div className="col-span-1">생성일</div>
+        <div className="col-span-1">방송일</div>
         <div className="col-span-1">생성자</div>
       </div>
 

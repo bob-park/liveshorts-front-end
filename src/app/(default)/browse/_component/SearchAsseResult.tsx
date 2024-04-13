@@ -124,11 +124,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   // query client
   const queryClient = useQueryClient();
 
-  const {
-    data: searchResult,
-    isFetching,
-    isPending,
-  } = useQuery<ApiResponse<Asset[]>>({
+  const { data: searchResult, isPending } = useQuery<ApiResponse<Asset[]>>({
     queryKey: ['assets', 'search'],
     queryFn: () => search(0, searchAssetParams),
     staleTime: 60 * 1_000,
@@ -209,7 +205,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       onlyCreateShortFormByMe: false,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 5,
+      size: 30,
     });
   };
 

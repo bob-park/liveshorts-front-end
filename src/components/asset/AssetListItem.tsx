@@ -78,7 +78,12 @@ export default function AssetListItem(props: AssetListItemProps) {
         <div className="">
           {asset.createdDate && (
             <div className="">
-              <TimeAgo datetime={asset.createdDate} locale="ko" />
+              <TimeAgo
+                datetime={
+                  asset.recordSchedule?.startDateTime || asset.createdDate
+                }
+                locale="ko"
+              />
             </div>
           )}
         </div>
