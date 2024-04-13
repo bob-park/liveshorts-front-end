@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
-// store providers
-import Providers from '@/store/Providers';
-
 import './globals.css';
 import RQProvider from './_component/RQProvivder';
 
@@ -29,9 +26,7 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={inter.className}>
-        <RQProvider>
-          <Providers>{children}</Providers>
-        </RQProvider>
+        <RQProvider>{children}</RQProvider>
       </body>
     </html>
   );
