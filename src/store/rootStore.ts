@@ -4,14 +4,10 @@ import { createWrapper } from 'next-redux-wrapper';
 
 import rootSaga from './rootSaga';
 
-// shortForm
-import { shortFormReducer } from './shortform';
-
 // schedule
 import { scheduleReducer } from './schedule';
 
 const rootReducer = combineReducers({
-  shortForm: shortFormReducer,
   schedule: scheduleReducer,
 });
 

@@ -4,72 +4,94 @@
 import { useState, useLayoutEffect, useEffect } from 'react';
 
 // nextjs
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // daisyui
 import { Menu } from 'react-daisyui';
 
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
-
 // dayjs
 import dayjs from 'dayjs';
-
-// store
-import { scheduleActions } from '@/store/schedule';
 
 import ScheduleDateSelector from '@/components/schedule/ScheduleDateSelector';
 import ScheduleList from '@/components/schedule/ScheduleList';
 import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
 import MoveOnTop from '@/components/common/MoveOnTop';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getSchedules } from '@/entries/schedule';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
+  selectChannelId: number;
+  selectDate: string;
 };
-
-// action
-const { requestGetSchedule, requestAddShortFormSchedule } = scheduleActions;
 
 export default function BroadcastScheduleContent(
   props: BroadcastScheduleContentProps,
 ) {
   // props
-  const { channels } = props;
+  const {
+    channels,
+    selectChannelId: prevChannelId,
+    selectDate: prevDate,
+  } = props;
 
   // nextjs
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // state
-  const [selectChannelId, setSelectChannelId] = useState<number>(
-    channels[0].channelId,
-  );
-  const [selectDate, setSelectDate] = useState<Date>(new Date());
-  const [showMoveTop, setShowMoveTop] = useState<boolean>(false);
+  const [selectChannelId, setSelectChannelId] = useState<number>(prevChannelId);
+  const [selectDate, setSelectDate] = useState<Date>(dayjs(prevDate).toDate());
   const [showReserveShortForm, setShowReserveShortForm] =
     useState<boolean>(false);
   const [reserveRecordSchedule, setReserveRecordSchedule] =
     useState<RecordSchedule>();
 
-  // store
-  const dispatch = useAppDispatch();
-  const { isLoading, schedules } = useAppSelector((state) => state.schedule);
+  // query client
+  const queryClient = useQueryClient();
+  const { data: schedules } = useQuery<RecordSchedule[]>({
+    queryKey: ['schedules'],
+    queryFn: () => getSchedules(selectChannelId, { selectDate }),
+    staleTime: 60 * 1_000,
+    gcTime: 120 * 1_000,
+    enabled: false,
+  });
+
+  const { mutate: onGetSchedules } = useMutation({
+    mutationKey: ['schedules'],
+    mutationFn: () => getSchedules(selectChannelId, { selectDate }),
+    onMutate: () => {
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['schedules'], data);
+    },
+  });
 
   useLayoutEffect(() => {
     handleGetSchedule();
+  }, [searchParams]);
+
+  useLayoutEffect(() => {
+    handleSubmit();
   }, [selectChannelId, selectDate]);
 
   // handle
-  const handleGetSchedule = () => {
-    const startDateTime = dayjs(selectDate).format('YYYY-MM-DDT00:00:00');
-    const endDateTime = dayjs(selectDate).format('YYYY-MM-DDT23:59:59');
-
-    dispatch(
-      requestGetSchedule({
-        channelId: selectChannelId,
-        startDateTime,
-        endDateTime,
-      }),
+  const handleSubmit = () => {
+    const urlParams = new URLSearchParams();
+    urlParams.append('channelId', selectChannelId + '');
+    urlParams.append(
+      'date',
+      dayjs(selectDate || new Date()).format('YYYY-MM-DD'),
     );
+
+    console.log(urlParams.toString());
+
+    router.replace(`/broadcast/schedule?${urlParams}`);
+  };
+
+  const handleGetSchedule = () => {
+    onGetSchedules();
   };
 
   const handleMoveScheduleDate = (isNext: boolean) => {
@@ -82,7 +104,7 @@ export default function BroadcastScheduleContent(
   };
 
   const handleMoveAssetPage = (scheduleId: number) => {
-    const schedule = schedules.find((item) => item.scheduleId === scheduleId);
+    const schedule = schedules?.find((item) => item.scheduleId === scheduleId);
 
     if (!schedule || schedule.status !== 'SUCCESS') {
       return;
@@ -98,23 +120,23 @@ export default function BroadcastScheduleContent(
       return;
     }
 
-    dispatch(
-      requestAddShortFormSchedule({
-        request: {
-          channelId: selectChannelId,
-          scheduleId: reserveRecordSchedule.scheduleId,
-          ranges: items.map((item) => {
-            return {
-              itemId: item.itemId,
-              time: {
-                startTime: item.startTime,
-                endTime: item.endTime,
-              },
-            };
-          }),
-        },
-      }),
-    );
+    // dispatch(
+    //   requestAddShortFormSchedule({
+    //     request: {
+    //       channelId: selectChannelId,
+    //       scheduleId: reserveRecordSchedule.scheduleId,
+    //       ranges: items.map((item) => {
+    //         return {
+    //           itemId: item.itemId,
+    //           time: {
+    //             startTime: item.startTime,
+    //             endTime: item.endTime,
+    //           },
+    //         };
+    //       }),
+    //     },
+    //   }),
+    // );
   };
 
   return (
@@ -160,11 +182,11 @@ export default function BroadcastScheduleContent(
             {/* 스케쥴 목록 */}
             <div className="col-span-1 mt-3">
               <ScheduleList
-                schedules={schedules}
+                schedules={schedules || []}
                 onRowClick={handleMoveAssetPage}
                 onReverveShortForm={(scheduleId) => {
                   setReserveRecordSchedule(
-                    schedules.find((item) => item.scheduleId === scheduleId),
+                    schedules?.find((item) => item.scheduleId === scheduleId),
                   );
                   setShowReserveShortForm(true);
                 }}
