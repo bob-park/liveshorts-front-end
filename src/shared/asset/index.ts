@@ -16,8 +16,6 @@ export const createAssetSlice: SlicePattern<AssetState> = (set) => ({
   initAssetPage: () =>
     set(
       (state) => {
-        console.log('init asset page...');
-
         return { ...state, assetsPage: undefined };
       },
       false,
