@@ -65,15 +65,21 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   // query client
   const queryClient = useQueryClient();
 
-  const {
-    data: tasks,
-    isFetching,
-    refetch: onGetTasks,
-  } = useQuery<ShortFormTask[]>({
+  const { data: tasks, isLoading } = useQuery<ShortFormTask[]>({
     queryKey: ['shortforms', assetId],
     queryFn: () => getTasksByAssetId(assetId),
     staleTime: 60 * 1_000,
     gcTime: 120 * 1_000,
+    refetchInterval: 10 * 1_000,
+  });
+
+  const { mutate: onGetTasks, isPending } = useMutation({
+    mutationKey: ['shortforms'],
+    mutationFn: () => getTasksByAssetId(assetId),
+    onMutate: () => {},
+    onSuccess: (data) => {
+      queryClient.setQueryData(['shortforms'], data);
+    },
   });
 
   const { mutate: onAddTask } = useMutation({
@@ -190,9 +196,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
           </div>
         </div>
         <div className="col-span-1 mt-4">
-          {isFetching && <ShortFormLoading />}
-          {!isFetching && tasks?.length === 0 && <EmptyShortFormList />}
-          {!isFetching && tasks && (
+          {isPending && <ShortFormLoading />}
+          {!isPending && tasks?.length === 0 && <EmptyShortFormList />}
+          {!isPending && tasks && (
             <ShortFormList
               tasks={tasks}
               onRowClick={handleMoveShortformView}
