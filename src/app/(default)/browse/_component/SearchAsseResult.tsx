@@ -137,7 +137,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       search(!assetsPage ? 0 : assetsPage.currentPage + 1, searchAssetParams),
     onMutate: () => {
       if (!assetsPage) {
-        queryClient.removeQueries({
+        queryClient.invalidateQueries({
           queryKey: ['assets', 'search'],
           exact: true,
         });
@@ -524,13 +524,13 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={isPending}
+            isLoading={!assetsPage && isLoading}
             assets={assets || []}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={isPending}
+            isLoading={!assetsPage && isLoading}
             assets={assets || []}
             onClick={handleMoveAsset}
           />
