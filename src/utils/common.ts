@@ -56,109 +56,6 @@ const statusList: Status[] = [
   },
 ];
 
-export async function get<R>(
-  url: string,
-  params?: { [name: string]: any },
-): Promise<ApiResult<R>> {
-  const urlSearchParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value instanceof Array) {
-      value.forEach((item) => {
-        urlSearchParams.append(key, item);
-      });
-    } else {
-      urlSearchParams.set(key, value);
-    }
-  });
-
-  return await client
-    .get(
-      `${url}${
-        params ? `?${urlSearchParams.toString().replaceAll('%2B', '+')}` : ''
-      }`,
-    )
-    .then((res) => {
-      return {
-        state: 'SUCCESS' as ApiResultState,
-        status: res.status,
-        data: res.data.result as R,
-        page: res.data.page,
-      };
-    })
-    .catch((err) => {
-      return {
-        state: 'FAILURE',
-        status: err.response.status,
-        error: {
-          message: err.response.data?.error?.message,
-        },
-      };
-    });
-}
-export async function post<B, R>(url: string, body?: B): Promise<ApiResult<R>> {
-  return client
-    .post(url, body)
-    .then((res) => {
-      return {
-        state: 'SUCCESS' as ApiResultState,
-        status: res.status,
-        data: res.data.result as R,
-      };
-    })
-    .catch((err) => {
-      return {
-        state: 'FAILURE',
-        status: err.response.status,
-        error: {
-          message: err.response.data?.error?.message,
-        },
-      };
-    });
-}
-
-export async function put<B, R>(url: string, body?: B): Promise<ApiResult<R>> {
-  return client
-    .put(url, body)
-    .then((res) => {
-      return {
-        state: 'SUCCESS' as ApiResultState,
-        status: res.status,
-        data: res.data.result as R,
-      };
-    })
-    .catch((err) => {
-      return {
-        state: 'FAILURE',
-        status: err.response.status,
-        error: {
-          message: err.response.data?.error?.message,
-        },
-      };
-    });
-}
-
-export async function del<B, R>(url: string): Promise<ApiResult<R>> {
-  return client
-    .delete(url)
-    .then((res) => {
-      return {
-        state: 'SUCCESS' as ApiResultState,
-        status: res.status,
-        data: res.data.result as R,
-      };
-    })
-    .catch((err) => {
-      return {
-        state: 'FAILURE',
-        status: err.response.status,
-        error: {
-          message: err.response.data?.error?.message,
-        },
-      };
-    });
-}
-
 export function decodeJwt(token: string) {
   const base64Payload = token.split('.')[1];
   const payload = Buffer.from(base64Payload, 'base64');
@@ -204,6 +101,48 @@ export function secondToTimecode(totalSeconds: number) {
     ':' +
     `${seconds > 9 ? seconds : `0${seconds}`}`
   );
+}
+
+export function parseShortFormTaskStatus(
+  status?: string,
+  overlayTasks?: ShortFormOverlayTask[],
+) {
+  let result = statusList.find((item) => item.id === status);
+
+  if (
+    result &&
+    result.id === 'WAITING' &&
+    overlayTasks &&
+    overlayTasks.length > 0
+  ) {
+    const overlayTask = overlayTasks[0];
+    let overlayStatusName = '대기중';
+
+    switch (overlayTask.status) {
+      case 'WAITING':
+      case 'PROCEEDING':
+        overlayStatusName = '작업 요청중';
+        break;
+    }
+
+    console.log(overlayTask.status);
+
+    result = {
+      id: 'PROCEEDING',
+      name: overlayStatusName,
+      color: 'secondary',
+    };
+  }
+
+  if (status === 'READY') {
+    result = {
+      id: 'PROCEEDING',
+      name: '작업 준비중',
+      color: 'secondary',
+    };
+  }
+
+  return result;
 }
 
 export function parseStatus(status?: string) {

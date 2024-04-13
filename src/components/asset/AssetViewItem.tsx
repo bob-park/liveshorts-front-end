@@ -53,7 +53,12 @@ export default function AssetViewItem(props: AssetItemProps) {
         <div className="card-actions justify-between">
           {asset.createdDate && (
             <div className="">
-              <TimeAgo datetime={asset.createdDate} locale="ko" />
+              <TimeAgo
+                datetime={
+                  asset.recordSchedule?.startDateTime || asset.createdDate
+                }
+                locale="ko"
+              />
             </div>
           )}
           <div className="flex gap-3 justify-end items-center">

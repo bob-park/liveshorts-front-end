@@ -1,9 +1,14 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import NavbarMenu from "./NavbarMenu";
-import "./globals.css";
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import NavbarMenu from './_component/NavbarMenu';
+import './globals.css';
 
-// mam api host
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from '@tanstack/react-query';
+
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
 export default async function DefaultLayout({
@@ -11,23 +16,44 @@ export default async function DefaultLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const touchReponse = await fetch(MAM_API_HOST + "/api/user/session/touch", {
-    method: "post",
-    headers: {
-      Authorization: `Bearer ${cookies().get("accessToken")?.value || ""}`,
-    },
+  const queryClient = new QueryClient();
+
+  const touch = async () => {
+    const response = await fetch(MAM_API_HOST + '/api/user/session/touch', {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${cookies().get('accessToken')?.value || ''}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Unauthorized');
+    }
+
+    return response
+      .json()
+      .then((res: ApiResponse<LoginResponse>) => res.result);
+  };
+
+  await queryClient.prefetchQuery({
+    queryKey: ['user', 'accessToken'],
+    queryFn: touch,
   });
 
-  if (!touchReponse.ok) {
-    redirect("/login");
-  }
+  const dehydratedState = dehydrate(queryClient);
 
-  const touchResult = await touchReponse.json();
+  const state = queryClient.getQueryState(['user', 'accessToken']);
+
+  if (state?.status === 'error') {
+    redirect('/login');
+  }
 
   return (
     <div className="w-full h-full min-w-[900px]">
-      <NavbarMenu token={touchResult.result.accessToken} />
-      <div className="p-2 ">{children}</div>
+      <HydrationBoundary state={dehydratedState}>
+        <NavbarMenu />
+        <div className="p-2 ">{children}</div>
+      </HydrationBoundary>
     </div>
   );
 }
