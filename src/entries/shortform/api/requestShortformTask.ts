@@ -36,6 +36,8 @@ export async function getTask(taskId: string) {
     },
   });
 
+  await delay(1_000);
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }

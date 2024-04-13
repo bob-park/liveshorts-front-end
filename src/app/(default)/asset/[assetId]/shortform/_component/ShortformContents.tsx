@@ -15,10 +15,9 @@ import { SiYoutubeshorts } from 'react-icons/si';
 
 import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
-import { shortFormActions } from '@/store/shortform';
 import CreateShortformExtraModal from './CreateShortformExtraModal';
 import { parseStatus } from '@/utils/common';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getTask } from '@/entries/shortform/api/requestShortformTask';
 import { requestExtra } from '@/entries/shortform/api/requestShortformExtra';
 
@@ -45,21 +44,30 @@ export default function ShortformContents(props: ShortformContentsProps) {
   const router = useRouter();
 
   // react query
-  const {
-    data: storeShortForm,
-    isPending: isLoading,
-    refetch: onGetShortform,
-  } = useQuery<ShortFormTask>({
-    queryKey: ['shortforms', 'detail', shortform.id],
-    queryFn: () => getTask(shortform.id),
-    staleTime: 60 * 1_000,
-    gcTime: 120 & 1_000,
-    refetchInterval: 10 * 1_000,
+  const queryClient = useQueryClient();
+  const { data: storeShortForm, isPending: isLoading } =
+    useQuery<ShortFormTask>({
+      queryKey: ['shortforms', 'detail', shortform.id],
+      queryFn: () => getTask(shortform.id),
+      staleTime: 60 * 1_000,
+      gcTime: 120 & 1_000,
+      refetchInterval: 10 * 1_000,
+    });
+
+  const { mutate: onGetShortform, isPending } = useMutation({
+    mutationKey: ['shortforms', 'detail', shortform.id],
+    mutationFn: () => getTask(shortform.id),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['shortforms', 'detail', shortform.id], data);
+    },
   });
 
   const { mutate: onRequestExtra } = useMutation({
     mutationKey: ['shortforms', 'request', shortform.id, 'extra'],
     mutationFn: (typeId: string) => requestExtra(shortform.id, typeId),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['shortforms', 'detail', data.id], data);
+    },
   });
 
   // state
@@ -204,8 +212,8 @@ export default function ShortformContents(props: ShortformContentsProps) {
                 </div>
               </div>
             </div>
-            {isLoading && <ShortFormExtraLoading />}
-            {!isLoading &&
+            {isPending && <ShortFormExtraLoading />}
+            {!isPending &&
               extraTypes.map((item) => (
                 <div
                   key={`extra-type-row-${item.id}`}
