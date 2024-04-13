@@ -27,6 +27,7 @@ export default function LoginPage() {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
+    mutationKey: ['user', 'accessToken'],
     mutationFn: login,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user', 'accessToken'] });

@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -15,28 +15,19 @@ import {
   HiOutlineSearch,
 } from 'react-icons/hi';
 import { GrPowerReset } from 'react-icons/gr';
-import { CgPlayListRemove } from 'react-icons/cg';
 
 import Datepicker from 'react-tailwindcss-datepicker';
-
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
-
-// componets
-import AssetViewItem from '@/components/asset/AssetViewItem';
-import AssetListItem from '@/components/asset/AssetListItem';
-import SkeletonAssetViewItem from '@/components/asset/SkeletonAssetViewItem';
-import SkeletonAssetListItem from '@/components/asset/SkeletonAssetListItem';
 
 // dayjs
 import dayjs from 'dayjs';
 
-// action
-import { assetActions } from '@/store/asset';
 import { Button, Loading } from 'react-daisyui';
 import MoveOnTop from '@/components/common/MoveOnTop';
-
-const { requestSearchAsset } = assetActions;
+import ListAssetView from './_component/ListAssetView';
+import ThumbnailAssetView from './_component/ThumbAssetView';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { searchAsset } from '@/entries/asset/api/requestAsset';
+import { useStore } from '@/shared/rootStore';
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -58,123 +49,52 @@ type SearchAssetParams = {
   size: number;
 };
 
-const LoadingThumbanilAssets = (props: { size: number }) => {
-  const { size } = props;
+function parseParams(
+  page: number,
+  searchParams: SearchAssetParams,
+): URLSearchParams {
+  const metas: string[] = [];
 
-  return (
-    <>
-      {new Array(size).fill('').map((value, index) => (
-        <SkeletonAssetViewItem key={`skeleton-asset-item-${index}`} />
-      ))}
-    </>
-  );
-};
+  searchParams.broadcastDate &&
+    metas.push(
+      `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchParams.broadcastDate}`,
+    );
 
-const LoadingListAssets = (props: { size: number }) => {
-  const { size } = props;
+  searchParams.channelId &&
+    metas.push(
+      `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${searchParams.channelId}`,
+    );
 
-  return (
-    <>
-      {new Array(size).fill('').map((value, index) => (
-        <SkeletonAssetListItem key={`skeleton-asset-item-${index}`} />
-      ))}
-    </>
-  );
-};
-
-const ThumbnailAssetView = (props: {
-  assets: Asset[];
-  isLoading: boolean;
-  onClick?: (assetId: number) => void;
-}) => {
-  const { assets, isLoading, onClick } = props;
-
-  // handler
-  const handleClick = (assetId: number) => {
-    onClick && onClick(assetId);
+  const params = {
+    page,
+    size: searchParams.size,
+    isDeleted: false,
+    assetStatus: 'REGISTERED',
+    metas,
+    title: searchParams.title || '',
+    existShortForm:
+      searchParams.isShortForm == undefined ? '' : searchParams.isShortForm,
+    onlyCreateShortFormByMe: searchParams.onlyCreateShortFormByMe,
   };
 
-  return (
-    <>
-      {!isLoading && assets.length === 0 && <EmptyAssetList />}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,min-content))] gap-8 justify-center justify-items-center content-center mt-4">
-        {isLoading ? (
-          <LoadingThumbanilAssets size={30} />
-        ) : (
-          assets.map((item) => (
-            <div
-              key={`asset-view-item-${item.assetId}`}
-              className="col-span-1"
-              onClick={() => handleClick(item.assetId)}
-            >
-              <AssetViewItem asset={item} />
-            </div>
-          ))
-        )}
-      </div>
-    </>
-  );
-};
+  const urlSearchParams = new URLSearchParams();
 
-const ListAssetView = (props: {
-  isLoading: boolean;
-  assets: Asset[];
-  onClick?: (assetId: number) => void;
-}) => {
-  // props
-  const { isLoading, assets, onClick } = props;
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value instanceof Array) {
+      value.forEach((item) => {
+        urlSearchParams.append(key, item);
+      });
+    } else {
+      urlSearchParams.set(key, value ? value + '' : '');
+    }
+  });
 
-  // handler
-  const handleClick = (assetId: number) => {
-    onClick && onClick(assetId);
-  };
+  return urlSearchParams;
+}
 
-  return (
-    <div className="grid grid-cols-1 min-w-[900px] gap-4">
-      {/* header */}
-      <div className="col-span-1 grid grid-cols-8 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 justify-center items-center">
-        <div className="col-span-1"></div>
-        <div className="col-span-2">제목</div>
-        <div className="col-span-1">채널</div>
-        <div className="col-span-1">대분류</div>
-        <div className="col-span-1">크기</div>
-        <div className="col-span-1">생성일</div>
-        <div className="col-span-1">생성자</div>
-      </div>
-
-      {/* content */}
-      {!isLoading && assets.length === 0 && <EmptyAssetList />}
-      {isLoading ? (
-        <div className="col-span-1 border-b-1 border-b-gray-200">
-          <LoadingListAssets size={30} />
-        </div>
-      ) : (
-        assets.map((item) => (
-          <div
-            key={`asset-list-item-${item.assetId}`}
-            className="col-span-1"
-            onClick={() => handleClick(item.assetId)}
-          >
-            <AssetListItem asset={item} />
-          </div>
-        ))
-      )}
-    </div>
-  );
-};
-
-const EmptyAssetList = () => {
-  return (
-    <div className="flex flex-col justify-center items-center w-full h-40">
-      <div className="">
-        <CgPlayListRemove className="w-24 h-24 text-gray-500" />
-      </div>
-      <div className="mt-2 text-md font-bold">
-        <h3>영상이 없습니다.</h3>
-      </div>
-    </div>
-  );
-};
+function search(page: number, searchParams: SearchAssetParams) {
+  return searchAsset(parseParams(page, searchParams));
+}
 
 export default function SearchAsseResult(props: SearchAsseResultProps) {
   // props
@@ -189,17 +109,49 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // store
+  const assets = useStore((state) => state.assets);
+  const assetsPage = useStore((state) => state.assetsPage);
+  const searchAssetAfter = useStore((state) => state.searchAssetAfter);
+  const initAssetPage = useStore((state) => state.initAssetPage);
+
   // state
   const [listViewMode, setListViewMode] = useState<boolean>(isListView);
   const [searchAssetParams, setSearchAssetParams] = useState<SearchAssetParams>(
     prevSearchAssetParams,
   );
 
-  // store
-  const dispatch = useAppDispatch();
-  const { isLoading, assets, pagination } = useAppSelector(
-    (state) => state.asset,
-  );
+  // query client
+  const queryClient = useQueryClient();
+
+  const {
+    data: searchResult,
+    isFetching,
+    isPending,
+  } = useQuery<ApiResponse<Asset[]>>({
+    queryKey: ['assets', 'search'],
+    queryFn: () => search(0, searchAssetParams),
+    staleTime: 60 * 1_000,
+    enabled: false,
+  });
+
+  const { mutate: onSearch, isPending: isLoading } = useMutation({
+    mutationKey: ['assets', 'search'],
+    mutationFn: () =>
+      search(!assetsPage ? 0 : assetsPage.currentPage + 1, searchAssetParams),
+    onMutate: () => {
+      if (!assetsPage) {
+        queryClient.removeQueries({
+          queryKey: ['assets', 'search'],
+          exact: true,
+        });
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['assets', 'search'], data);
+      searchAssetAfter(data.result, data?.page);
+    },
+  });
 
   // useEffect
   useLayoutEffect(() => {
@@ -207,69 +159,38 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   }, [isListView]);
 
   useLayoutEffect(() => {
-    handleSearch(0, false);
+    handleSearch();
   }, [searchParams]);
 
   useLayoutEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, { threshold: 1 });
+    initAssetPage();
+  }, [searchAssetParams]);
 
+  useLayoutEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 1,
+    });
     const observerTarget = document.getElementById('observer');
 
     if (observerTarget) {
       observer.observe(observerTarget);
     }
-
     return () => {
       observer.disconnect();
     };
-  }, [pagination]);
+  }, [assetsPage, isLoading]);
 
   // handle
-  const handleSearch = (page: number, isAppend: boolean) => {
-    const metas: string[] = [];
-
-    searchAssetParams.broadcastDate &&
-      metas.push(
-        `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchAssetParams.broadcastDate}`,
-      );
-
-    searchAssetParams.channelId &&
-      metas.push(
-        `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${
-          channels.find(
-            (item) => item.channelId === searchAssetParams.channelId,
-          )?.channelId || ''
-        }`,
-      );
-
-    dispatch(
-      requestSearchAsset({
-        params: {
-          page,
-          size: searchAssetParams.size,
-          isDeleted: false,
-          assetType: 'VIDEO',
-          assetStatus: 'REGISTERED',
-          metas,
-          title: searchAssetParams.title || '',
-          existShortForm:
-            searchAssetParams.isShortForm == undefined
-              ? ''
-              : searchAssetParams.isShortForm,
-          onlyCreateShortFormByMe: searchAssetParams.onlyCreateShortFormByMe,
-        },
-        isAppend,
-      }),
-    );
+  const handleSearch = () => {
+    onSearch();
   };
 
   const handleToggleViewMode = (isListView: boolean) => {
-    setListViewMode(isListView);
     setIsListView(isListView);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    e && e.preventDefault();
 
     const urlSearchParams = new URLSearchParams();
 
@@ -288,7 +209,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       onlyCreateShortFormByMe: false,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 30,
+      size: 5,
     });
   };
 
@@ -298,12 +219,12 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
-    if (
-      target.isIntersecting &&
-      !isLoading &&
-      pagination.currentPage + 1 < pagination.totalPage
-    ) {
-      handleSearch(pagination.currentPage + 1, true);
+
+    const currentPage = assetsPage?.currentPage || 0;
+    const totalPage = assetsPage?.totalPage || 0;
+
+    if (target.isIntersecting && !isLoading && currentPage + 1 < totalPage) {
+      handleSearch();
     }
   };
 
@@ -552,10 +473,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                   type="submit"
                   size="md"
                   color="neutral"
-                  loading={isLoading}
-                  disabled={isLoading}
+                  loading={isPending}
+                  disabled={isPending}
                 >
-                  {isLoading ? <></> : <HiOutlineSearch className="w-6 h-6" />}
+                  {isPending ? <></> : <HiOutlineSearch className="w-6 h-6" />}
                   검색
                 </Button>
               </div>
@@ -569,7 +490,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         <div className="grid grid-cols-2 justify-between items-center">
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
-              총 <strong>{pagination.totalCount}</strong>개 중{' '}
+              총<strong>{searchResult?.page?.totalCount || 0}</strong>개 중{' '}
               <strong>{assets.length}</strong>개
             </h3>
           </div>
@@ -607,14 +528,14 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={assets.length === 0 && isLoading}
-            assets={assets}
+            isLoading={isPending}
+            assets={assets || []}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={assets.length === 0 && isLoading}
-            assets={assets}
+            isLoading={isPending}
+            assets={assets || []}
             onClick={handleMoveAsset}
           />
         )}

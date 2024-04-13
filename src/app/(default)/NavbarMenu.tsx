@@ -62,6 +62,7 @@ export default function NavbarMenu() {
   });
 
   const { mutate: getUseDetail } = useMutation({
+    mutationKey: ['user', 'detail'],
     mutationFn: getUserDetail,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user', 'detail'] });

@@ -3,15 +3,14 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { createUserSlice } from './user';
+import { createAssetSlice } from './asset';
 
 export const useStore = create<BoundState>()(
   devtools(
-    persist(
-      immer((...a) => ({
-        ...createUserSlice(...a),
-      })),
-      { name: 'liveshorts-store' },
-    ),
+    immer((...a) => ({
+      ...createUserSlice(...a),
+      ...createAssetSlice(...a),
+    })),
     {
       name: 'liveshorts-store',
       enabled: process.env.NODE_ENV !== 'production',
@@ -19,4 +18,4 @@ export const useStore = create<BoundState>()(
   ),
 );
 
-export type BoundState = UserState;
+export type BoundState = UserState & AssetState;

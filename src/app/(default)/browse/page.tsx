@@ -33,7 +33,7 @@ export default async function Browse(props: {
       ? Number(searchParams.channelId)
       : undefined,
     page: Number(searchParams.page || 0),
-    size: Number(searchParams.size || 30),
+    size: Number(searchParams.size || 5),
   };
 
   // get channel
