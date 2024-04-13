@@ -85,7 +85,7 @@ function parseParams(
         urlSearchParams.append(key, item);
       });
     } else {
-      urlSearchParams.set(key, value ? value + '' : '');
+      urlSearchParams.set(key, value != undefined ? value + '' : '');
     }
   });
 
