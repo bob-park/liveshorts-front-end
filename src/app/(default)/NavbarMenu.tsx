@@ -1,15 +1,14 @@
 'use client';
 
 // react
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect } from 'react';
+
+import cx from 'classnames';
 
 // next
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, useSelectedLayoutSegments } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
 
 // react-icon
 import { LuLogOut } from 'react-icons/lu';
@@ -24,45 +23,70 @@ import { userActions } from '@/store/user';
 
 import routes from './routes';
 import { getRoleType } from '@/utils/parseUtils';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { logout, touch } from '@/entries/user/api/requestAuth';
+import { useStore } from '@/shared/rootStore';
+import { getUserDetail } from '@/entries/user/api/requestUser';
 
-const { requestUpdateMe, requestLoggedOut, requestGetUser } = userActions;
+const activeMenuItem = (segments: string[], menuPaths: string[]) => {
+  if (
+    menuPaths.every((menuPath) =>
+      segments.some((segment) => segment === menuPath),
+    )
+  ) {
+    return 'active';
+  }
 
-export default function NavbarMenu(props: { token: string }) {
+  return '';
+};
+
+export default function NavbarMenu() {
   // router
   const router = useRouter();
-  const pathname = usePathname();
+  const segments = useSelectedLayoutSegments();
 
   // store
-  const dispatch = useAppDispatch();
-  const { me } = useAppSelector((state) => state.user);
+  const me = useStore((state) => state.me);
+  const updateMe = useStore((state) => state.updateMe);
+  const updateDetailMe = useStore((state) => state.updateDetailMe);
+
+  // query client
+  const queryClient = useQueryClient();
+
+  const { data: touchData } = useQuery<LoginResponse>({
+    queryKey: ['user', 'accessToken'],
+    queryFn: touch,
+    staleTime: 60 * 1_000,
+    gcTime: 300 * 1_000,
+    refetchInterval: 60 * 1_000,
+  });
+
+  const { mutate: getUseDetail } = useMutation({
+    mutationFn: getUserDetail,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'detail'] });
+      updateDetailMe(data);
+    },
+  });
+
+  const { mutate: onLogout } = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'accessToken'] });
+      router.push('/login');
+    },
+  });
 
   // useEffect
   useLayoutEffect(() => {
-    dispatch(requestUpdateMe(props.token));
-  }, []);
+    touchData && updateMe(touchData.accessToken);
+  }, [touchData]);
 
   useLayoutEffect(() => {
-    me && dispatch(requestGetUser({ id: me.id }));
-  }, [me != null]);
-
-  // handle
-  const handleLogout = () => {
-    dispatch(
-      requestLoggedOut({
-        handleAfter: () => {
-          router.push('/login');
-        },
-      }),
-    );
-  };
-
-  const activeMenuItem = (menuPath: string) => {
-    if (pathname.startsWith(menuPath)) {
-      return 'active';
+    if (me) {
+      !me.department && getUseDetail(me.id);
     }
-
-    return '';
-  };
+  }, [me]);
 
   return (
     <>
@@ -87,7 +111,9 @@ export default function NavbarMenu(props: { token: string }) {
               {routes.map((route) => (
                 <Menu.Item key={`route-menu-item-${route.id}`}>
                   <Link
-                    className={activeMenuItem(route.route)}
+                    className={cx(
+                      activeMenuItem(segments, ['broadcast', 'schedule']),
+                    )}
                     href={route.route}
                   >
                     {route.name}
@@ -183,7 +209,7 @@ export default function NavbarMenu(props: { token: string }) {
                 </li>
 
                 <hr />
-                <Dropdown.Item onClick={handleLogout}>
+                <Dropdown.Item onClick={() => onLogout()}>
                   <LuLogOut />
                   로그아웃
                 </Dropdown.Item>

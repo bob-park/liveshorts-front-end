@@ -3,11 +3,9 @@ import { SlicePattern } from 'zustand';
 import { decodeJwt } from '@/utils/common';
 
 export const createUserSlice: SlicePattern<UserState> = (set) => ({
-  updateMe: (jwt: string) =>
+  updateMe: (jwt) =>
     set(
       (state) => {
-        console.log('update me');
-
         const jwtPayload = decodeJwt(jwt);
 
         const user: User = {
@@ -24,6 +22,21 @@ export const createUserSlice: SlicePattern<UserState> = (set) => ({
       false,
       {
         type: 'user/updateMe',
+      },
+    ),
+  updateDetailMe: (user) =>
+    set(
+      (state) => {
+        return {
+          me: {
+            ...state.me,
+            ...user,
+          },
+        };
+      },
+      false,
+      {
+        type: 'user/updateDetailMe',
       },
     ),
 });

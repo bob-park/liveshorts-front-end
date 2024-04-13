@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 // nextjs
 import LoginForm from '@/components/user/LoginForm';
@@ -29,7 +29,7 @@ export default function LoginPage() {
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'login'] });
+      queryClient.invalidateQueries({ queryKey: ['user', 'accessToken'] });
       setErrMessage('');
       updateMe(data.accessToken);
 
