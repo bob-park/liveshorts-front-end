@@ -1,43 +1,49 @@
 'use client';
 
 // react
-import { useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // nextjs
 import LoginForm from '@/components/user/LoginForm';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-// hooks
-import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
-
-// action
-import { userActions } from '@/store/user';
-
-const { requestLoggedIn } = userActions;
+// query client
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { login } from '@/entries/user/api/requestAuth';
+import { useStore } from '@/shared/rootStore';
 
 export default function LoginPage() {
   // router
   const router = useRouter();
 
   // store
-  const dispatch = useAppDispatch();
-  const { isLoggingIn, isLoggedIn, failLoggedInMessage, me } = useAppSelector(
-    (state) => state.user,
-  );
+  const updateMe = useStore((state) => state.updateMe);
 
   // state
+  const [errMessage, setErrMessage] = useState<string>();
 
-  // useEffect
-  useLayoutEffect(() => {
-    if (me) {
-      router.push('/');
-    }
-  }, [me]);
+  // query client
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['user', 'login'] });
+      setErrMessage('');
+      updateMe(data.accessToken);
+
+      // browse 폴더로 이동
+      router.replace('/browse');
+    },
+    onError: () => {
+      setErrMessage('아이디 또는 패스워드가 올바르지 않습니다.');
+    },
+  });
 
   // handler
   const handleLogin = async (userId: string, password: string) => {
-    dispatch(requestLoggedIn({ userId, password }));
+    mutate({ username: userId, password });
   };
 
   return (
@@ -46,9 +52,9 @@ export default function LoginPage() {
         <Image alt="logo" src="/logo.png" width={300} height={100} />
       </div>
       <LoginForm
-        isLoggingIn={isLoggingIn}
-        isLoggedIn={isLoggedIn}
-        msg={failLoggedInMessage}
+        isLoggingIn={isPending}
+        isLoggedIn={false}
+        msg={errMessage}
         onLogin={handleLogin}
       />
     </div>
