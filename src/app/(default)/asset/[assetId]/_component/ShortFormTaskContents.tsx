@@ -86,6 +86,8 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     mutationKey: ['shortforms', 'add'],
     mutationFn: (title: string) => addTask(assetId, title),
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['shortforms'] });
+
       router.push(`/edit/${assetId}/shortform/${data.id}`);
     },
   });
