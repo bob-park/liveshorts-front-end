@@ -467,10 +467,10 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                   type="submit"
                   size="md"
                   color="neutral"
-                  loading={isPending}
-                  disabled={isPending}
+                  loading={isLoading}
+                  disabled={isLoading}
                 >
-                  {isPending ? <></> : <HiOutlineSearch className="w-6 h-6" />}
+                  {isLoading ? <></> : <HiOutlineSearch className="w-6 h-6" />}
                   검색
                 </Button>
               </div>
