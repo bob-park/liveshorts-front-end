@@ -33,7 +33,7 @@ export default async function Browse(props: {
       ? Number(searchParams.channelId)
       : undefined,
     page: Number(searchParams.page || 0),
-    size: Number(searchParams.size || 5),
+    size: Number(searchParams.size || 30),
   };
 
   // get channel
@@ -43,12 +43,9 @@ export default async function Browse(props: {
     },
   });
 
-  const channelsResult = await channelsResponse.json();
-  const channels = channelsResult.result
-    ? channelsResult.result.map((item: any) => {
-        return { channelId: item.channelId, name: item.channelName };
-      })
-    : [];
+  const channels = await channelsResponse
+    .json()
+    .then((res: ApiResponse<RecordChannel[]>) => res.result);
 
   return (
     <div>

@@ -34,10 +34,8 @@ const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 type SearchAsseResultProps = {
   isListView: boolean;
   searchAssetParams: SearchAssetParams;
-  channels: SearchChannel[];
+  channels: RecordChannel[];
 };
-
-type SearchChannel = { channelId: number; name: string };
 
 type SearchAssetParams = {
   title: string;
@@ -205,7 +203,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       onlyCreateShortFormByMe: false,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 5,
+      size: 30,
     });
   };
 
@@ -344,7 +342,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
                             })
                           }
                         >
-                          {channel.name}
+                          {channel.channelName}
                         </Button>
                       ))}
                     </div>
