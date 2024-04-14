@@ -205,7 +205,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       onlyCreateShortFormByMe: false,
       broadcastDate: dayjs().format('YYYY-MM-DD'),
       page: 0,
-      size: 30,
+      size: 5,
     });
   };
 
@@ -486,7 +486,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         <div className="grid grid-cols-2 justify-between items-center">
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
-              총<strong>{searchResult?.page?.totalCount || 0}</strong>개 중{' '}
+              총 <strong>{searchResult?.page?.totalCount || 0}</strong>개 중{' '}
               <strong>{assets.length}</strong>개
             </h3>
           </div>
@@ -524,13 +524,13 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
       <div className="col-span-1">
         {listViewMode ? (
           <ListAssetView
-            isLoading={!assetsPage && isLoading}
+            isLoading={(!assetsPage && isLoading) || isPending}
             assets={assets || []}
             onClick={handleMoveAsset}
           />
         ) : (
           <ThumbnailAssetView
-            isLoading={!assetsPage && isLoading}
+            isLoading={(!assetsPage && isLoading) || isPending}
             assets={assets || []}
             onClick={handleMoveAsset}
           />

@@ -126,8 +126,6 @@ export default function BroadcastScheduleContent(
       dayjs(selectDate || new Date()).format('YYYY-MM-DD'),
     );
 
-    console.log(urlParams.toString());
-
     router.replace(`/broadcast/schedule?${urlParams}`);
   };
 

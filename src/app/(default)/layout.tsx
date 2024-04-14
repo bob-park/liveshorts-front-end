@@ -1,7 +1,11 @@
+import { Suspense } from 'react';
+
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import NavbarMenu from './_component/NavbarMenu';
 import './globals.css';
+
+import Loading from './loading';
 
 import {
   HydrationBoundary,
@@ -52,7 +56,9 @@ export default async function DefaultLayout({
     <div className="w-full h-full min-w-[900px]">
       <HydrationBoundary state={dehydratedState}>
         <NavbarMenu />
-        <div className="p-2 ">{children}</div>
+        <div className="p-2 ">
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </div>
       </HydrationBoundary>
     </div>
   );
