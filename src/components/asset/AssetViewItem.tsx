@@ -43,11 +43,21 @@ export default function AssetViewItem(props: AssetItemProps) {
         />
       </figure>
       <div className="card-body relative">
-        {asset.shortFormCount > 0 && (
-          <div className="tooltip absolute top-2 left-8" data-tip="숏폼">
-            <SiYoutubeshorts className="w-5 h-5 text-red-600" />
+        <div className="absolute top-2 left-8 w-full">
+          <div className="flex justify-start gap-3">
+            {asset.shortFormCount > 0 && (
+              <div className="tooltip " data-tip="숏폼">
+                <SiYoutubeshorts className="w-5 h-5 text-black" />
+              </div>
+            )}
+            {asset.uploadSnsCount > 0 &&
+              asset.shortFormCount === asset.uploadSnsCount && (
+                <div className="tooltip" data-tip="YouTube 업로드">
+                  <SiYoutube className="w-5 h-5 text-black" />
+                </div>
+              )}
           </div>
-        )}
+        </div>
         <h2 className="card-title">
           <div className="tooltip w-full" data-tip={asset.title}>
             <p className="w-full truncate font-bold text-start">
@@ -77,12 +87,6 @@ export default function AssetViewItem(props: AssetItemProps) {
           </div>
 
           <div className="flex gap-3 justify-end items-center">
-            {asset.uploadSnsCount > 0 &&
-              asset.shortFormCount === asset.uploadSnsCount && (
-                <div className="tooltip" data-tip="업로드">
-                  <SiYoutube className="w-5 h-5 text-red-600" />
-                </div>
-              )}
             {asset.recordSchedule && (
               <div className="badge badge-outline badge-lg font-semibold text-sm">
                 {asset.recordSchedule.channel.channelName}
