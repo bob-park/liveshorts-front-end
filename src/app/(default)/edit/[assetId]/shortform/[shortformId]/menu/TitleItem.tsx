@@ -1,4 +1,4 @@
-import { TitleContent, WorkMenu } from '../type';
+import { TitleContent, WorkMenu } from '../_component/type';
 
 interface TitleItemProps {
   title: TitleContent;
