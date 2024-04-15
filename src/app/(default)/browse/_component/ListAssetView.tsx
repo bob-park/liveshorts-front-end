@@ -19,14 +19,13 @@ export default function ListAssetView(props: {
   return (
     <div className="grid grid-cols-1 min-w-[900px] gap-4">
       {/* header */}
-      <div className="col-span-1 grid grid-cols-8 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 justify-center items-center">
-        <div className="col-span-1"></div>
-        <div className="col-span-2">제목</div>
+      <div className="col-span-1 grid grid-cols-8 gap-4 text-center font-bold border-b-2 border-b-gray-300 h-12 mx-10 px-4 justify-center items-center">
+        <div className="col-span-3">제목</div>
         <div className="col-span-1">채널</div>
         <div className="col-span-1">대분류</div>
-        <div className="col-span-1">크기</div>
-        <div className="col-span-1">방송일</div>
-        <div className="col-span-1">생성자</div>
+        <div className="col-span-1">숏폼 여부</div>
+        <div className="col-span-1">업로드 여부</div>
+        <div className="col-span-1">방송 시간</div>
       </div>
 
       {/* content */}
