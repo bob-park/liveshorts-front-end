@@ -22,7 +22,10 @@ export default function AssetListItem(props: AssetListItemProps) {
   return (
     <div className="grid grid-cols-8 gap-4 mx-10 px-4 py-6 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-150 cursor-pointer">
       <div className="col-span-3 flex justify-start items-center mx-5 relative">
-        <div className="tooltip max-w-full text-start" data-tip={asset.title}>
+        <div
+          className="tooltip max-w-full text-start text-lg"
+          data-tip={asset.title}
+        >
           <p className="w-full truncate font-bold">{asset.title}</p>
         </div>
       </div>

@@ -60,7 +60,7 @@ export default function AssetViewItem(props: AssetItemProps) {
         </div>
         <h2 className="card-title">
           <div className="tooltip w-full" data-tip={asset.title}>
-            <p className="w-full truncate font-bold text-start">
+            <p className="w-full truncate font-bold text-start text-lg">
               {asset.title}
             </p>
           </div>
