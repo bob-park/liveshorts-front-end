@@ -69,7 +69,7 @@ const ScheduleListItem = ({
   };
 
   return (
-    <div className="flex w-full gap-5 h-44 items-center px-5 py-2 transition ease-in-out delay-150 rounded-2xl shadow-xl hover:scale-105 hover:-translate-y-1 duration-300">
+    <div className="flex w-full gap-5 h-44 items-center px-5 py-2 transition ease-in-out delay-150 rounded-2xl shadow-xl hover:scale-105 hover:-translate-y-1 duration-300 cursor-pointer">
       {/* 방송 시간 */}
       <div className="flex-none w-24 text-center text-lg font-bold">
         <div>{parseStatus(schedule.status)}</div>
