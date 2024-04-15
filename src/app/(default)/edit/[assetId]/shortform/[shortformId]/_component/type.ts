@@ -43,6 +43,7 @@ export interface Bgm {
 }
 
 export type ActivePanel = "video" | "template" | "title" | "subtitle" | "bgm";
+export type LineType = "video" | "title" | "subtitle" | "bgm";
 export type WorkMenu = "template" | "title" | "subtitle" | "bgm";
 
 // non export type

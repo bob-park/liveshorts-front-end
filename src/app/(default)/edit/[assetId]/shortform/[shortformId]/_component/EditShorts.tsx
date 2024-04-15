@@ -831,7 +831,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               sectionBoxRef={sectionBoxRef}
               startX={startX}
               endX={endX}
-              activePanel={activePanel}
+              lineType="video"
+              isActive={activePanel === "video"}
               handleMouseDownSectionBox={handleMouseDownSectionBox}
               handleMouseDownStartExpand={handleMouseDownStartExpand}
               handleMouseDownEndExpand={handleMouseDownEndExpand}
@@ -842,13 +843,49 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           </div>
 
           {/* title */}
-          <div className="relative h-1/4 border-b border-slate-300"></div>
+          <div className="relative h-1/4 border-b border-slate-300">
+            {titleContent && (
+              <SectionBox
+                sectionBoxRef={sectionBoxRef}
+                startX={startX}
+                endX={endX}
+                lineType="title"
+                isActive={activePanel === "title"}
+                text={titleContent.text}
+                handleMouseDownSectionBox={handleMouseDownSectionBox}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
+                handleClickPanel={() => {
+                  handleClickPanel("title");
+                  handleClickWorkMenu("title");
+                }}
+              />
+            )}
+          </div>
 
           {/* subtitle */}
           <div className="relative h-1/4 border-b border-slate-300"></div>
 
           {/* bgm */}
-          <div className="relative h-1/4 border-b border-slate-300"></div>
+          <div className="relative h-1/4 border-b border-slate-300">
+            {selectedBgm && (
+              <SectionBox
+                sectionBoxRef={sectionBoxRef}
+                startX={startX}
+                endX={endX}
+                lineType="bgm"
+                isActive={activePanel === "bgm"}
+                text={selectedBgm.title}
+                handleMouseDownSectionBox={handleMouseDownSectionBox}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
+                handleClickPanel={() => {
+                  handleClickPanel("bgm");
+                  handleClickWorkMenu("bgm");
+                }}
+              />
+            )}
+          </div>
         </div>
 
         <div

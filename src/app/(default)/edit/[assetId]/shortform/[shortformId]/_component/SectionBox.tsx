@@ -1,10 +1,12 @@
-import { ActivePanel } from "./type";
+import { LineType } from "./type";
 
 interface SectionBoxProps {
   sectionBoxRef: React.RefObject<HTMLDivElement>;
   startX: number;
   endX: number;
-  activePanel: ActivePanel | null;
+  lineType: LineType | null;
+  isActive: boolean;
+  text?: string;
   handleMouseDownSectionBox: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownStartExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownEndExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -15,7 +17,9 @@ export default function SectionBox({
   sectionBoxRef,
   startX,
   endX,
-  activePanel,
+  lineType,
+  isActive,
+  text,
   handleMouseDownSectionBox,
   handleMouseDownStartExpand,
   handleMouseDownEndExpand,
@@ -34,7 +38,6 @@ export default function SectionBox({
         absolute top-0 flex justify-between h-full
         cursor-grab rounded-lg
         group
-        bg-slate-200
                 `}
     >
       <div
@@ -43,30 +46,41 @@ export default function SectionBox({
           cursor-w-resize
           rounded-l-lg w-[12px] min-w-[12px]
           border-t-4 border-b-4 border-l-4
-          ${activePanel !== "video" && "group-hover:border-opacity-60"}
-          ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-          border-slate-700 bg-slate-200
+          ${!isActive && "group-hover:border-opacity-60"}
+          ${isActive ? " border-opacity-100" : "border-opacity-20"}
+          ${lineType === "video" && "videoBorder videoBackground"}
+          ${lineType === "title" && "border-violet-700 bg-violet-50"}
+          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
+          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
                 `}
       ></div>
       <div
         className={`
-            w-full
-            inset-0 border-t-4 border-b-4 box-content
-            ${activePanel !== "video" && "group-hover:border-opacity-60"}
-            ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-          border-slate-700 bg-slate-200
+          w-full
+          inset-0 border-t-4 border-b-4 box-content
+          ${!isActive && "group-hover:border-opacity-60"}
+          ${isActive ? " border-opacity-100" : "border-opacity-20"}
+          ${lineType === "video" && "border-slate-700 bg-slate-50"}
+          ${lineType === "title" && "border-violet-700 bg-violet-50"}
+          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
+          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
                 `}
-      ></div>
+      >
+        {text}
+      </div>
       <div
         onMouseDown={handleMouseDownEndExpand}
         className={`
-                cursor-e-resize
-                rounded-r-lg w-[12px] min-w-[12px]
-                border-t-4 border-b-4 border-r-4
-                ${activePanel !== "video" && "group-hover:border-opacity-60"}
-                ${activePanel === "video" ? " border-opacity-100" : "border-opacity-20"}
-                border-slate-700 bg-slate-200
-                `}
+          cursor-e-resize
+          rounded-r-lg w-[12px] min-w-[12px]
+          border-t-4 border-b-4 border-r-4
+          ${!isActive && "group-hover:border-opacity-60"}
+          ${isActive ? " border-opacity-100" : "border-opacity-20"}
+          ${lineType === "video" && "border-slate-700 bg-slate-50"}
+          ${lineType === "title" && "border-violet-700 bg-violet-50"}
+          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
+          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
+          `}
       ></div>
     </div>
   );
