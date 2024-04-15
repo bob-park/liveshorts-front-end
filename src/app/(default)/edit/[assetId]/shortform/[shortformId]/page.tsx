@@ -1,10 +1,6 @@
-import ResourceProvider from './ResourceProvider';
+import ResourceProvider from "./_component/ResourceProvider";
 
-export default async function Edit({
-  params,
-}: {
-  params: { assetId: number; shortformId: string };
-}) {
+export default async function Edit({ params }: { params: { assetId: number; shortformId: string } }) {
   const { assetId } = params;
 
   return (
