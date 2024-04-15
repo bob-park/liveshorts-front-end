@@ -12,10 +12,20 @@ export function secondsToHhmmss(seconds: number) {
   return `${HH}:${MM}:${SS}`;
 }
 
+export function secondsToMmss(seconds: number) {
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+
+  const MM = String(min).padStart(2, "0");
+  const SS = String(sec).padStart(2, "0");
+
+  return `${MM}:${SS}`;
+}
+
 export function secondsToTimeObject(seconds: number) {
   const hour = Math.floor(seconds / 3600);
   const min = Math.floor((seconds % 3600) / 60);
-  const sec = seconds % 60;
+  const sec = Math.round(seconds % 60);
 
   const formattedHour = String(hour).padStart(2, "0");
   const formattedMin = String(min).padStart(2, "0");
@@ -54,9 +64,17 @@ export function hexToRgba(hex: string, alpha?: number) {
     g = parseInt(hex.slice(3, 5), 16),
     b = parseInt(hex.slice(5, 7), 16);
 
-  if (alpha) {
+  if (alpha !== undefined) {
     return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
   } else {
     return "rgb(" + r + ", " + g + ", " + b + ")";
   }
+}
+
+export function generateTimeArray(startSeconds: number, endSeconds: number, stepSeconds: number) {
+  const timeArray = [];
+  for (let i = startSeconds; i <= endSeconds; i += stepSeconds) {
+    timeArray.push(secondsToHhmmss(i));
+  }
+  return timeArray;
 }

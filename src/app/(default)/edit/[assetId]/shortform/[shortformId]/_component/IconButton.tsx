@@ -16,11 +16,11 @@ export default function IconButton({ toolTip, Icon, onClick }: IconButtonProps) 
         className={`
         focus:outline-0
         w-10 h-10 rounded-full flex justify-center items-center
-         bg-neutral-100
-       bg-opacity-0 hover:bg-opacity-100
+         bg-neutral-200
+       bg-opacity-40 hover:bg-opacity-100
       `}
       >
-        <div className="w-5 h-5 flex justify-center items-center">{Icon}</div>
+        <div className="w-5 h-5 flex justify-center items-center text-slate-700">{Icon}</div>
       </button>
     </div>
   );
