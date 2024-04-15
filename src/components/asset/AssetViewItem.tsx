@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from 'dayjs';
 // nextjs
 import Image from 'next/image';
 import { useState } from 'react';
@@ -30,8 +31,8 @@ export default function AssetViewItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-110 duration-300 px-2 pt-6 cursor-pointer">
-      <figure className="w-full h-48">
+    <div className="card w-[396px] bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-101 duration-150 px-2 pt-6 cursor-pointer ">
+      <figure className="w-full h-48 ">
         <Image
           className="w-auto h-full rounded-md "
           src={assetImageSrc}
@@ -41,7 +42,12 @@ export default function AssetViewItem(props: AssetItemProps) {
           onError={() => setAssetImageSrc('/default_thumbnail.png')}
         />
       </figure>
-      <div className="card-body">
+      <div className="card-body relative">
+        {asset.shortFormCount > 0 && (
+          <div className="tooltip absolute top-2 left-8" data-tip="숏폼">
+            <SiYoutubeshorts className="w-5 h-5 text-red-600" />
+          </div>
+        )}
         <h2 className="card-title">
           <div className="tooltip w-full" data-tip={asset.title}>
             <p className="w-full truncate font-bold text-start">
@@ -50,23 +56,27 @@ export default function AssetViewItem(props: AssetItemProps) {
           </div>
         </h2>
         <p className="pt-4"></p>
-        <div className="card-actions justify-between">
-          {asset.createdDate && (
-            <div className="">
-              <TimeAgo
-                datetime={
-                  asset.recordSchedule?.startDateTime || asset.createdDate
-                }
-                locale="ko"
-              />
-            </div>
-          )}
-          <div className="flex gap-3 justify-end items-center">
-            {asset.shortFormCount > 0 && (
-              <div className="tooltip" data-tip="숏폼">
-                <SiYoutubeshorts className="w-5 h-5 text-red-600" />
+        <div className="card-actions justify-between items-center">
+          <div className="">
+            {asset.recordSchedule ? (
+              <div className="">
+                <p className="font-bold">방송 시간</p>
+                <p>
+                  <span className="text-base font-bold">
+                    {dayjs(asset.recordSchedule.startDateTime).format('HH:MM')}
+                  </span>
+                  <span> ~ </span>
+                  <span className="text-base font-bold">
+                    {dayjs(asset.recordSchedule.endDateTime).format('HH:MM')}
+                  </span>
+                </p>
               </div>
+            ) : (
+              <TimeAgo datetime={asset.createdDate} locale="ko" />
             )}
+          </div>
+
+          <div className="flex gap-3 justify-end items-center">
             {asset.uploadSnsCount > 0 &&
               asset.shortFormCount === asset.uploadSnsCount && (
                 <div className="tooltip" data-tip="업로드">
