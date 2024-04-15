@@ -53,7 +53,12 @@ export default function AssetViewItem(props: AssetItemProps) {
         <div className="card-actions justify-between">
           {asset.createdDate && (
             <div className="">
-              <TimeAgo datetime={asset.createdDate} locale="ko" />
+              <TimeAgo
+                datetime={
+                  asset.recordSchedule?.startDateTime || asset.createdDate
+                }
+                locale="ko"
+              />
             </div>
           )}
           <div className="flex gap-3 justify-end items-center">
@@ -68,6 +73,11 @@ export default function AssetViewItem(props: AssetItemProps) {
                   <SiYoutube className="w-5 h-5 text-red-600" />
                 </div>
               )}
+            {asset.recordSchedule && (
+              <div className="badge badge-outline badge-lg font-semibold text-sm">
+                {asset.recordSchedule.channel.channelName}
+              </div>
+            )}
             {asset.category && (
               <div className="badge badge-outline badge-lg font-semibold text-sm">
                 {asset.category.name}

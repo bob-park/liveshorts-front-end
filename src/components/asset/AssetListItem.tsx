@@ -26,7 +26,7 @@ export default function AssetListItem(props: AssetListItemProps) {
   );
 
   return (
-    <div className="grid grid-cols-7 gap-4 mx-10 my-2 px-2 py-3 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300 cursor-pointer">
+    <div className="grid grid-cols-8 gap-4 mx-10 my-2 px-2 py-3 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300 cursor-pointer">
       <div className="col-span-1 h-24 flex justify-center items-center">
         <Image
           className="w-auto h-full rounded-xl object-contain"
@@ -57,6 +57,13 @@ export default function AssetListItem(props: AssetListItemProps) {
           </div>
         )}
       </div>
+      <div className="col-span-1">
+        <div className="flex justify-center items-center h-full">
+          <div className="badge badge-outline badge-lg font-semibold text-sm">
+            {asset.recordSchedule?.channel.channelName}
+          </div>
+        </div>
+      </div>
       <div className="col-span-1 flex justify-center items-center">
         {asset.category && (
           <div className="badge badge-outline badge-lg font-semibold text-sm">
@@ -71,7 +78,12 @@ export default function AssetListItem(props: AssetListItemProps) {
         <div className="">
           {asset.createdDate && (
             <div className="">
-              <TimeAgo datetime={asset.createdDate} locale="ko" />
+              <TimeAgo
+                datetime={
+                  asset.recordSchedule?.startDateTime || asset.createdDate
+                }
+                locale="ko"
+              />
             </div>
           )}
         </div>

@@ -1,8 +1,8 @@
 // nextjs
 import { Metadata, ResolvingMetadata } from 'next';
 import { cookies } from 'next/headers';
-import ShortformHeader from './ShortformHeader';
-import ShortformContents from './ShortformContents';
+import ShortformHeader from '../_component/ShortformHeader';
+import ShortformContents from '../_component/ShortformContents';
 
 // mam api host
 const MAM_API_HOST = process.env.MAM_API_HOST;
