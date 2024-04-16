@@ -52,9 +52,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   const searchParams = useSearchParams();
 
   // store
-  const assets = useStore((state) => state.assets);
   const assetsPage = useStore((state) => state.assetsPage);
-  const searchAssetAfter = useStore((state) => state.searchAssetAfter);
   const initAssetPage = useStore((state) => state.initAssetPage);
 
   // state
@@ -62,17 +60,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   const [searchAssetParams, setSearchAssetParams] = useState<SearchAssetParams>(
     prevSearchAssetParams,
   );
-
-  const { searchResult, isPending } = useSearchAsset(
-    !assetsPage ? 0 : assetsPage.currentPage + 1,
-    searchAssetParams,
-  );
-
-  const { onSearch, isLoading } = useRequestSearchAsset(
-    !assetsPage ? 0 : assetsPage.currentPage + 1,
-    searchAssetParams,
-    searchAssetAfter,
-  );
+  const { assets, page, isPending, isLoading, onSearchAsset } =
+    useSearchAsset(searchAssetParams);
 
   // useEffect
   useLayoutEffect(() => {
@@ -103,7 +92,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // handle
   const handleSearch = () => {
-    onSearch();
+    onSearchAsset();
   };
 
   const handleToggleViewMode = (isListView: boolean) => {
@@ -411,7 +400,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         <div className="grid grid-cols-2 justify-between items-center">
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
-              총 <strong>{searchResult?.page?.totalCount || 0}</strong>개 중{' '}
+              총 <strong>{page?.totalCount || 0}</strong>개 중{' '}
               <strong>{assets.length}</strong>개
             </h3>
           </div>
