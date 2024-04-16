@@ -20,11 +20,12 @@ import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 
 import routes from '../routes';
 import { getRoleType } from '@/utils/parseUtils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { logout, touch } from '@/entries/user/api/requestAuth';
+
 import { useStore } from '@/shared/rootStore';
-import { getUserDetail } from '@/entries/user/api/requestUser';
+
 import useSessionTouch from '@/hooks/user/useSessionTouch';
+import useGetUserDetail from '@/hooks/user/useGetUserDetail';
+import useLogout from '@/hooks/user/useLogout';
 
 const activeMenuItem = (segments: string[], menuPaths: string[]) => {
   if (
@@ -48,27 +49,9 @@ export default function NavbarMenu() {
   const updateMe = useStore((state) => state.updateMe);
   const updateDetailMe = useStore((state) => state.updateDetailMe);
 
-  // query client
-  const queryClient = useQueryClient();
-
   const { touchData } = useSessionTouch();
-
-  const { mutate: getUseDetail } = useMutation({
-    mutationKey: ['user', 'detail'],
-    mutationFn: getUserDetail,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'detail'] });
-      updateDetailMe(data);
-    },
-  });
-
-  const { mutate: onLogout } = useMutation({
-    mutationFn: logout,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', 'accessToken'] });
-      router.push('/login');
-    },
-  });
+  const { onGetUserDetail } = useGetUserDetail(updateDetailMe);
+  const { onLogout } = useLogout(() => router.push('/login'));
 
   // useEffect
   useLayoutEffect(() => {
@@ -77,7 +60,7 @@ export default function NavbarMenu() {
 
   useLayoutEffect(() => {
     if (me) {
-      !me.department && getUseDetail(me.id);
+      !me.department && onGetUserDetail(me.id);
     }
   }, [me]);
 
