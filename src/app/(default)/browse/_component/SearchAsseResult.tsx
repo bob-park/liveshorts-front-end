@@ -28,7 +28,6 @@ import ThumbnailAssetView from './ThumbAssetView';
 
 import { useStore } from '@/shared/rootStore';
 import useSearchAsset from '@/hooks/asset/useSearchAsset';
-import useRequestSearchAsset from '@/hooks/asset/useRequestSearchAsset';
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -400,7 +399,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         <div className="grid grid-cols-2 justify-between items-center">
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
-              총 <strong>{page?.totalCount || 0}</strong>개 중{' '}
+              총 <strong>{page.totalCount || 0}</strong>개 중{' '}
               <strong>{assets.length}</strong>개
             </h3>
           </div>

@@ -20,8 +20,8 @@ export default function useSearchAsset(searchAssetParams: SearchAssetParams) {
           searchAssetParams,
         ),
       ),
-    staleTime: 60 * 1_000,
-    enabled: false,
+    staleTime: 300 * 1_000,
+    gcTime: 360 * 1_000,
   });
 
   const { mutate, isPending: isLoading } = useMutation({
@@ -49,7 +49,12 @@ export default function useSearchAsset(searchAssetParams: SearchAssetParams) {
 
   return {
     assets,
-    page: data?.page,
+    page: data?.page || {
+      totalCount: 0,
+      totalPage: 0,
+      currentPage: 0,
+      size: 30,
+    },
     isPending,
     isLoading,
     onSearchAsset: mutate,

@@ -13,7 +13,7 @@ export default function useSessionTouch() {
     queryKey: ['user', 'accessToken'],
     queryFn: touch,
     staleTime: 60 * 1_000,
-    gcTime: 300 * 1_000,
+    gcTime: 120 * 1_000,
     refetchInterval: 60 * 1_000,
   });
 
