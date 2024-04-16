@@ -8,12 +8,13 @@ import React from 'react';
 // dayjs
 import dayjs from 'dayjs';
 
+// hooks
+import useGetAsset from '@/hooks/asset/useGetAsset';
+
 // timeago
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
-import { useQuery } from '@tanstack/react-query';
-import { getDetailAsset } from '@/entries/asset/api/requestAsset';
 
 timeago.register('ko', ko);
 
@@ -31,12 +32,7 @@ export default function AssetPlayeContents({
   assetId,
 }: AssetPlayeContentsProps) {
   // query client
-  const { data: asset } = useQuery<Asset>({
-    queryKey: ['assets', 'detail', assetId + ''],
-    queryFn: () => getDetailAsset(assetId),
-    staleTime: 60 * 1_000,
-    gcTime: 120 * 1_000,
-  });
+  const { asset } = useGetAsset(assetId);
 
   return (
     <div className="grid grid-cols-1 gap-4">
