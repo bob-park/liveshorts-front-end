@@ -166,9 +166,12 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* copy confirm modal */}
       <CopyShortFormConfirm
         show={showCopyConfirm}
+        assetId={assetId}
         shortform={tasks?.find((item) => item.id === copyTaskId)}
         onBackdrop={() => setShowCopyConfirm(false)}
-        onConfirm={handleCopyShortForm}
+        onSuccess={(newId, copyTitle) =>
+          onUpdateShortform({ taskId: newId, title: copyTitle })
+        }
       />
 
       {/* remove confirm modal */}
