@@ -24,6 +24,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { logout, touch } from '@/entries/user/api/requestAuth';
 import { useStore } from '@/shared/rootStore';
 import { getUserDetail } from '@/entries/user/api/requestUser';
+import useSessionTouch from '@/hooks/user/useSessionTouch';
 
 const activeMenuItem = (segments: string[], menuPaths: string[]) => {
   if (
@@ -50,13 +51,7 @@ export default function NavbarMenu() {
   // query client
   const queryClient = useQueryClient();
 
-  const { data: touchData } = useQuery<LoginResponse>({
-    queryKey: ['user', 'accessToken'],
-    queryFn: touch,
-    staleTime: 60 * 1_000,
-    gcTime: 300 * 1_000,
-    refetchInterval: 60 * 1_000,
-  });
+  const { touchData } = useSessionTouch();
 
   const { mutate: getUseDetail } = useMutation({
     mutationKey: ['user', 'detail'],
