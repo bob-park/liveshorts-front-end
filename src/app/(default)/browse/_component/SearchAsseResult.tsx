@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -207,9 +207,9 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     });
   };
 
-  const handleMoveAsset = (assetId: number) => {
+  const handleMoveAsset = useCallback((assetId: number) => {
     router.push(`/asset/${assetId}`);
-  };
+  }, []);
 
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];

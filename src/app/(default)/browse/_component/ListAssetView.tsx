@@ -1,13 +1,13 @@
 import AssetListItem from '@/components/asset/AssetListItem';
 import LoadingListAssets from './LoadingListAssets';
 import EmptyAssets from './EmptyAssets';
-import { Fragment } from 'react';
+import React from 'react';
 
-export default function ListAssetView(props: {
+const ListAssetView = (props: {
   isLoading: boolean;
   assets: Asset[];
   onClick?: (assetId: number) => void;
-}) {
+}) => {
   // props
   const { isLoading, assets, onClick } = props;
 
@@ -47,4 +47,6 @@ export default function ListAssetView(props: {
       )}
     </div>
   );
-}
+};
+
+export default React.memo(ListAssetView);

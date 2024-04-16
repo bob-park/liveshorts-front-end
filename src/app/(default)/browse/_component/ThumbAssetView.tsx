@@ -1,13 +1,14 @@
+import React from 'react';
+
 import LoadingThumbanilAssets from './LoadingThumbnailAssets';
 import EmptyAssets from './EmptyAssets';
 import AssetViewItem from '@/components/asset/AssetViewItem';
-import { Fragment } from 'react';
 
-export default function ThumbnailAssetView(props: {
+const ThumbnailAssetView = (props: {
   assets: Asset[];
   isLoading: boolean;
   onClick?: (assetId: number) => void;
-}) {
+}) => {
   const { assets, isLoading, onClick } = props;
 
   // handler
@@ -35,4 +36,6 @@ export default function ThumbnailAssetView(props: {
       </div>
     </>
   );
-}
+};
+
+export default React.memo(ThumbnailAssetView);
