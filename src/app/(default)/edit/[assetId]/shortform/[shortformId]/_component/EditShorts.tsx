@@ -24,10 +24,24 @@ interface EditShortsProps {
 export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
 export const FORWARD_BACKWARD_STEP_SECONDS = 10;
+export const FONT_ARRAY = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const SIXTY_SECONDS = 60;
+const DEFAULT_TITLE_CONTENT = {
+  text: "제목을 입력하세요.",
+  x1: 0,
+  y1: 0,
+  x2: 1,
+  y2: 0.2,
+  font: FONT_ARRAY[1],
+  size: 60,
+  color: "#ffffff",
+  background: "#000000",
+  textOpacity: 1,
+  bgOpacity: 0,
+};
 
 export default function EditShorts({ videoSrc, templateList, bgmList }: EditShortsProps) {
   // useRef
@@ -70,13 +84,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
-  const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
+  const [titleContent, setTitleContent] = useState<TitleContent>(DEFAULT_TITLE_CONTENT);
   const [hasTitle, setHasTitle] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedBgm, setSelectedBgm] = useState<Bgm | null>(null);
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
-  const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
   // useEffect
@@ -432,10 +445,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [progressWidthPercent]);
 
   useEffect(() => {
-    if (selectedTemplate) {
+    if (selectedTemplate && !selectedTemplate.options.title.none) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
-        text: "제목을 입력하세요.",
+        ...titleContent,
         x1,
         y1,
         x2,
@@ -448,19 +461,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         bgOpacity,
       });
     } else {
-      setTitleContent({
-        text: "제목을 입력하세요.",
-        x1: 0,
-        y1: 0,
-        x2: 1,
-        y2: 0.2,
-        font: fontArray[1],
-        size: 60,
-        color: "#ffffff",
-        background: "#000000",
-        textOpacity: 1,
-        bgOpacity: 0,
-      });
+      setTitleContent({ ...DEFAULT_TITLE_CONTENT, text: titleContent.text });
     }
   }, [selectedTemplate]);
 
@@ -591,6 +592,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function handleClickAddTitle() {
+    if (selectedTemplate && selectedTemplate.options.title.none) return;
+
     setHasTitle(true);
 
     if (selectedTemplate) {
@@ -608,26 +611,11 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         textOpacity,
         bgOpacity,
       });
-    } else {
-      setTitleContent({
-        text: "제목을 입력하세요.",
-        x1: 0,
-        y1: 0,
-        x2: 1,
-        y2: 0.2,
-        font: fontArray[1],
-        size: 60,
-        color: "#ffffff",
-        background: "#000000",
-        textOpacity: 1,
-        bgOpacity: 0,
-      });
     }
   }
 
   function handleClickDeleteTitle() {
     setHasTitle(false);
-    setTitleContent(null);
   }
 
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -697,9 +685,9 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           {selectedWorkMenu === "title" && (
             <TitleMenu
               titleContent={titleContent}
-              optionArray={fontArray}
               disabled={!!selectedTemplate}
               hasTitle={hasTitle}
+              none={selectedTemplate?.options.title.none ?? false}
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
@@ -756,7 +744,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                 alt="template-img"
                 className="w-full h-full"
               />
-              {hasTitle && titleContent && (
+              {hasTitle && titleContent && !selectedTemplate?.options.title.none && (
                 <TitleInput
                   title={titleContent}
                   templateWidth={templateImageSize.width}
