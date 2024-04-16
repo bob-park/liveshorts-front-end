@@ -16,8 +16,8 @@ import ScheduleDateSelector from '@/components/schedule/ScheduleDateSelector';
 import ScheduleList from '@/components/schedule/ScheduleList';
 import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
 import MoveOnTop from '@/components/common/MoveOnTop';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addShortformSchedule, getSchedules } from '@/entries/schedule/api';
+import useGetSchedules from '@/hooks/schedule/useGetSchedules';
+import useReservationShortform from '@/hooks/schedule/useReservationShortform';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -47,67 +47,11 @@ export default function BroadcastScheduleContent(
   const [reserveRecordSchedule, setReserveRecordSchedule] =
     useState<RecordSchedule>();
 
-  // query client
-  const queryClient = useQueryClient();
-  const { data: schedules } = useQuery<RecordSchedule[]>({
-    queryKey: ['schedules'],
-    queryFn: () => getSchedules(selectChannelId, { selectDate }),
-    staleTime: 60 * 1_000,
-    gcTime: 120 * 1_000,
-    enabled: false,
-  });
-
-  const { mutate: onGetSchedules } = useMutation({
-    mutationKey: ['schedules'],
-    mutationFn: () => getSchedules(selectChannelId, { selectDate }),
-    onMutate: () => {
-      queryClient.invalidateQueries({ queryKey: ['schedules'] });
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['schedules'], data);
-    },
-  });
-
-  const { mutate: onAddShortformSchedule } = useMutation({
-    mutationKey: [
-      'schedules',
-      reserveRecordSchedule?.scheduleId,
-      'add',
-      'shortform',
-    ],
-    mutationFn: ({
-      scheduleId,
-      body,
-    }: {
-      scheduleId: number;
-      body: {
-        channelId: number;
-        ranges: {
-          itemId: string;
-          time: {
-            startTime: string;
-            endTime: string;
-          };
-        }[];
-      };
-    }) => addShortformSchedule(scheduleId, body),
-    onSuccess: (data) => {
-      const newSchedules = schedules?.slice() || [];
-
-      const index = newSchedules.findIndex(
-        (item) => item.scheduleId === data.schedule?.scheduleId,
-      );
-
-      if (index >= 0) {
-        newSchedules[index] = {
-          ...newSchedules[index],
-          shorts: data,
-        };
-      }
-
-      queryClient.setQueryData(['schedules'], newSchedules);
-    },
-  });
+  const { schedules, onGetSchedules } = useGetSchedules(
+    selectChannelId,
+    selectDate,
+  );
+  const { onReservationShortform } = useReservationShortform(schedules || []);
 
   useLayoutEffect(() => {
     handleGetSchedule();
@@ -159,7 +103,7 @@ export default function BroadcastScheduleContent(
       return;
     }
 
-    onAddShortformSchedule({
+    onReservationShortform({
       scheduleId: reserveRecordSchedule.scheduleId,
       body: {
         channelId: selectChannelId,
