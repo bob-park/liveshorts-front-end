@@ -21,8 +21,6 @@ import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
 import routes from '../routes';
 import { getRoleType } from '@/utils/parseUtils';
 
-import { useStore } from '@/shared/rootStore';
-
 import useSessionTouch from '@/hooks/user/useSessionTouch';
 import useGetUserDetail from '@/hooks/user/useGetUserDetail';
 import useLogout from '@/hooks/user/useLogout';
@@ -44,20 +42,11 @@ export default function NavbarMenu() {
   const router = useRouter();
   const segments = useSelectedLayoutSegments();
 
-  // store
-  const me = useStore((state) => state.me);
-  const updateMe = useStore((state) => state.updateMe);
-  const updateDetailMe = useStore((state) => state.updateDetailMe);
-
-  const { touchData } = useSessionTouch();
-  const { onGetUserDetail } = useGetUserDetail(updateDetailMe);
+  const { me } = useSessionTouch();
+  const { onGetUserDetail } = useGetUserDetail();
   const { onLogout } = useLogout(() => router.push('/login'));
 
   // useEffect
-  useLayoutEffect(() => {
-    touchData && updateMe(touchData.accessToken);
-  }, [touchData]);
-
   useLayoutEffect(() => {
     if (me) {
       !me.department && onGetUserDetail(me.id);
