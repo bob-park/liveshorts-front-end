@@ -739,6 +739,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                 }}
                 className="absolute w-full border border-red-500 z-10"
               ></div>
+              {/* TODO - 이부분 에러 처리 */}
               <img
                 src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
                 alt="template-img"
