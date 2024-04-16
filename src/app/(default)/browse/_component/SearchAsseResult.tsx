@@ -25,9 +25,11 @@ import { Button, Loading } from 'react-daisyui';
 import MoveOnTop from '@/components/common/MoveOnTop';
 import ListAssetView from './ListAssetView';
 import ThumbnailAssetView from './ThumbAssetView';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { searchAsset } from '@/entries/asset/api/requestAsset';
 import { useStore } from '@/shared/rootStore';
+import useSearchAsset from '@/hooks/asset/useSearchAsset';
+import useRequestSearchAsset from '@/hooks/asset/useRequestSearchAsset';
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -36,63 +38,6 @@ type SearchAsseResultProps = {
   searchAssetParams: SearchAssetParams;
   channels: RecordChannel[];
 };
-
-type SearchAssetParams = {
-  title: string;
-  channelId?: number;
-  isShortForm?: boolean;
-  onlyCreateShortFormByMe: boolean;
-  broadcastDate: string;
-  page: number;
-  size: number;
-};
-
-function parseParams(
-  page: number,
-  searchParams: SearchAssetParams,
-): URLSearchParams {
-  const metas: string[] = [];
-
-  searchParams.broadcastDate &&
-    metas.push(
-      `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchParams.broadcastDate}`,
-    );
-
-  searchParams.channelId &&
-    metas.push(
-      `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${searchParams.channelId}`,
-    );
-
-  const params = {
-    page,
-    size: searchParams.size,
-    isDeleted: false,
-    assetStatus: 'REGISTERED',
-    metas,
-    title: searchParams.title || '',
-    existShortForm:
-      searchParams.isShortForm == undefined ? '' : searchParams.isShortForm,
-    onlyCreateShortFormByMe: searchParams.onlyCreateShortFormByMe,
-  };
-
-  const urlSearchParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value instanceof Array) {
-      value.forEach((item) => {
-        urlSearchParams.append(key, item);
-      });
-    } else {
-      urlSearchParams.set(key, value != undefined ? value + '' : '');
-    }
-  });
-
-  return urlSearchParams;
-}
-
-function search(page: number, searchParams: SearchAssetParams) {
-  return searchAsset(parseParams(page, searchParams));
-}
 
 export default function SearchAsseResult(props: SearchAsseResultProps) {
   // props
@@ -119,33 +64,16 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     prevSearchAssetParams,
   );
 
-  // query client
-  const queryClient = useQueryClient();
+  const { searchResult, isPending } = useSearchAsset(
+    !assetsPage ? 0 : assetsPage.currentPage + 1,
+    searchAssetParams,
+  );
 
-  const { data: searchResult, isPending } = useQuery<ApiResponse<Asset[]>>({
-    queryKey: ['assets', 'search'],
-    queryFn: () => search(0, searchAssetParams),
-    staleTime: 60 * 1_000,
-    enabled: false,
-  });
-
-  const { mutate: onSearch, isPending: isLoading } = useMutation({
-    mutationKey: ['assets', 'search'],
-    mutationFn: () =>
-      search(!assetsPage ? 0 : assetsPage.currentPage + 1, searchAssetParams),
-    onMutate: () => {
-      if (!assetsPage) {
-        queryClient.invalidateQueries({
-          queryKey: ['assets', 'search'],
-          exact: true,
-        });
-      }
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['assets', 'search'], data);
-      searchAssetAfter(data.result, data?.page);
-    },
-  });
+  const { onSearch, isLoading } = useRequestSearchAsset(
+    !assetsPage ? 0 : assetsPage.currentPage + 1,
+    searchAssetParams,
+    searchAssetAfter,
+  );
 
   // useEffect
   useLayoutEffect(() => {

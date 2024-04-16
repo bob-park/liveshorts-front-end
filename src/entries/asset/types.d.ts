@@ -49,3 +49,13 @@ type SearchAssetsParams = {
   existShortForm: boolean | string;
   onlyCreateShortFormByMe: boolean;
 };
+
+type SearchAssetParams = {
+  title: string;
+  channelId?: number;
+  isShortForm?: boolean;
+  onlyCreateShortFormByMe: boolean;
+  broadcastDate: string;
+  page: number;
+  size: number;
+};
