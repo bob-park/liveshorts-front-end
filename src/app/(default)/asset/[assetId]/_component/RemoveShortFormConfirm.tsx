@@ -7,6 +7,7 @@ import { IoCloseCircleOutline } from 'react-icons/io5';
 
 type RemoveShortFormConfirmProps = {
   show: boolean;
+  loading: boolean;
   shortform?: ShortFormTask;
   onBackdrop?: () => void;
   onConfirm?: () => void;
@@ -16,6 +17,7 @@ const id = 'remove_shortform_confirm_modal';
 
 export default function RemoveShortFormConfirm({
   show,
+  loading,
   shortform,
   onBackdrop,
   onConfirm,
@@ -46,8 +48,6 @@ export default function RemoveShortFormConfirm({
 
   const handleConfirm = () => {
     onConfirm && onConfirm();
-
-    handleBackdrop();
   };
 
   return (
@@ -73,8 +73,13 @@ export default function RemoveShortFormConfirm({
               type="button"
               className="btn btn-error bg-red-600 text-white ml-3"
               onClick={handleConfirm}
+              disabled={loading}
             >
-              <FaTrashAlt className="w-6 h-6" />
+              {loading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                <FaTrashAlt className="w-6 h-6" />
+              )}
               삭제
             </button>
           </form>

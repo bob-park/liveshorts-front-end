@@ -9,7 +9,7 @@ export default function useDeleteShortform(
 ) {
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ['shortforms', 'remove'],
     mutationFn: () => removeTask(removeShortFormId),
     onSuccess: () => {
@@ -21,5 +21,5 @@ export default function useDeleteShortform(
     },
   });
 
-  return { onDeleteShortform: mutate };
+  return { onDeleteShortform: mutate, isLoading: isPending };
 }

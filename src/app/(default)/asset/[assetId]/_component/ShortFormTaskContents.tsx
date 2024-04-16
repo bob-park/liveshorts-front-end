@@ -61,24 +61,20 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   const { tasks } = useSearchTask(assetId);
   const { onSearchTask, isLoading } = useRequestSearchTask(assetId);
-  const { onCreateShortform } = useCreateShortform(assetId, (shortformId) =>
-    router.push(`/edit/${assetId}/shortform/${shortformId}`),
-  );
-  const { onDeleteShortform } = useRemoveShortform(
-    tasks || [],
-    assetId,
-    removeTaskId || '',
-  );
+  const { onCreateShortform, isLoading: isLoadingCreateShortform } =
+    useCreateShortform(assetId, (shortformId) =>
+      router.push(`/edit/${assetId}/shortform/${shortformId}`),
+    );
+  const { onDeleteShortform, isLoading: isLoadingDeleteShortform } =
+    useRemoveShortform(tasks || [], assetId, removeTaskId || '');
   const { onUpdateShortform } = useUpdateShortform(tasks || [], assetId);
-  const { onCopyShortform } = useCopyShortform(
-    tasks || [],
-    assetId,
-    (newShortForm) =>
+  const { onCopyShortform, isLoading: isLoadingCopyShortform } =
+    useCopyShortform(tasks || [], assetId, (newShortForm) =>
       onUpdateShortform({
         taskId: newShortForm.id,
         title: newShortForm.title + ' - 복사본',
       }),
-  );
+    );
 
   //useEffect
   useLayoutEffect(() => {
@@ -171,6 +167,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* create shortform modal */}
       <CreateShortFormModal
         show={showCreateModal}
+        loading={isLoadingCreateShortform}
         onBackdrop={() => setShowCreateModal(false)}
         onCreate={handleCreateShortForm}
       />
@@ -186,6 +183,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* remove confirm modal */}
       <RemoveShortFormConfirm
         show={showRemoveConfirm}
+        loading={isLoadingDeleteShortform}
         shortform={tasks?.find((item) => item.id === removeTaskId)}
         onBackdrop={() => setShowRemoveConfirm(false)}
         onConfirm={handleRemoveShortForm}

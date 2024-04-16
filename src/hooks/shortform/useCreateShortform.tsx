@@ -8,7 +8,7 @@ export default function useCreateShortform(
 ) {
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ['shortforms', 'add'],
     mutationFn: (title: string) => addTask(assetId, title),
     onSuccess: (data) => {
@@ -18,5 +18,5 @@ export default function useCreateShortform(
     },
   });
 
-  return { onCreateShortform: mutate };
+  return { onCreateShortform: mutate, isLoading: isPending };
 }

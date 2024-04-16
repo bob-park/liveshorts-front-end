@@ -7,6 +7,7 @@ import { IoCloseCircleOutline } from 'react-icons/io5';
 
 type CreateShortFormModalProps = {
   show: boolean;
+  loading: boolean;
   onBackdrop?: () => void;
   onCreate?: (title?: string) => void;
 };
@@ -15,6 +16,7 @@ const id = 'create_shortform_modal';
 
 export default function CreateShortFormModal({
   show,
+  loading,
   onBackdrop,
   onCreate,
 }: CreateShortFormModalProps) {
@@ -47,8 +49,6 @@ export default function CreateShortFormModal({
 
   const handleCreate = () => {
     onCreate && onCreate(title);
-
-    handleBackdrop();
   };
 
   return (
@@ -87,8 +87,13 @@ export default function CreateShortFormModal({
               type="button"
               className="btn btn-neutral text-white ml-3"
               onClick={handleCreate}
+              disabled={loading}
             >
-              <IoAddCircle className="w-6 h-6" />
+              {loading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                <IoAddCircle className="w-6 h-6" />
+              )}
               생성
             </button>
           </form>
