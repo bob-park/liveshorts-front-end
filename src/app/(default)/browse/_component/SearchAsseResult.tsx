@@ -26,7 +26,6 @@ import MoveOnTop from '@/components/common/MoveOnTop';
 import ListAssetView from './ListAssetView';
 import ThumbnailAssetView from './ThumbAssetView';
 
-import { searchAsset } from '@/entries/asset/api/requestAsset';
 import { useStore } from '@/shared/rootStore';
 import useSearchAsset from '@/hooks/asset/useSearchAsset';
 import useRequestSearchAsset from '@/hooks/asset/useRequestSearchAsset';

@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 // react icons
 import { SiYoutubeshorts, SiYoutube } from 'react-icons/si';
+import { IoTimeOutline } from 'react-icons/io5';
 
 // timeago
 import TimeAgo from 'timeago-react';
@@ -31,7 +32,7 @@ export default function AssetViewItem(props: AssetItemProps) {
   // handle
 
   return (
-    <div className="card w-[396px] bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-101 duration-150 px-2 pt-6 cursor-pointer ">
+    <div className="card w-[410px] bg-base-100 shadow-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-101 duration-150 px-2 pt-6 cursor-pointer ">
       <figure className="w-full h-48 ">
         <Image
           className="w-auto h-full rounded-md "
@@ -67,11 +68,23 @@ export default function AssetViewItem(props: AssetItemProps) {
         </h2>
         <p className="pt-4"></p>
         <div className="card-actions justify-between items-center">
+          <div className="flex gap-3 justify-end items-center">
+            {asset.recordSchedule && (
+              <div className="badge badge-outline badge-lg font-semibold text-sm">
+                {asset.recordSchedule.channel.channelName}
+              </div>
+            )}
+            {asset.category && (
+              <div className="badge badge-outline badge-lg font-semibold text-sm">
+                {asset.category.name}
+              </div>
+            )}
+          </div>
           <div className="">
             {asset.recordSchedule ? (
-              <div className="">
-                <p className="font-bold">방송 시간</p>
-                <p>
+              <div className="tooltip w-full" data-tip="방송 시간">
+                <p className="items-center">
+                  <IoTimeOutline className="inline mr-1" />
                   <span className="text-base font-bold">
                     {dayjs(asset.recordSchedule.startDateTime).format('HH:MM')}
                   </span>
@@ -83,19 +96,6 @@ export default function AssetViewItem(props: AssetItemProps) {
               </div>
             ) : (
               <TimeAgo datetime={asset.createdDate} locale="ko" />
-            )}
-          </div>
-
-          <div className="flex gap-3 justify-end items-center">
-            {asset.recordSchedule && (
-              <div className="badge badge-outline badge-lg font-semibold text-sm">
-                {asset.recordSchedule.channel.channelName}
-              </div>
-            )}
-            {asset.category && (
-              <div className="badge badge-outline badge-lg font-semibold text-sm">
-                {asset.category.name}
-              </div>
             )}
           </div>
         </div>
