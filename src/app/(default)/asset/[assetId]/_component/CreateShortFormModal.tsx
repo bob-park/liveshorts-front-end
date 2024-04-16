@@ -1,4 +1,8 @@
+'use client';
+
 // react
+import useCreateShortform from '@/hooks/shortform/useCreateShortform';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // react icon
@@ -7,7 +11,7 @@ import { IoCloseCircleOutline } from 'react-icons/io5';
 
 type CreateShortFormModalProps = {
   show: boolean;
-  loading: boolean;
+  assetId: number;
   onBackdrop?: () => void;
   onCreate?: (title?: string) => void;
 };
@@ -16,12 +20,17 @@ const id = 'create_shortform_modal';
 
 export default function CreateShortFormModal({
   show,
-  loading,
+  assetId,
   onBackdrop,
-  onCreate,
 }: CreateShortFormModalProps) {
+  const router = useRouter();
+
   // state
   const [title, setTitle] = useState<string>('');
+
+  const { onCreateShortform, isLoading } = useCreateShortform((shortformId) => {
+    router.push(`/edit/${assetId}/shortform/${shortformId}`);
+  });
 
   // useEffect
   useEffect(() => {
@@ -48,7 +57,7 @@ export default function CreateShortFormModal({
   };
 
   const handleCreate = () => {
-    onCreate && onCreate(title);
+    title && onCreateShortform({ assetId, title });
   };
 
   return (
@@ -87,9 +96,9 @@ export default function CreateShortFormModal({
               type="button"
               className="btn btn-neutral text-white ml-3"
               onClick={handleCreate}
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? (
+              {isLoading ? (
                 <span className="loading loading-spinner" />
               ) : (
                 <IoAddCircle className="w-6 h-6" />

@@ -61,10 +61,6 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   const { tasks } = useSearchTask(assetId);
   const { onSearchTask, isLoading } = useRequestSearchTask(assetId);
-  const { onCreateShortform, isLoading: isLoadingCreateShortform } =
-    useCreateShortform(assetId, (shortformId) =>
-      router.push(`/edit/${assetId}/shortform/${shortformId}`),
-    );
   const { onDeleteShortform, isLoading: isLoadingDeleteShortform } =
     useRemoveShortform(tasks || [], assetId, removeTaskId || '');
   const { onUpdateShortform } = useUpdateShortform(tasks || [], assetId);
@@ -94,10 +90,6 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     }
 
     router.push(`/asset/${assetId}/shortform/${taskId}`);
-  };
-
-  const handleCreateShortForm = (title: string | undefined) => {
-    title && onCreateShortform(title);
   };
 
   const handleEditShortForm = (taskId: string) => {
@@ -167,9 +159,8 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* create shortform modal */}
       <CreateShortFormModal
         show={showCreateModal}
-        loading={isLoadingCreateShortform}
+        assetId={assetId}
         onBackdrop={() => setShowCreateModal(false)}
-        onCreate={handleCreateShortForm}
       />
 
       {/* copy confirm modal */}
