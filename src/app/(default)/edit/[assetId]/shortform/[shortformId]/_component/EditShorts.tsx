@@ -71,6 +71,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
+  const [hasTitle, setHasTitle] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedBgm, setSelectedBgm] = useState<Bgm | null>(null);
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
@@ -590,6 +591,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function handleClickAddTitle() {
+    setHasTitle(true);
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
@@ -623,6 +626,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function handleClickDeleteTitle() {
+    setHasTitle(false);
     setTitleContent(null);
   }
 
@@ -695,6 +699,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               titleContent={titleContent}
               optionArray={fontArray}
               disabled={!!selectedTemplate}
+              hasTitle={hasTitle}
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
@@ -751,7 +756,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                 alt="template-img"
                 className="w-full h-full"
               />
-              {titleContent && (
+              {hasTitle && titleContent && (
                 <TitleInput
                   title={titleContent}
                   templateWidth={templateImageSize.width}
@@ -844,7 +849,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
           {/* title */}
           <div className="relative h-1/4 border-b border-slate-300">
-            {titleContent && (
+            {hasTitle && titleContent && (
               <SectionBox
                 sectionBoxRef={sectionBoxRef}
                 startX={startX}

@@ -5,6 +5,7 @@ interface TitleMenuProps {
   titleContent: TitleContent | null;
   optionArray: string[];
   disabled: boolean;
+  hasTitle: boolean;
   handleClickAddTitle: () => void;
   handleClickDeleteTitle: () => void;
   handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
@@ -15,12 +16,12 @@ export default function TitleMenu({
   titleContent,
   optionArray,
   disabled,
+  hasTitle,
   handleClickAddTitle,
   handleClickDeleteTitle,
   handleChangeTitle,
   handleClickWorkMenu,
 }: TitleMenuProps) {
-  // TODO - titleContent가 null이 아니어도 제목 추가 버튼으로만 생성될 수 있게 보완 필요
   return (
     <div
       onClick={() => {
@@ -28,11 +29,11 @@ export default function TitleMenu({
       }}
       className="relative h-full p-2 flex flex-col gap-2"
     >
-      <button disabled={!!titleContent} onClick={handleClickAddTitle} className="btn w-full">
+      <button disabled={hasTitle} onClick={handleClickAddTitle} className="btn w-full">
         + 제목 추가
       </button>
       <div className="h-[calc(100vh-500px)] overflow-y-scroll">
-        {titleContent && (
+        {hasTitle && titleContent && (
           <TitleItem
             title={titleContent}
             optionArray={optionArray}

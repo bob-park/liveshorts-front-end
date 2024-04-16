@@ -48,7 +48,7 @@ export default function SectionBox({
           border-t-4 border-b-4 border-l-4
           ${!isActive && "group-hover:border-opacity-60"}
           ${isActive ? " border-opacity-100" : "border-opacity-20"}
-          ${lineType === "video" && "videoBorder videoBackground"}
+          ${lineType === "video" && "border-slate-700 bg-slate-50"}
           ${lineType === "title" && "border-violet-700 bg-violet-50"}
           ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
           ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
