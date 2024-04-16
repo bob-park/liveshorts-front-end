@@ -1,3 +1,5 @@
+import delay from '@/utils/delay';
+
 export async function requestExtra(taskId: string, extraTypeId: string) {
   const response = await fetch(`/api/v1/shorts/task/${taskId}/extra`, {
     method: 'post',
@@ -9,6 +11,8 @@ export async function requestExtra(taskId: string, extraTypeId: string) {
     },
     body: JSON.stringify({ extraTypeIds: [extraTypeId] }),
   });
+
+  await delay(1_000);
 
   if (!response.ok) {
     throw new Error(response.statusText);

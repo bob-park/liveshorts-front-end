@@ -1,7 +1,10 @@
 import { requestExtra } from '@/entries/shortform/api/requestShortformExtra';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export default function useRequestExtra(shortformId: string) {
+export default function useRequestExtra(
+  shortformId: string,
+  onSuccess?: () => void,
+) {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
@@ -9,6 +12,8 @@ export default function useRequestExtra(shortformId: string) {
     mutationFn: (typeId: string) => requestExtra(shortformId, typeId),
     onSuccess: (data) => {
       queryClient.setQueryData(['shortforms', 'detail', data.id], data);
+
+      onSuccess && onSuccess();
     },
   });
 

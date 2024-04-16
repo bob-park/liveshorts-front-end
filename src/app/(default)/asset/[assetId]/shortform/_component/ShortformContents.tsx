@@ -18,7 +18,6 @@ import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 import CreateShortformExtraModal from './CreateShortformExtraModal';
 import { parseStatus } from '@/utils/common';
 import useGetShortform from '@/hooks/shortform/useGetShortform';
-import useRequestExtra from '@/hooks/shortform/useRequestExtra';
 
 type ShortformContentsProps = {
   assetId: number;
@@ -48,7 +47,6 @@ export default function ShortformContents(props: ShortformContentsProps) {
     onGetShortform,
     isLoading,
   } = useGetShortform(shortform.id);
-  const { onRequestExtra } = useRequestExtra(shortform.id);
 
   // state
   const [nowSrc, setNowSrc] = useState<string>(``);
@@ -97,14 +95,6 @@ export default function ShortformContents(props: ShortformContentsProps) {
     setShowCreateExtra(show);
 
     show ? setSelectExtraType(extraType) : setSelectExtraType(undefined);
-  };
-
-  const handleCreateExtra = () => {
-    if (!selectExtraType) {
-      return;
-    }
-
-    onRequestExtra(selectExtraType.id);
   };
 
   return (
@@ -319,9 +309,10 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* create extra modal */}
       <CreateShortformExtraModal
         show={showCreateExtra}
+        shortformId={shortform.id}
         title={selectExtraType?.name}
+        selectExtraType={selectExtraType}
         onBackdrop={() => handleShowCreateExtra(false, undefined)}
-        onCreate={() => handleCreateExtra()}
       />
     </>
   );
