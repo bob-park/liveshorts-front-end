@@ -8,8 +8,6 @@ interface TemplateMenuProps {
 }
 
 export default function TemplateMenu({ templateList, selectedTemplateId, handleClickTemplate }: TemplateMenuProps) {
-  console.log(templateList);
-
   return (
     <div className="p-2 flex flex-col gap-2">
       <button
