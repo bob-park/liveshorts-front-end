@@ -28,7 +28,7 @@ export default function CopyShortFormConfirm({
 
   const { tasks } = useSearchTask(assetId);
   const { onCopyShortform, isLoading } = useCopyShortform(
-    tasks || [],
+    tasks,
     assetId,
     (newShortForm) => {
       onSuccess && onSuccess(newShortForm.id, newShortForm.title + ' - 복사본');

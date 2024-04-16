@@ -18,11 +18,7 @@ import RemoveShortFormConfirm from './RemoveShortFormConfirm';
 import CreateShortFormModal from './CreateShortFormModal';
 
 import useSearchTask from '@/hooks/shortform/useSearchTask';
-import useRequestSearchTask from '@/hooks/shortform/useRequestSearchTask';
-import useCreateShortform from '@/hooks/shortform/useCreateShortform';
-import useRemoveShortform from '@/hooks/shortform/useDeleteShortform';
 import useUpdateShortform from '@/hooks/shortform/useUpdateShortform';
-import useCopyShortform from '@/hooks/shortform/useCopyShortform';
 
 const ShortFormLoading = () => {
   return (
@@ -59,18 +55,8 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
   const [showRemoveConfirm, setShowRemoveConfirm] = useState<boolean>(false);
   const [removeTaskId, setRemoveTaskId] = useState<string>();
 
-  const { tasks } = useSearchTask(assetId);
-  const { onSearchTask, isLoading } = useRequestSearchTask(assetId);
-  const { onDeleteShortform, isLoading: isLoadingDeleteShortform } =
-    useRemoveShortform(tasks || [], assetId, removeTaskId || '');
-  const { onUpdateShortform } = useUpdateShortform(tasks || [], assetId);
-  const { onCopyShortform, isLoading: isLoadingCopyShortform } =
-    useCopyShortform(tasks || [], assetId, (newShortForm) =>
-      onUpdateShortform({
-        taskId: newShortForm.id,
-        title: newShortForm.title + ' - 복사본',
-      }),
-    );
+  const { tasks, onSearchShortform, isLoading } = useSearchTask(assetId);
+  const { onUpdateShortform } = useUpdateShortform(tasks, assetId);
 
   //useEffect
   useLayoutEffect(() => {
@@ -79,7 +65,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // handle
   const handleGetShortFormTask = () => {
-    onSearchTask();
+    onSearchShortform();
   };
 
   const handleMoveShortformView = (taskId: string) => {
@@ -94,14 +80,6 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   const handleEditShortForm = (taskId: string) => {
     router.push(`/edit/${assetId}/shortform/${taskId}`);
-  };
-
-  const handleCopyShortForm = () => {
-    copyTaskId && onCopyShortform(copyTaskId);
-  };
-
-  const handleRemoveShortForm = () => {
-    removeTaskId && onDeleteShortform();
   };
 
   return (
@@ -177,10 +155,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* remove confirm modal */}
       <RemoveShortFormConfirm
         show={showRemoveConfirm}
-        loading={isLoadingDeleteShortform}
+        assetId={assetId}
         shortform={tasks?.find((item) => item.id === removeTaskId)}
         onBackdrop={() => setShowRemoveConfirm(false)}
-        onConfirm={handleRemoveShortForm}
       />
     </>
   );
