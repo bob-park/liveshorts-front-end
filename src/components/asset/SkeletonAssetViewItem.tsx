@@ -1,6 +1,6 @@
 export default function SkeletonAssetItem() {
   return (
-    <div className="card w-[396px] bg-base-100 shadow-xl hover:shadow-2xl transition px-4 pt-6 hover:-translate-y-1 hover:scale-110 duration-300 ease-in-out delay-150 ">
+    <div className="card w-[410px] bg-base-100 shadow-xl hover:shadow-2xl transition px-4 pt-6 hover:-translate-y-1 hover:scale-110 duration-300 ease-in-out delay-150 ">
       <figure className="w-full relative h-48">
         <div className="skeleton h-full w-full"></div>
       </figure>
