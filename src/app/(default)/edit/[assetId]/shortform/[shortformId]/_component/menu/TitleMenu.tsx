@@ -1,4 +1,4 @@
-import { TitleContent, WorkMenu } from "../type";
+import { ActivePanel, TitleContent, WorkMenu } from "../type";
 import TitleItem from "./TitleItem";
 
 interface TitleMenuProps {
@@ -10,6 +10,7 @@ interface TitleMenuProps {
   handleClickDeleteTitle: () => void;
   handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
+  handleClickPanel(panel: ActivePanel): void;
 }
 
 export default function TitleMenu({
@@ -21,11 +22,13 @@ export default function TitleMenu({
   handleClickDeleteTitle,
   handleChangeTitle,
   handleClickWorkMenu,
+  handleClickPanel,
 }: TitleMenuProps) {
   return (
     <div
       onClick={() => {
         handleClickWorkMenu("title");
+        handleClickPanel("title");
       }}
       className="relative h-full p-2 flex flex-col gap-2"
     >

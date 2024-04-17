@@ -672,18 +672,18 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   return (
     <div className="grid grid-rows-[1fr,60px,240px] h-full">
       <div className="grid grid-cols-[340px,1fr] border-b">
-        <div
-          onClick={() => {
-            handleClickPanel("title");
-          }}
-          className="border-r flex flex-col"
-        >
-          <TabMenu selectedWorkMenu={selectedWorkMenu} handleClickWorkMenu={handleClickWorkMenu} />
+        <div className="border-r flex flex-col">
+          <TabMenu
+            selectedWorkMenu={selectedWorkMenu}
+            handleClickWorkMenu={handleClickWorkMenu}
+            handleClickPanel={handleClickPanel}
+          />
           {selectedWorkMenu === "template" && (
             <TemplateMenu
               templateList={templateList}
               selectedTemplateId={selectedTemplate?.templateId ?? ""}
               handleClickTemplate={handleClickTemplate}
+              handleClickPanel={handleClickPanel}
             />
           )}
           {selectedWorkMenu === "title" && (
@@ -696,15 +696,19 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
               handleClickWorkMenu={handleClickWorkMenu}
+              handleClickPanel={handleClickPanel}
             />
           )}
-          {selectedWorkMenu === "subtitle" && <SubtitleMenu />}
+          {selectedWorkMenu === "subtitle" && (
+            <SubtitleMenu handleClickWorkMenu={handleClickWorkMenu} handleClickPanel={handleClickPanel} />
+          )}
           {selectedWorkMenu === "bgm" && (
             <BgmMenu
               bgmList={bgmList}
               selectedBgmId={selectedBgm?.bgmId ?? ""}
               handleClickBgm={handleClickBgm}
               handleClickWorkMenu={handleClickWorkMenu}
+              handleClickPanel={handleClickPanel}
             />
           )}
         </div>

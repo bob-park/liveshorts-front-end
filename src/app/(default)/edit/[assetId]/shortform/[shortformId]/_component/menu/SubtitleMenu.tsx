@@ -1,5 +1,19 @@
-interface SubtitleMenuProps {}
+import { ActivePanel, WorkMenu } from "../type";
 
-export default function SubtitleMenu({}: SubtitleMenuProps) {
-  return <div>w</div>;
+interface SubtitleMenuProps {
+  handleClickWorkMenu(workMenu: WorkMenu): void;
+  handleClickPanel(panel: ActivePanel): void;
+}
+
+export default function SubtitleMenu({ handleClickWorkMenu, handleClickPanel }: SubtitleMenuProps) {
+  return (
+    <div
+      onClick={() => {
+        handleClickWorkMenu("bgm");
+        handleClickPanel("bgm");
+      }}
+    >
+      w
+    </div>
+  );
 }
