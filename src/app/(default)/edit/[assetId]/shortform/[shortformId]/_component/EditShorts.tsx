@@ -24,10 +24,24 @@ interface EditShortsProps {
 export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
 export const FORWARD_BACKWARD_STEP_SECONDS = 10;
+export const FONT_ARRAY = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const SIXTY_SECONDS = 60;
+const DEFAULT_TITLE_CONTENT = {
+  text: "제목을 입력하세요.",
+  x1: 0,
+  y1: 0,
+  x2: 1,
+  y2: 0.2,
+  font: FONT_ARRAY[1],
+  size: 60,
+  color: "#ffffff",
+  background: "#000000",
+  textOpacity: 1,
+  bgOpacity: 0,
+};
 
 export default function EditShorts({ videoSrc, templateList, bgmList }: EditShortsProps) {
   // useRef
@@ -70,12 +84,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
-  const [titleContent, setTitleContent] = useState<TitleContent | null>(null);
+  const [titleContent, setTitleContent] = useState<TitleContent>(DEFAULT_TITLE_CONTENT);
+  const [hasTitle, setHasTitle] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedBgm, setSelectedBgm] = useState<Bgm | null>(null);
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
-  const fontArray = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
   // useEffect
@@ -431,10 +445,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [progressWidthPercent]);
 
   useEffect(() => {
-    if (selectedTemplate) {
+    if (selectedTemplate && !selectedTemplate.options.title.none) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
-        text: "제목을 입력하세요.",
+        ...titleContent,
         x1,
         y1,
         x2,
@@ -447,19 +461,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         bgOpacity,
       });
     } else {
-      setTitleContent({
-        text: "제목을 입력하세요.",
-        x1: 0,
-        y1: 0,
-        x2: 1,
-        y2: 0.2,
-        font: fontArray[1],
-        size: 60,
-        color: "#ffffff",
-        background: "#000000",
-        textOpacity: 1,
-        bgOpacity: 0,
-      });
+      setTitleContent({ ...DEFAULT_TITLE_CONTENT, text: titleContent.text });
     }
   }, [selectedTemplate]);
 
@@ -590,6 +592,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function handleClickAddTitle() {
+    if (selectedTemplate && selectedTemplate.options.title.none) return;
+
+    setHasTitle(true);
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
@@ -605,25 +611,11 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         textOpacity,
         bgOpacity,
       });
-    } else {
-      setTitleContent({
-        text: "제목을 입력하세요.",
-        x1: 0,
-        y1: 0,
-        x2: 1,
-        y2: 0.2,
-        font: fontArray[1],
-        size: 60,
-        color: "#ffffff",
-        background: "#000000",
-        textOpacity: 1,
-        bgOpacity: 0,
-      });
     }
   }
 
   function handleClickDeleteTitle() {
-    setTitleContent(null);
+    setHasTitle(false);
   }
 
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -693,8 +685,9 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           {selectedWorkMenu === "title" && (
             <TitleMenu
               titleContent={titleContent}
-              optionArray={fontArray}
               disabled={!!selectedTemplate}
+              hasTitle={hasTitle}
+              none={selectedTemplate?.options.title.none ?? false}
               handleClickAddTitle={handleClickAddTitle}
               handleClickDeleteTitle={handleClickDeleteTitle}
               handleChangeTitle={handleChangeTitle}
@@ -721,7 +714,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           <div
             ref={videoAreaRef}
             style={{ minWidth: videoRef.current?.clientWidth }}
-            className={`relative w-full h-[calc(100vh-500px)] min-h-[100px] flex justify-center items-center m-auto overflow-hidden`}
+            className={`relative min-h-[100px] h-[calc(100vh-500px)] w-[calc(100vw-100px)] flex justify-center items-center m-auto overflow-hidden`}
           >
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
@@ -746,12 +739,13 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                 }}
                 className="absolute w-full border border-red-500 z-10"
               ></div>
+              {/* TODO - 이부분 에러 처리 */}
               <img
                 src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
                 alt="template-img"
                 className="w-full h-full"
               />
-              {titleContent && (
+              {hasTitle && titleContent && !selectedTemplate?.options.title.none && (
                 <TitleInput
                   title={titleContent}
                   templateWidth={templateImageSize.width}
@@ -831,7 +825,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               sectionBoxRef={sectionBoxRef}
               startX={startX}
               endX={endX}
-              activePanel={activePanel}
+              lineType="video"
+              isActive={activePanel === "video"}
               handleMouseDownSectionBox={handleMouseDownSectionBox}
               handleMouseDownStartExpand={handleMouseDownStartExpand}
               handleMouseDownEndExpand={handleMouseDownEndExpand}
@@ -842,13 +837,49 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           </div>
 
           {/* title */}
-          <div className="relative h-1/4 border-b border-slate-300"></div>
+          <div className="relative h-1/4 border-b border-slate-300">
+            {hasTitle && titleContent && (
+              <SectionBox
+                sectionBoxRef={sectionBoxRef}
+                startX={startX}
+                endX={endX}
+                lineType="title"
+                isActive={activePanel === "title"}
+                text={titleContent.text}
+                handleMouseDownSectionBox={handleMouseDownSectionBox}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
+                handleClickPanel={() => {
+                  handleClickPanel("title");
+                  handleClickWorkMenu("title");
+                }}
+              />
+            )}
+          </div>
 
           {/* subtitle */}
           <div className="relative h-1/4 border-b border-slate-300"></div>
 
           {/* bgm */}
-          <div className="relative h-1/4 border-b border-slate-300"></div>
+          <div className="relative h-1/4 border-b border-slate-300">
+            {selectedBgm && (
+              <SectionBox
+                sectionBoxRef={sectionBoxRef}
+                startX={startX}
+                endX={endX}
+                lineType="bgm"
+                isActive={activePanel === "bgm"}
+                text={selectedBgm.title}
+                handleMouseDownSectionBox={handleMouseDownSectionBox}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
+                handleClickPanel={() => {
+                  handleClickPanel("bgm");
+                  handleClickWorkMenu("bgm");
+                }}
+              />
+            )}
+          </div>
         </div>
 
         <div

@@ -1,4 +1,5 @@
 import { Template } from "../type";
+import TemplateMenuImage from "./TemplateMenuImage";
 
 interface TemplateMenuProps {
   templateList: Template[];
@@ -32,11 +33,7 @@ export default function TemplateMenu({ templateList, selectedTemplateId, handleC
           >
             <div className="card-body flex flex-col gap-4">
               <span className="card-title">{v.title}</span>
-              <img
-                src={`/api/v1/shorts/template/${v.templateId}/file`}
-                alt="template-img"
-                className="w-1/2 mx-auto border"
-              />
+              <TemplateMenuImage templateId={v.templateId} className="w-1/2 mx-auto border" />
             </div>
           </div>
         ))}
