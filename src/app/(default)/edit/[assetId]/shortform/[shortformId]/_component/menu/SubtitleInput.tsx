@@ -1,30 +1,33 @@
-import { TitleContent, WorkMenu } from "../type";
+import { SubtitleContent, WorkMenu } from "../type";
 import { hexToRgba } from "../util";
 import { SHORTS_WIDTH } from "../EditShorts";
 
-interface TitleInputProps {
-  title: TitleContent;
+interface SubtitleInputProps {
+  subtitle: SubtitleContent;
   templateWidth: number;
-  handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChangeSubtitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClickPanel(): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
+  handleClickSubtitleInput(): void;
 }
 
-export default function TitleInput({
-  title,
+export default function SubtitleInput({
+  subtitle,
   templateWidth,
-  handleChangeTitle,
+  handleChangeSubtitle,
   handleClickPanel,
   handleClickWorkMenu,
-}: TitleInputProps) {
-  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
+  handleClickSubtitleInput,
+}: SubtitleInputProps) {
+  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity, startTime, endTime } = subtitle;
 
   return (
     <div
       onClick={(e) => {
         e.stopPropagation();
         handleClickPanel();
-        handleClickWorkMenu("title");
+        handleClickWorkMenu("subtitle");
+        handleClickSubtitleInput();
       }}
       style={{
         left: `${x1 * 100}%`,
@@ -33,7 +36,7 @@ export default function TitleInput({
         bottom: `${100 - y2 * 100}%`,
         background: hexToRgba(background, bgOpacity),
       }}
-      className="absolute z-40 flex justify-center"
+      className={`flex absolute z-40 justify-center`}
     >
       <input
         name="text"
@@ -46,7 +49,7 @@ export default function TitleInput({
           color: hexToRgba(color, textOpacity),
           background: "none",
         }}
-        onChange={handleChangeTitle}
+        onChange={handleChangeSubtitle}
         className={`
         z-50 focus:outline-none text-center h-fit
         `}

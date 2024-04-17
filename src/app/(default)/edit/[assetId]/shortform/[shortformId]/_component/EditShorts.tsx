@@ -11,7 +11,7 @@ import TitleMenu from "./menu/TitleMenu";
 import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
 import TemplateMenu from "./menu/TemplateMenu";
-import { TitleContent, ActivePanel, WorkMenu, Template, Bgm } from "./type";
+import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent } from "./type";
 import SectionControlBar from "./SectionControlBar";
 import VideoArea from "./VideoArea";
 
@@ -25,10 +25,12 @@ export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
 export const FORWARD_BACKWARD_STEP_SECONDS = 10;
 export const FONT_ARRAY = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
+export const SHORTS_WIDTH = 720;
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const SIXTY_SECONDS = 60;
+const DEFAULT_SUBTITLE_SEC = 10;
 const DEFAULT_TITLE_CONTENT = {
   text: "제목을 입력하세요.",
   x1: 0,
@@ -85,6 +87,9 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent>(DEFAULT_TITLE_CONTENT);
+  const [subtitleContentArray, setSubtitleContentArray] = useState<SubtitleContent[]>([]);
+  const [selectedSubtitleIndex, setSelectedSubtitleIndex] = useState<number | null>(null);
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState<number | null>(null);
   const [hasTitle, setHasTitle] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedBgm, setSelectedBgm] = useState<Bgm | null>(null);
@@ -465,6 +470,16 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }, [selectedTemplate]);
 
+  useEffect(() => {
+    const index = subtitleContentArray.findIndex((v) => v.startTime <= videoProgress && v.endTime >= videoProgress);
+    if (index === -1) {
+      setCurrentSubtitleIndex(null);
+    } else {
+      setCurrentSubtitleIndex(index);
+    }
+    // index === -1 ? setCurrentSubtitleIndex(null) : setCurrentSubtitleIndex(index);
+  }, [videoProgress, subtitleContentArray]);
+
   // functions
   function handleTimeUpdate(time: number) {
     setVideoProgress(time);
@@ -618,8 +633,66 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }
 
+  function handleClickAddSubtitle() {
+    if (selectedTemplate && selectedTemplate.options.title.none) return;
+
+    if (selectedTemplate) {
+      const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
+        selectedTemplate.options.subtitle;
+      setSubtitleContentArray([
+        ...subtitleContentArray,
+        {
+          text: "자막을 입력하세요.",
+          x1,
+          y1,
+          x2,
+          y2,
+          font,
+          size,
+          color,
+          background,
+          textOpacity,
+          bgOpacity,
+          startTime: videoProgress,
+          endTime: videoProgress + DEFAULT_SUBTITLE_SEC,
+        },
+      ]);
+    } else {
+      setSubtitleContentArray([
+        ...subtitleContentArray,
+        {
+          text: "자막을 입력하세요.",
+          x1: 0,
+          y1: 0.8,
+          x2: 1,
+          y2: 1,
+          font: FONT_ARRAY[1],
+          size: 20,
+          color: "#ffffff",
+          background: "#000000",
+          textOpacity: 1,
+          bgOpacity: 0,
+          startTime: videoProgress,
+          endTime: videoProgress + DEFAULT_SUBTITLE_SEC,
+        },
+      ]);
+    }
+  }
+
   function handleClickDeleteTitle() {
     setHasTitle(false);
+  }
+
+  function handleClickDeleteSubtitle() {
+    if (selectedSubtitleIndex !== null) {
+      setSubtitleContentArray((prev) => {
+        const updatedArray = prev.filter((v, i) => i !== selectedSubtitleIndex);
+        return updatedArray;
+      });
+
+      setSelectedSubtitleIndex(null);
+      setCurrentSubtitleIndex(null);
+    }
   }
 
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -629,12 +702,27 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }
 
+  function handleChangeSubtitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value } = e.target;
+    if (selectedSubtitleIndex !== null) {
+      setSubtitleContentArray((prev) => {
+        const updatedArray = [...prev];
+        updatedArray[selectedSubtitleIndex] = { ...prev[selectedSubtitleIndex], [name]: value };
+        return updatedArray;
+      });
+    }
+  }
+
   function handleClickTemplate(template?: Template) {
     setSelectedTemplate(template ?? null);
   }
 
   function handleClickBgm(bgm?: Bgm) {
     setSelectedBgm(bgm ?? null);
+  }
+
+  function handleClickSubtitleInput(index: number) {
+    setSelectedSubtitleIndex(index);
   }
 
   function scrollToProgressBar() {
@@ -700,7 +788,17 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             />
           )}
           {selectedWorkMenu === "subtitle" && (
-            <SubtitleMenu handleClickWorkMenu={handleClickWorkMenu} handleClickPanel={handleClickPanel} />
+            <SubtitleMenu
+              subtitleContentArray={subtitleContentArray}
+              disabled={!!selectedTemplate}
+              none={selectedTemplate?.options.subtitle.none ?? false}
+              selectedSubtitleIndex={selectedSubtitleIndex}
+              handleClickAddSubtitle={handleClickAddSubtitle}
+              handleClickDeleteSubtitle={handleClickDeleteSubtitle}
+              handleChangeSubtitle={handleChangeSubtitle}
+              handleClickWorkMenu={handleClickWorkMenu}
+              handleClickPanel={handleClickPanel}
+            />
           )}
           {selectedWorkMenu === "bgm" && (
             <BgmMenu
@@ -728,14 +826,20 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             templateImageSize={templateImageSize}
             selectedTemplate={selectedTemplate}
             titleContent={titleContent}
+            subtitleContentArray={subtitleContentArray}
+            selectedSubtitleIndex={selectedSubtitleIndex}
+            currentSubtitleIndex={currentSubtitleIndex}
             videoSrc={videoSrc}
             videoX={videoX}
+            videoProgress={videoProgress}
             handleChangeTitle={handleChangeTitle}
+            handleChangeSubtitle={handleChangeSubtitle}
             handleClickWorkMenu={handleClickWorkMenu}
             handleMouseDownVideo={handleMouseDownVideo}
             handleLoadedMetadata={handleLoadedMetadata}
             handleTimeUpdate={handleTimeUpdate}
             handleClickPanel={handleClickPanel}
+            handleClickSubtitleInput={handleClickSubtitleInput}
             handlePause={() => setIsPlay(false)}
             handlePlay={() => setIsPlay(true)}
           />
@@ -812,7 +916,22 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           </div>
 
           {/* subtitle */}
-          <div className="relative h-1/4 border-b border-slate-300"></div>
+          <div className="relative h-1/4 border-b border-slate-300">
+            {subtitleContentArray.map((v, i) => (
+              <div
+                key={i}
+                onMouseDown={() => {
+                  setSelectedSubtitleIndex(i);
+                  handleClickPanel("subtitle");
+                  handleClickWorkMenu("subtitle");
+                }}
+                style={{ left: timeToPx(v.startTime), width: timeToPx(v.endTime - v.startTime) }}
+                className={`${
+                  i === selectedSubtitleIndex ? "border-4 border-slate-900" : "border-2 border-slate-500"
+                } absolute h-full border-slate-900 bg-slate-200`}
+              ></div>
+            ))}
+          </div>
 
           {/* bgm */}
           <div className="relative h-1/4 border-b border-slate-300">

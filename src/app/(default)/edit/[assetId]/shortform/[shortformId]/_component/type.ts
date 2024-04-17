@@ -12,6 +12,11 @@ export interface TitleContent {
   bgOpacity: number;
 }
 
+export interface SubtitleContent extends TitleContent {
+  startTime: number;
+  endTime: number;
+}
+
 export interface Template {
   templateId: string;
   title: string;

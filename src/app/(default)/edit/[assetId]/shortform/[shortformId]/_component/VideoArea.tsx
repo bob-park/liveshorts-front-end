@@ -1,5 +1,6 @@
-import TitleInput from "./menu/TitleInput";
-import { ActivePanel, Template, TitleContent, WorkMenu } from "./type";
+import SubtitleInput from "./menu/SubtitleInput";
+import TextInput from "./menu/TitleInput";
+import { ActivePanel, SubtitleContent, Template, TitleContent, WorkMenu } from "./type";
 
 interface VideoAreaProps {
   videoAreaRef: React.RefObject<HTMLDivElement>;
@@ -10,14 +11,20 @@ interface VideoAreaProps {
   templateImageSize: { width: number; height: number };
   selectedTemplate: Template | null;
   titleContent: TitleContent;
+  subtitleContentArray: SubtitleContent[];
+  selectedSubtitleIndex: number | null;
+  currentSubtitleIndex: number | null;
   videoSrc: string;
   videoX: number;
+  videoProgress: number;
   handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void;
+  handleChangeSubtitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
   handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>): void;
   handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>): void;
   handleTimeUpdate(time: number): void;
   handleClickPanel(panel: ActivePanel): void;
+  handleClickSubtitleInput(index: number): void;
   handlePause(): void;
   handlePlay(): void;
 }
@@ -31,14 +38,18 @@ export default function VideoArea({
   templateImageSize,
   selectedTemplate,
   titleContent,
+  subtitleContentArray,
+  currentSubtitleIndex,
   videoSrc,
   videoX,
   handleChangeTitle,
+  handleChangeSubtitle,
   handleClickWorkMenu,
   handleMouseDownVideo,
   handleLoadedMetadata,
   handleTimeUpdate,
   handleClickPanel,
+  handleClickSubtitleInput,
   handlePause,
   handlePlay,
 }: VideoAreaProps) {
@@ -46,7 +57,7 @@ export default function VideoArea({
     <div
       ref={videoAreaRef}
       style={{ minWidth: videoRef.current?.clientWidth }}
-      className={`relative min-h-[100px] h-[calc(100vh-500px)] w-[calc(100vw-100px)] flex justify-center items-center m-auto overflow-hidden`}
+      className={`relative min-h-[100px] h-[calc(100vh-500px)] w-[calc(100vw-500px)] flex justify-center items-center m-auto overflow-hidden`}
     >
       {!loaded && (
         <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
@@ -78,7 +89,7 @@ export default function VideoArea({
           className="w-full h-full"
         />
         {hasTitle && titleContent && !selectedTemplate?.options.title.none && (
-          <TitleInput
+          <TextInput
             title={titleContent}
             templateWidth={templateImageSize.width}
             handleChangeTitle={handleChangeTitle}
@@ -88,6 +99,22 @@ export default function VideoArea({
             handleClickWorkMenu={handleClickWorkMenu}
           />
         )}
+        {subtitleContentArray.length > 0 &&
+          !selectedTemplate?.options.subtitle.none &&
+          currentSubtitleIndex !== null && (
+            <SubtitleInput
+              subtitle={subtitleContentArray[currentSubtitleIndex]}
+              templateWidth={templateImageSize.width}
+              handleChangeSubtitle={handleChangeSubtitle}
+              handleClickPanel={() => {
+                handleClickPanel("subtitle");
+              }}
+              handleClickWorkMenu={handleClickWorkMenu}
+              handleClickSubtitleInput={() => {
+                handleClickSubtitleInput(currentSubtitleIndex);
+              }}
+            />
+          )}
       </div>
 
       <video
