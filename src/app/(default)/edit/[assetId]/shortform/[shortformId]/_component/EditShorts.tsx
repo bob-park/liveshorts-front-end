@@ -714,7 +714,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           <div
             ref={videoAreaRef}
             style={{ minWidth: videoRef.current?.clientWidth }}
-            className={`relative w-full h-[calc(100vh-500px)] min-h-[100px] flex justify-center items-center m-auto overflow-hidden`}
+            className={`relative min-h-[100px] h-[calc(100vh-500px)] w-[calc(100vw-100px)] flex justify-center items-center m-auto overflow-hidden`}
           >
             {!loaded && (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
