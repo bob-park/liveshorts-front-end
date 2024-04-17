@@ -10,10 +10,10 @@ import TabMenu from "./TabMenu";
 import TitleMenu from "./menu/TitleMenu";
 import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
-import TitleInput from "./menu/TitleInput";
 import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template, Bgm } from "./type";
 import SectionControlBar from "./SectionControlBar";
+import VideoArea from "./VideoArea";
 
 interface EditShortsProps {
   videoSrc: string;
@@ -466,6 +466,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [selectedTemplate]);
 
   // functions
+  function handleTimeUpdate(time: number) {
+    setVideoProgress(time);
+  }
+
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (progressRef.current && progressBarRef.current && videoRef.current) {
       const maxX = (videoDuration * progressWidthPercent) / 100;
@@ -711,80 +715,26 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           }}
           className="grid grid-rows-[1fr,60px] max-w-[calc(100vw-340px)]"
         >
-          <div
-            ref={videoAreaRef}
-            style={{ minWidth: videoRef.current?.clientWidth }}
-            className={`relative min-h-[100px] h-[calc(100vh-500px)] w-[calc(100vw-100px)] flex justify-center items-center m-auto overflow-hidden`}
-          >
-            {!loaded && (
-              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 loading loading-spinner loading-lg text-black" />
-            )}
-
-            <div
-              ref={templateImageRef}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClickPanel("template");
-                handleClickWorkMenu("template");
-              }}
-              style={{ width: templateImageSize.width, height: templateImageSize.height }}
-              className={`relative border border-green-500 ${loaded ? "block" : "hidden"}`}
-            >
-              <div
-                style={{
-                  height:
-                    templateImageSize.height *
-                    ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0)),
-                  top: (videoAreaRef.current?.clientHeight ?? 0) * (selectedTemplate?.videoPosition.y1 ?? 0),
-                }}
-                className="absolute w-full border border-red-500 z-10"
-              ></div>
-              {/* TODO - 이부분 에러 처리 */}
-              <img
-                src={`/api/v1/shorts/template/${selectedTemplate?.templateId}/file`}
-                alt="template-img"
-                className="w-full h-full"
-              />
-              {hasTitle && titleContent && !selectedTemplate?.options.title.none && (
-                <TitleInput
-                  title={titleContent}
-                  templateWidth={templateImageSize.width}
-                  handleChangeTitle={handleChangeTitle}
-                  handleClickPanel={() => {
-                    handleClickPanel("title");
-                  }}
-                  handleClickWorkMenu={handleClickWorkMenu}
-                />
-              )}
-            </div>
-
-            <video
-              playsInline
-              ref={videoRef}
-              src={videoSrc}
-              onTimeUpdate={(e) => {
-                setVideoProgress(e.currentTarget.currentTime);
-              }}
-              onLoadedMetadataCapture={handleLoadedMetadata}
-              onPause={() => setIsPlay(false)}
-              onPlay={() => setIsPlay(true)}
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-              onMouseDown={handleMouseDownVideo}
-              style={{
-                height: `${
-                  templateImageSize.height *
-                  ((selectedTemplate?.videoPosition.y2 ?? 1) - (selectedTemplate?.videoPosition.y1 ?? 0))
-                }px`,
-                left: `${videoX}px`,
-              }}
-              className={`aspect-auto absolute
-              /-translate-x-1/2
-              ${loaded ? "block" : "hidden"}
-              `}
-            ></video>
-          </div>
+          <VideoArea
+            videoAreaRef={videoAreaRef}
+            videoRef={videoRef}
+            templateImageRef={templateImageRef}
+            loaded={loaded}
+            hasTitle={hasTitle}
+            templateImageSize={templateImageSize}
+            selectedTemplate={selectedTemplate}
+            titleContent={titleContent}
+            videoSrc={videoSrc}
+            videoX={videoX}
+            handleChangeTitle={handleChangeTitle}
+            handleClickWorkMenu={handleClickWorkMenu}
+            handleMouseDownVideo={handleMouseDownVideo}
+            handleLoadedMetadata={handleLoadedMetadata}
+            handleTimeUpdate={handleTimeUpdate}
+            handleClickPanel={handleClickPanel}
+            handlePause={() => setIsPlay(false)}
+            handlePlay={() => setIsPlay(true)}
+          />
 
           <VideoControlBar
             videoProgress={videoProgress}
