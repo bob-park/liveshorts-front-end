@@ -17,9 +17,7 @@ import ShortformPlayer from '@/components/shortform/ShortformPlayer';
 
 import CreateShortformExtraModal from './CreateShortformExtraModal';
 import { parseStatus } from '@/utils/common';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTask } from '@/entries/shortform/api/requestShortformTask';
-import { requestExtra } from '@/entries/shortform/api/requestShortformExtra';
+import useGetShortform from '@/hooks/shortform/useGetShortform';
 
 type ShortformContentsProps = {
   assetId: number;
@@ -44,31 +42,11 @@ export default function ShortformContents(props: ShortformContentsProps) {
   const router = useRouter();
 
   // react query
-  const queryClient = useQueryClient();
-  const { data: storeShortForm, isPending: isLoading } =
-    useQuery<ShortFormTask>({
-      queryKey: ['shortforms', 'detail', shortform.id],
-      queryFn: () => getTask(shortform.id),
-      staleTime: 60 * 1_000,
-      gcTime: 120 & 1_000,
-      refetchInterval: 10 * 1_000,
-    });
-
-  const { mutate: onGetShortform, isPending } = useMutation({
-    mutationKey: ['shortforms', 'detail', shortform.id],
-    mutationFn: () => getTask(shortform.id),
-    onSuccess: (data) => {
-      queryClient.setQueryData(['shortforms', 'detail', shortform.id], data);
-    },
-  });
-
-  const { mutate: onRequestExtra } = useMutation({
-    mutationKey: ['shortforms', 'request', shortform.id, 'extra'],
-    mutationFn: (typeId: string) => requestExtra(shortform.id, typeId),
-    onSuccess: (data) => {
-      queryClient.setQueryData(['shortforms', 'detail', data.id], data);
-    },
-  });
+  const {
+    shortform: storeShortForm,
+    onGetShortform,
+    isLoading,
+  } = useGetShortform(shortform.id);
 
   // state
   const [nowSrc, setNowSrc] = useState<string>(``);
@@ -117,14 +95,6 @@ export default function ShortformContents(props: ShortformContentsProps) {
     setShowCreateExtra(show);
 
     show ? setSelectExtraType(extraType) : setSelectExtraType(undefined);
-  };
-
-  const handleCreateExtra = () => {
-    if (!selectExtraType) {
-      return;
-    }
-
-    onRequestExtra(selectExtraType.id);
   };
 
   return (
@@ -212,8 +182,8 @@ export default function ShortformContents(props: ShortformContentsProps) {
                 </div>
               </div>
             </div>
-            {isPending && <ShortFormExtraLoading />}
-            {!isPending &&
+            {isLoading && <ShortFormExtraLoading />}
+            {!isLoading &&
               extraTypes.map((item) => (
                 <div
                   key={`extra-type-row-${item.id}`}
@@ -339,9 +309,10 @@ export default function ShortformContents(props: ShortformContentsProps) {
       {/* create extra modal */}
       <CreateShortformExtraModal
         show={showCreateExtra}
+        shortformId={shortform.id}
         title={selectExtraType?.name}
+        selectExtraType={selectExtraType}
         onBackdrop={() => handleShowCreateExtra(false, undefined)}
-        onCreate={() => handleCreateExtra()}
       />
     </>
   );

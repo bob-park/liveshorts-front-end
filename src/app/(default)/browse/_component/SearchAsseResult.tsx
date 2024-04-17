@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -25,9 +25,9 @@ import { Button, Loading } from 'react-daisyui';
 import MoveOnTop from '@/components/common/MoveOnTop';
 import ListAssetView from './ListAssetView';
 import ThumbnailAssetView from './ThumbAssetView';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { searchAsset } from '@/entries/asset/api/requestAsset';
+
 import { useStore } from '@/shared/rootStore';
+import useSearchAsset from '@/hooks/asset/useSearchAsset';
 
 const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -36,63 +36,6 @@ type SearchAsseResultProps = {
   searchAssetParams: SearchAssetParams;
   channels: RecordChannel[];
 };
-
-type SearchAssetParams = {
-  title: string;
-  channelId?: number;
-  isShortForm?: boolean;
-  onlyCreateShortFormByMe: boolean;
-  broadcastDate: string;
-  page: number;
-  size: number;
-};
-
-function parseParams(
-  page: number,
-  searchParams: SearchAssetParams,
-): URLSearchParams {
-  const metas: string[] = [];
-
-  searchParams.broadcastDate &&
-    metas.push(
-      `2024-1ee5ed97-c594-4a3e-9e88-08cfbc7a2320,${searchParams.broadcastDate}`,
-    );
-
-  searchParams.channelId &&
-    metas.push(
-      `2024-1de7a2cd-72c6-4057-87d3-97926a85e0bb,${searchParams.channelId}`,
-    );
-
-  const params = {
-    page,
-    size: searchParams.size,
-    isDeleted: false,
-    assetStatus: 'REGISTERED',
-    metas,
-    title: searchParams.title || '',
-    existShortForm:
-      searchParams.isShortForm == undefined ? '' : searchParams.isShortForm,
-    onlyCreateShortFormByMe: searchParams.onlyCreateShortFormByMe,
-  };
-
-  const urlSearchParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value instanceof Array) {
-      value.forEach((item) => {
-        urlSearchParams.append(key, item);
-      });
-    } else {
-      urlSearchParams.set(key, value != undefined ? value + '' : '');
-    }
-  });
-
-  return urlSearchParams;
-}
-
-function search(page: number, searchParams: SearchAssetParams) {
-  return searchAsset(parseParams(page, searchParams));
-}
 
 export default function SearchAsseResult(props: SearchAsseResultProps) {
   // props
@@ -108,9 +51,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   const searchParams = useSearchParams();
 
   // store
-  const assets = useStore((state) => state.assets);
   const assetsPage = useStore((state) => state.assetsPage);
-  const searchAssetAfter = useStore((state) => state.searchAssetAfter);
   const initAssetPage = useStore((state) => state.initAssetPage);
 
   // state
@@ -118,34 +59,8 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
   const [searchAssetParams, setSearchAssetParams] = useState<SearchAssetParams>(
     prevSearchAssetParams,
   );
-
-  // query client
-  const queryClient = useQueryClient();
-
-  const { data: searchResult, isPending } = useQuery<ApiResponse<Asset[]>>({
-    queryKey: ['assets', 'search'],
-    queryFn: () => search(0, searchAssetParams),
-    staleTime: 60 * 1_000,
-    enabled: false,
-  });
-
-  const { mutate: onSearch, isPending: isLoading } = useMutation({
-    mutationKey: ['assets', 'search'],
-    mutationFn: () =>
-      search(!assetsPage ? 0 : assetsPage.currentPage + 1, searchAssetParams),
-    onMutate: () => {
-      if (!assetsPage) {
-        queryClient.invalidateQueries({
-          queryKey: ['assets', 'search'],
-          exact: true,
-        });
-      }
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['assets', 'search'], data);
-      searchAssetAfter(data.result, data?.page);
-    },
-  });
+  const { assets, page, isPending, isLoading, onSearchAsset } =
+    useSearchAsset(searchAssetParams);
 
   // useEffect
   useLayoutEffect(() => {
@@ -176,7 +91,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
 
   // handle
   const handleSearch = () => {
-    onSearch();
+    onSearchAsset();
   };
 
   const handleToggleViewMode = (isListView: boolean) => {
@@ -207,9 +122,9 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
     });
   };
 
-  const handleMoveAsset = (assetId: number) => {
+  const handleMoveAsset = useCallback((assetId: number) => {
     router.push(`/asset/${assetId}`);
-  };
+  }, []);
 
   const handleObserver = (entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
@@ -484,7 +399,7 @@ export default function SearchAsseResult(props: SearchAsseResultProps) {
         <div className="grid grid-cols-2 justify-between items-center">
           <div className="col-span-1 mx-10">
             <h3 className="text-base text-gray-500">
-              총 <strong>{searchResult?.page?.totalCount || 0}</strong>개 중{' '}
+              총 <strong>{page.totalCount || 0}</strong>개 중{' '}
               <strong>{assets.length}</strong>개
             </h3>
           </div>

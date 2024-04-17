@@ -4,23 +4,31 @@ import { useEffect } from 'react';
 // react icon
 import { FaTrashAlt } from 'react-icons/fa';
 import { IoCloseCircleOutline } from 'react-icons/io5';
+import useRemoveShortform from '@/hooks/shortform/useDeleteShortform';
+import useSearchTask from '@/hooks/shortform/useSearchTask';
 
 type RemoveShortFormConfirmProps = {
   show: boolean;
+  assetId: number;
   shortform?: ShortFormTask;
   onBackdrop?: () => void;
-  onConfirm?: () => void;
 };
 
 const id = 'remove_shortform_confirm_modal';
 
 export default function RemoveShortFormConfirm({
   show,
+  assetId,
   shortform,
   onBackdrop,
-  onConfirm,
 }: RemoveShortFormConfirmProps) {
-  // state
+  const { tasks } = useSearchTask(assetId);
+  const { onDeleteShortform, isLoading } = useRemoveShortform(
+    tasks,
+    assetId,
+    shortform?.id,
+    () => handleBackdrop(),
+  );
 
   // useEffect
   useEffect(() => {
@@ -45,9 +53,7 @@ export default function RemoveShortFormConfirm({
   };
 
   const handleConfirm = () => {
-    onConfirm && onConfirm();
-
-    handleBackdrop();
+    shortform && onDeleteShortform();
   };
 
   return (
@@ -73,8 +79,13 @@ export default function RemoveShortFormConfirm({
               type="button"
               className="btn btn-error bg-red-600 text-white ml-3"
               onClick={handleConfirm}
+              disabled={isLoading}
             >
-              <FaTrashAlt className="w-6 h-6" />
+              {isLoading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                <FaTrashAlt className="w-6 h-6" />
+              )}
               삭제
             </button>
           </form>

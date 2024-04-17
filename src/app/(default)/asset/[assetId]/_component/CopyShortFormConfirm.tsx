@@ -4,23 +4,37 @@ import { useEffect } from 'react';
 // react icon
 import { LuCopyPlus } from 'react-icons/lu';
 import { IoCloseCircleOutline } from 'react-icons/io5';
+import useCopyShortform from '@/hooks/shortform/useCopyShortform';
+import useSearchTask from '@/hooks/shortform/useSearchTask';
 
 type CopyShortFormConfirmProps = {
   show: boolean;
+  assetId: number;
   shortform?: ShortFormTask;
   onBackdrop?: () => void;
-  onConfirm?: () => void;
+  onSuccess?: (taskId: string, title: string) => void;
 };
 
 const id = 'copy_shortform_confirm_modal';
 
 export default function CopyShortFormConfirm({
   show,
+  assetId,
   shortform,
   onBackdrop,
-  onConfirm,
+  onSuccess,
 }: CopyShortFormConfirmProps) {
   // state
+
+  const { tasks } = useSearchTask(assetId);
+  const { onCopyShortform, isLoading } = useCopyShortform(
+    tasks,
+    assetId,
+    (newShortForm) => {
+      onSuccess && onSuccess(newShortForm.id, newShortForm.title + ' - 복사본');
+      handleBackdrop();
+    },
+  );
 
   // useEffect
   useEffect(() => {
@@ -45,9 +59,7 @@ export default function CopyShortFormConfirm({
   };
 
   const handleConfirm = () => {
-    onConfirm && onConfirm();
-
-    handleBackdrop();
+    shortform && onCopyShortform(shortform.id);
   };
 
   return (
@@ -73,8 +85,13 @@ export default function CopyShortFormConfirm({
               type="button"
               className="btn btn-neutral ml-3"
               onClick={handleConfirm}
+              disabled={isLoading}
             >
-              <LuCopyPlus className="w-6 h-6" />
+              {isLoading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                <LuCopyPlus className="w-6 h-6" />
+              )}
               복사
             </button>
           </form>

@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useLayoutEffect, useState, useEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 // nextjs
 import { useRouter } from 'next/navigation';
@@ -16,14 +16,9 @@ import ShortFormList from '@/components/shortform/ShortFormList';
 import CopyShortFormConfirm from './CopyShortFormConfirm';
 import RemoveShortFormConfirm from './RemoveShortFormConfirm';
 import CreateShortFormModal from './CreateShortFormModal';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  addTask,
-  copyTask,
-  getTasksByAssetId,
-  removeTask,
-  updateTask,
-} from '@/entries/shortform/api/requestShortformTask';
+
+import useSearchTask from '@/hooks/shortform/useSearchTask';
+import useUpdateShortform from '@/hooks/shortform/useUpdateShortform';
 
 const ShortFormLoading = () => {
   return (
@@ -55,80 +50,13 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // state
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-
   const [showCopyConfirm, setShowCopyConfirm] = useState<boolean>(false);
   const [copyTaskId, setCopyTaskId] = useState<string>();
-
   const [showRemoveConfirm, setShowRemoveConfirm] = useState<boolean>(false);
   const [removeTaskId, setRemoveTaskId] = useState<string>();
 
-  // query client
-  const queryClient = useQueryClient();
-
-  const { data: tasks, isLoading } = useQuery<ShortFormTask[]>({
-    queryKey: ['shortforms', assetId],
-    queryFn: () => getTasksByAssetId(assetId),
-    staleTime: 60 * 1_000,
-    gcTime: 120 * 1_000,
-    refetchInterval: 10 * 1_000,
-  });
-
-  const { mutate: onGetTasks, isPending } = useMutation({
-    mutationKey: ['shortforms'],
-    mutationFn: () => getTasksByAssetId(assetId),
-    onMutate: () => {},
-    onSuccess: (data) => {
-      queryClient.setQueryData(['shortforms'], data);
-    },
-  });
-
-  const { mutate: onAddTask } = useMutation({
-    mutationKey: ['shortforms', 'add'],
-    mutationFn: (title: string) => addTask(assetId, title),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['shortforms'] });
-
-      router.push(`/edit/${assetId}/shortform/${data.id}`);
-    },
-  });
-
-  const { mutate: onRemoveTask } = useMutation({
-    mutationKey: ['shortforms', 'remove'],
-    mutationFn: (taskId: string) => removeTask(taskId),
-    onSuccess: () => {
-      const prev = tasks?.slice() || [];
-      const index = prev.findIndex((item) => item.id === removeTaskId);
-      index >= 0 && prev.splice(index, 1);
-
-      queryClient.setQueryData(['shortforms', assetId], prev);
-    },
-  });
-
-  const { mutate: onUpdateTask } = useMutation({
-    mutationKey: ['shortforms', 'update'],
-    mutationFn: ({ taskId, title }: { taskId: string; title: string }) =>
-      updateTask(taskId, { title }),
-    onSuccess: (data) => {
-      const newTask = tasks?.slice() || [];
-      const index = newTask.findIndex((item) => item.id === data.id);
-
-      index >= 0 && newTask.splice(index, 1, data);
-
-      queryClient.setQueryData(['shortforms', assetId], newTask);
-    },
-  });
-
-  const { mutate: onCopyTask } = useMutation({
-    mutationKey: ['shortforms', 'copy'],
-    mutationFn: (taskId: string) => copyTask(taskId),
-    onSuccess: (data) => {
-      const newTask = tasks?.slice() || [];
-      newTask.unshift(data);
-      queryClient.setQueryData(['shortforms', assetId], newTask);
-
-      onUpdateTask({ taskId: data.id, title: data.title + ' - 복사본' });
-    },
-  });
+  const { tasks, onSearchShortform, isLoading } = useSearchTask(assetId);
+  const { onUpdateShortform } = useUpdateShortform(tasks, assetId);
 
   //useEffect
   useLayoutEffect(() => {
@@ -137,7 +65,7 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
 
   // handle
   const handleGetShortFormTask = () => {
-    onGetTasks();
+    onSearchShortform();
   };
 
   const handleMoveShortformView = (taskId: string) => {
@@ -150,20 +78,8 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
     router.push(`/asset/${assetId}/shortform/${taskId}`);
   };
 
-  const handleCreateShortForm = (title: string | undefined) => {
-    title && onAddTask(title);
-  };
-
   const handleEditShortForm = (taskId: string) => {
     router.push(`/edit/${assetId}/shortform/${taskId}`);
-  };
-
-  const handleCopyShortForm = () => {
-    copyTaskId && onCopyTask(copyTaskId);
-  };
-
-  const handleRemoveShortForm = () => {
-    removeTaskId && onRemoveTask(removeTaskId);
   };
 
   return (
@@ -198,9 +114,9 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
           </div>
         </div>
         <div className="col-span-1 mt-4">
-          {isPending && <ShortFormLoading />}
-          {!isPending && tasks?.length === 0 && <EmptyShortFormList />}
-          {!isPending && tasks && (
+          {isLoading && <ShortFormLoading />}
+          {!isLoading && tasks?.length === 0 && <EmptyShortFormList />}
+          {!isLoading && tasks && (
             <ShortFormList
               tasks={tasks}
               onRowClick={handleMoveShortformView}
@@ -221,24 +137,27 @@ export default function ShortFormTaskContents(props: { assetId: number }) {
       {/* create shortform modal */}
       <CreateShortFormModal
         show={showCreateModal}
+        assetId={assetId}
         onBackdrop={() => setShowCreateModal(false)}
-        onCreate={handleCreateShortForm}
       />
 
       {/* copy confirm modal */}
       <CopyShortFormConfirm
         show={showCopyConfirm}
+        assetId={assetId}
         shortform={tasks?.find((item) => item.id === copyTaskId)}
         onBackdrop={() => setShowCopyConfirm(false)}
-        onConfirm={handleCopyShortForm}
+        onSuccess={(newId, copyTitle) =>
+          onUpdateShortform({ taskId: newId, title: copyTitle })
+        }
       />
 
       {/* remove confirm modal */}
       <RemoveShortFormConfirm
         show={showRemoveConfirm}
+        assetId={assetId}
         shortform={tasks?.find((item) => item.id === removeTaskId)}
         onBackdrop={() => setShowRemoveConfirm(false)}
-        onConfirm={handleRemoveShortForm}
       />
     </>
   );

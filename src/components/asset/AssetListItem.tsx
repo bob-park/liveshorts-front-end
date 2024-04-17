@@ -1,14 +1,8 @@
-import Image from 'next/image';
-
-// react icons
-import { SiYoutubeshorts, SiYoutube } from 'react-icons/si';
-
-import { convertFileSize } from '@/utils/common';
-
 import TimeAgo from 'timeago-react';
 import * as timeago from 'timeago.js';
 import ko from 'timeago.js/lib/lang/ko';
 import { useState } from 'react';
+import dayjs from 'dayjs';
 
 timeago.register('ko', ko);
 
@@ -26,70 +20,56 @@ export default function AssetListItem(props: AssetListItemProps) {
   );
 
   return (
-    <div className="grid grid-cols-8 gap-4 mx-10 my-2 px-2 py-3 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-300 cursor-pointer">
-      <div className="col-span-1 h-24 flex justify-center items-center">
-        <Image
-          className="w-auto h-full rounded-xl object-contain"
-          src={assetImageSrc}
-          alt="thumbnail"
-          width={200}
-          height={150}
-          onError={() => setAssetImageSrc('/default_thumbnail.png')}
-        />
-      </div>
-      <div className="col-span-2 flex justify-start items-center mx-5 relative">
-        <div className="tooltip max-w-full text-start" data-tip={asset.title}>
+    <div className="grid grid-cols-8 gap-4 mx-10 px-4 py-6 rounded-xl transition ease-in-out delay-150 hover:shadow-2xl hover:-translate-y-1 hover:scale-100 duration-150 cursor-pointer">
+      <div className="col-span-3 flex justify-start items-center mx-5 relative">
+        <div
+          className="tooltip max-w-full text-start text-lg"
+          data-tip={asset.title}
+        >
           <p className="w-full truncate font-bold">{asset.title}</p>
         </div>
-        {asset.uploadSnsCount > 0 &&
-          asset.shortFormCount === asset.uploadSnsCount && (
-            <div className="absolute top-0 left-0">
-              <div className="tooltip" data-tip="업로드">
-                <SiYoutube className="w-5 h-5 text-red-600" />
-              </div>
-            </div>
-          )}
-        {asset.shortFormCount > 0 && (
-          <div className="absolute top-0 left-0">
-            <div className="tooltip" data-tip="숏폼">
-              <SiYoutubeshorts className="w-5 h-5 text-red-600" />
-            </div>
-          </div>
-        )}
       </div>
       <div className="col-span-1">
         <div className="flex justify-center items-center h-full">
-          <div className="badge badge-outline badge-lg font-semibold text-sm">
-            {asset.recordSchedule?.channel.channelName}
-          </div>
+          {asset.recordSchedule?.channel.channelName}
         </div>
       </div>
       <div className="col-span-1 flex justify-center items-center">
-        {asset.category && (
-          <div className="badge badge-outline badge-lg font-semibold text-sm">
-            {asset.category.name}
-          </div>
-        )}
+        {asset.category.name}
       </div>
       <div className="col-span-1 flex justify-center items-center">
-        <h3 className="">{convertFileSize(asset.fileSize)}</h3>
+        <p className="">
+          <span>{asset.shortFormCount > 0 ? 'O' : 'X'}</span>
+        </p>
+      </div>
+      <div className="col-span-1 flex justify-center items-center">
+        <p className="">
+          <span>
+            {asset.uploadSnsCount > 0 &&
+            asset.shortFormCount === asset.uploadSnsCount
+              ? 'O'
+              : 'X'}
+          </span>
+        </p>
       </div>
       <div className="col-span-1 flex justify-center items-center">
         <div className="">
-          {asset.createdDate && (
-            <div className="">
-              <TimeAgo
-                datetime={
-                  asset.recordSchedule?.startDateTime || asset.createdDate
-                }
-                locale="ko"
-              />
-            </div>
+          {asset.recordSchedule ? (
+            <p>
+              <span>
+                {dayjs(asset.recordSchedule.startDateTime).format('HH:mm')}
+              </span>
+              <span> ~ </span>
+              <span>
+                {dayjs(asset.recordSchedule.endDateTime).format('HH:mm')}
+              </span>
+            </p>
+          ) : (
+            <p>
+              <TimeAgo datetime={asset.createdDate} locale="ko" />
+            </p>
           )}
         </div>
-      </div>
-      <div className="col-span-1 flex justify-center items-center">
-        <h3 className="">{asset.createdBy}</h3>
       </div>
     </div>
   );

@@ -60,6 +60,8 @@ export async function addTask(assetId: number, title: string) {
     }),
   });
 
+  await delay(1_000);
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }
@@ -100,6 +102,8 @@ export async function copyTask(taskId: string) {
     },
   });
 
+  await delay(1_000);
+
   if (!response.ok) {
     throw new Error(response.statusText);
   }
@@ -117,6 +121,8 @@ export async function removeTask(taskId: string) {
       'Content-Type': 'application/json',
     },
   });
+
+  await delay(1_000);
 
   if (!response.ok) {
     throw new Error(response.statusText);

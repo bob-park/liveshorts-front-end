@@ -1,4 +1,5 @@
 // react
+import useRequestExtra from '@/hooks/shortform/useRequestExtra';
 import { useEffect } from 'react';
 
 // react icon
@@ -7,19 +8,25 @@ import { IoCloseCircleOutline } from 'react-icons/io5';
 
 type CreateShortformExtraModalProps = {
   show: boolean;
+  shortformId: string;
+  selectExtraType?: ShortFormExtraType;
   title?: string;
   onBackdrop?: () => void;
-  onCreate?: () => void;
 };
 
 const id = 'create_shortform_extra_modal';
 
 export default function CreateShortformExtraModal({
   show,
+  shortformId,
+  selectExtraType,
   title,
   onBackdrop,
-  onCreate,
 }: CreateShortformExtraModalProps) {
+  const { onRequestExtra, isLoading } = useRequestExtra(shortformId, () =>
+    handleBackdrop(),
+  );
+
   // useEffect
   useEffect(() => {
     const modal = document.getElementById(id) as HTMLDialogElement;
@@ -43,9 +50,7 @@ export default function CreateShortformExtraModal({
   };
 
   const handleCreate = () => {
-    onCreate && onCreate();
-
-    handleBackdrop();
+    selectExtraType && onRequestExtra(selectExtraType.id);
   };
 
   return (
@@ -70,8 +75,13 @@ export default function CreateShortformExtraModal({
               type="button"
               className="btn btn-neutral text-white ml-3"
               onClick={handleCreate}
+              disabled={isLoading}
             >
-              <IoAddCircle className="w-6 h-6" />
+              {isLoading ? (
+                <span className="loading loading-spinner" />
+              ) : (
+                <IoAddCircle className="w-6 h-6" />
+              )}
               제작 요청
             </button>
           </form>
