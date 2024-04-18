@@ -470,15 +470,44 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [selectedTemplate]);
 
   useEffect(() => {
+    if (selectedTemplate && !selectedTemplate.options.subtitle.none) {
+      const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
+        selectedTemplate.options.subtitle;
+
+      setSubtitleContentArray((prev) => {
+        const updatedArray = prev.map((v) => {
+          return { ...v, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity };
+        });
+        return updatedArray;
+      });
+    } else {
+      setSubtitleContentArray((prev) => {
+        const updatedArray = prev.map((v) => {
+          return {
+            ...v,
+            text: v.text,
+            x1: 0,
+            y1: 0.8,
+            x2: 1,
+            y2: 1,
+            font: FONT_ARRAY[1],
+            size: 20,
+            color: "#ffffff",
+            background: "#000000",
+            textOpacity: 1,
+            bgOpacity: 0,
+          };
+        });
+        return updatedArray;
+      });
+    }
+  }, [selectedTemplate]);
+
+  useEffect(() => {
     const index = subtitleContentArray.findIndex(
       (v) => timeObjectToSeconds(v.startTime) <= videoProgress && timeObjectToSeconds(v.endTime) >= videoProgress
     );
-    if (index === -1) {
-      setCurrentSubtitleIndex(null);
-    } else {
-      setCurrentSubtitleIndex(index);
-    }
-    // index === -1 ? setCurrentSubtitleIndex(null) : setCurrentSubtitleIndex(index);
+    index === -1 ? setCurrentSubtitleIndex(null) : setCurrentSubtitleIndex(index);
   }, [videoProgress, subtitleContentArray]);
 
   // functions
@@ -637,6 +666,14 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   function handleClickAddSubtitle() {
     if (selectedTemplate && selectedTemplate.options.title.none) return;
 
+    const index = subtitleContentArray.findIndex((v) => {
+      const startTime = timeObjectToSeconds(v.startTime);
+      const endTime = timeObjectToSeconds(v.endTime);
+      return startTime < videoProgress + DEFAULT_SUBTITLE_SEC && endTime + 1 > videoProgress;
+    });
+
+    if (index !== -1) return;
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
         selectedTemplate.options.subtitle;
@@ -678,6 +715,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         },
       ]);
     }
+
+    setSelectedSubtitleIndex(subtitleContentArray.length);
   }
 
   function handleClickDeleteTitle() {

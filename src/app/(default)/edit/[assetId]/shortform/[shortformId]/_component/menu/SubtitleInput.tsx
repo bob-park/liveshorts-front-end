@@ -19,7 +19,7 @@ export default function SubtitleInput({
   handleClickWorkMenu,
   handleClickSubtitleInput,
 }: SubtitleInputProps) {
-  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity, startTime, endTime } = subtitle;
+  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = subtitle;
 
   return (
     <div
