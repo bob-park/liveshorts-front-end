@@ -43,6 +43,7 @@ const DEFAULT_TITLE_CONTENT = {
   textOpacity: 1,
   bgOpacity: 0,
 };
+const SECTION_BOX_MINIMUM_WIDTH = 24;
 
 export default function EditShorts({ videoSrc, templateList, bgmList }: EditShortsProps) {
   // useRef
@@ -223,9 +224,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const scrollLeft = progressRef.current.scrollLeft;
         const progressWidth = progressRef.current.scrollWidth;
         if (isExpandDragging.startTime && startXRef.current !== null) {
-          const sectionBoxWidth = sectionBoxRef.current.clientWidth;
           const newDivX = e.clientX + scrollLeft - startXRef.current;
-          const maxX = progressWidth - sectionBoxWidth;
+          const maxX = endX - SECTION_BOX_MINIMUM_WIDTH;
 
           const newX = Math.max(0, Math.min(maxX, newDivX));
           const newTime = pxToTime(newX);
@@ -238,8 +238,9 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
           const newDivX = e.clientX + scrollLeft - endXRef.current;
           const maxX = progressWidth;
+          const minX = startX + SECTION_BOX_MINIMUM_WIDTH;
 
-          const newX = Math.max(0, Math.min(maxX, newDivX));
+          const newX = Math.max(minX, Math.min(maxX, newDivX));
           const newTime = pxToTime(newX);
           const newTimeObject = secondsToTimeObject(newTime);
 
@@ -629,7 +630,85 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   function handleChangeEndTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setEndTimeInput({ ...startTimeInput, [name]: value });
+    setEndTimeInput({ ...endTimeInput, [name]: value });
+  }
+
+  function handleBlurStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    if (value.length === 0) {
+      setStartTimeInput({ ...startTimeInput, [name]: "00" });
+    }
+
+    let maxValue = 0;
+    switch (name) {
+      case "hour":
+        maxValue = Number(endTimeInput.hour);
+        break;
+      case "min":
+        maxValue =
+          startTimeInput.hour < endTimeInput.hour
+            ? 59
+            : // TODO 이부분 점검할 것
+            startTimeInput.sec < endTimeInput.sec
+            ? Number(endTimeInput.min)
+            : Number(endTimeInput.min) - 1;
+        break;
+      case "sec":
+        maxValue = startTimeInput.min < endTimeInput.min ? 59 : Number(endTimeInput.sec) - 1;
+        break;
+      default:
+        break;
+    }
+
+    const newValue = Math.min(Math.max(Number(value), 0), maxValue);
+
+    if (value.length >= 1) {
+      setStartTimeInput({ ...startTimeInput, [name]: newValue.toString().padStart(2, "0") });
+    }
+  }
+
+  function handleBlurEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    if (value.length === 0) {
+      setEndTimeInput({ ...startTimeInput, [name]: "00" });
+    }
+
+    let maxValue = 0;
+    const { hour, min, sec } = secondsToTimeObject(videoDuration);
+    switch (name) {
+      case "hour":
+        maxValue = Number(hour);
+        break;
+      case "min":
+        maxValue = endTimeInput.hour < hour ? 59 : Number(min);
+        break;
+      case "sec":
+        maxValue = endTimeInput.min < min ? 59 : Number(sec) - 1;
+        break;
+      default:
+        break;
+    }
+
+    let minValue = 0;
+    switch (name) {
+      case "hour":
+        minValue = Number(startTimeInput.hour);
+        break;
+      case "min":
+        minValue = endTimeInput.hour > startTimeInput.hour ? 0 : Number(startTimeInput.min);
+        break;
+      case "sec":
+        minValue = endTimeInput.min > startTimeInput.min ? 0 : Number(startTimeInput.sec) + 1;
+        break;
+      default:
+        break;
+    }
+
+    const newValue = Math.min(Math.max(Number(value), minValue), maxValue);
+
+    if (value.length >= 1) {
+      setEndTimeInput({ ...endTimeInput, [name]: newValue.toString().padStart(2, "0") });
+    }
   }
 
   function handleClickPanel(panel: ActivePanel) {
@@ -935,6 +1014,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         shrinkProgress={shrinkProgress}
         scrollToProgressBar={scrollToProgressBar}
         moveSectionBoxToProgressBar={moveSectionBoxToProgressBar}
+        handleBlurStartTimeInput={handleBlurStartTimeInput}
+        handleBlurEndTimeInput={handleBlurEndTimeInput}
       />
 
       <div

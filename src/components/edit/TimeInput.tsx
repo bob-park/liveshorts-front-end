@@ -3,15 +3,17 @@ import { TimeObject } from "@/app/(default)/edit/[assetId]/shortform/[shortformI
 interface TimeInputProps {
   value: TimeObject;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBlurInput?(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 interface IndividualInputProps {
   name: string;
   value: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBlurInput?(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
-export default function TimeInput({ value, handleChange }: TimeInputProps) {
+export default function TimeInput({ value, handleChange, handleBlurInput }: TimeInputProps) {
   return (
     <div
       className={`
@@ -19,16 +21,16 @@ export default function TimeInput({ value, handleChange }: TimeInputProps) {
     input-bordered input w-full
     `}
     >
-      <IndividualInput name="hour" value={value.hour} handleChange={handleChange} />
+      <IndividualInput name="hour" value={value.hour} handleChange={handleChange} handleBlurInput={handleBlurInput} />
       <span>:</span>
-      <IndividualInput name="min" value={value.min} handleChange={handleChange} />
+      <IndividualInput name="min" value={value.min} handleChange={handleChange} handleBlurInput={handleBlurInput} />
       <span>:</span>
-      <IndividualInput name="sec" value={value.sec} handleChange={handleChange} />
+      <IndividualInput name="sec" value={value.sec} handleChange={handleChange} handleBlurInput={handleBlurInput} />
     </div>
   );
 }
 
-function IndividualInput({ name, value, handleChange }: IndividualInputProps) {
+function IndividualInput({ name, value, handleChange, handleBlurInput }: IndividualInputProps) {
   function maxLengthCheck(e: React.FormEvent<HTMLInputElement>) {
     if (e.currentTarget.value.length > e.currentTarget.maxLength) {
       e.currentTarget.value = e.currentTarget.value.slice(0, e.currentTarget.maxLength);
@@ -44,6 +46,7 @@ function IndividualInput({ name, value, handleChange }: IndividualInputProps) {
       min={0}
       onInput={maxLengthCheck}
       onChange={handleChange}
+      onBlur={handleBlurInput}
       className={`
       timeInput
     w-[20px] bg-[none]

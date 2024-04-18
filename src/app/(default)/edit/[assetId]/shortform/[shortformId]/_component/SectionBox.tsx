@@ -25,18 +25,19 @@ export default function SectionBox({
   handleMouseDownEndExpand,
   handleClickPanel,
 }: SectionBoxProps) {
+  const width = startX > endX ? 0 : endX - startX;
   return (
     <div
       ref={sectionBoxRef}
       style={{
-        width: `${endX - startX}px`,
+        width: `${width}px`,
         left: `${startX}px`,
       }}
       onMouseDown={handleMouseDownSectionBox}
       onClick={handleClickPanel}
       className={`
         absolute top-0 flex justify-between h-full
-        cursor-grab rounded-lg
+        cursor-grab
         group
                 `}
     >
@@ -44,7 +45,7 @@ export default function SectionBox({
         onMouseDown={handleMouseDownStartExpand}
         className={`
           cursor-w-resize
-          rounded-l-lg w-[12px] min-w-[12px]
+          rounded-l-md w-[0px] min-w-[12px]
           border-t-4 border-b-4 border-l-4
           ${!isActive && "group-hover:border-opacity-60"}
           ${isActive ? " border-opacity-100" : "border-opacity-20"}
@@ -72,7 +73,7 @@ export default function SectionBox({
         onMouseDown={handleMouseDownEndExpand}
         className={`
           cursor-e-resize
-          rounded-r-lg w-[12px] min-w-[12px]
+          rounded-r-md w-[0px] min-w-[12px]
           border-t-4 border-b-4 border-r-4
           ${!isActive && "group-hover:border-opacity-60"}
           ${isActive ? " border-opacity-100" : "border-opacity-20"}
