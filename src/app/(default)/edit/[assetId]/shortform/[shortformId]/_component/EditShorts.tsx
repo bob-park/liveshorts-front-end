@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { TimeObject } from "@/components/edit/TimeInput";
 import VideoControlBar from "./VideoControlBar";
 import SectionBox from "./SectionBox";
 import { secondsToTimeObject, timeObjectToSeconds } from "./util";
@@ -11,7 +10,7 @@ import TitleMenu from "./menu/TitleMenu";
 import SubtitleMenu from "./menu/SubtitleMenu";
 import BgmMenu from "./menu/BgmMenu";
 import TemplateMenu from "./menu/TemplateMenu";
-import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent } from "./type";
+import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent, TimeObject } from "./type";
 import SectionControlBar from "./SectionControlBar";
 import VideoArea from "./VideoArea";
 
@@ -471,7 +470,9 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [selectedTemplate]);
 
   useEffect(() => {
-    const index = subtitleContentArray.findIndex((v) => v.startTime <= videoProgress && v.endTime >= videoProgress);
+    const index = subtitleContentArray.findIndex(
+      (v) => timeObjectToSeconds(v.startTime) <= videoProgress && timeObjectToSeconds(v.endTime) >= videoProgress
+    );
     if (index === -1) {
       setCurrentSubtitleIndex(null);
     } else {
@@ -653,8 +654,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           background,
           textOpacity,
           bgOpacity,
-          startTime: videoProgress,
-          endTime: videoProgress + DEFAULT_SUBTITLE_SEC,
+          startTime: secondsToTimeObject(videoProgress),
+          endTime: secondsToTimeObject(videoProgress + DEFAULT_SUBTITLE_SEC),
         },
       ]);
     } else {
@@ -672,8 +673,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           background: "#000000",
           textOpacity: 1,
           bgOpacity: 0,
-          startTime: videoProgress,
-          endTime: videoProgress + DEFAULT_SUBTITLE_SEC,
+          startTime: secondsToTimeObject(videoProgress),
+          endTime: secondsToTimeObject(videoProgress + DEFAULT_SUBTITLE_SEC),
         },
       ]);
     }
@@ -708,6 +709,34 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       setSubtitleContentArray((prev) => {
         const updatedArray = [...prev];
         updatedArray[selectedSubtitleIndex] = { ...prev[selectedSubtitleIndex], [name]: value };
+        return updatedArray;
+      });
+    }
+  }
+
+  function handleChangeSubtitleStartTime(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    if (selectedSubtitleIndex !== null) {
+      setSubtitleContentArray((prev) => {
+        const updatedArray = [...prev];
+        updatedArray[selectedSubtitleIndex] = {
+          ...prev[selectedSubtitleIndex],
+          startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: value },
+        };
+        return updatedArray;
+      });
+    }
+  }
+
+  function handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    if (selectedSubtitleIndex !== null) {
+      setSubtitleContentArray((prev) => {
+        const updatedArray = [...prev];
+        updatedArray[selectedSubtitleIndex] = {
+          ...prev[selectedSubtitleIndex],
+          endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: value },
+        };
         return updatedArray;
       });
     }
@@ -796,6 +825,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               handleClickAddSubtitle={handleClickAddSubtitle}
               handleClickDeleteSubtitle={handleClickDeleteSubtitle}
               handleChangeSubtitle={handleChangeSubtitle}
+              handleChangeSubtitleStartTime={handleChangeSubtitleStartTime}
+              handleChangeSubtitleEndTime={handleChangeSubtitleEndTime}
               handleClickWorkMenu={handleClickWorkMenu}
               handleClickPanel={handleClickPanel}
             />
@@ -925,7 +956,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                   handleClickPanel("subtitle");
                   handleClickWorkMenu("subtitle");
                 }}
-                style={{ left: timeToPx(v.startTime), width: timeToPx(v.endTime - v.startTime) }}
+                style={{
+                  left: timeToPx(timeObjectToSeconds(v.startTime)),
+                  width: timeToPx(timeObjectToSeconds(v.endTime) - timeObjectToSeconds(v.startTime)),
+                }}
                 className={`${
                   i === selectedSubtitleIndex ? "border-4 border-slate-900" : "border-2 border-slate-500"
                 } absolute h-full border-slate-900 bg-slate-200`}

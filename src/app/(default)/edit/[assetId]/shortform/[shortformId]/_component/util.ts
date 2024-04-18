@@ -1,4 +1,4 @@
-import { TimeObject } from "@/components/edit/TimeInput";
+import { TimeObject } from "./type";
 
 export function secondsToHhmmss(seconds: number) {
   const hour = Math.floor(seconds / 3600);

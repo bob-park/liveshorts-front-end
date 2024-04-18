@@ -1,8 +1,4 @@
-export interface TimeObject {
-  hour: string;
-  min: string;
-  sec: string;
-}
+import { TimeObject } from "@/app/(default)/edit/[assetId]/shortform/[shortformId]/_component/type";
 
 interface TimeInputProps {
   value: TimeObject;

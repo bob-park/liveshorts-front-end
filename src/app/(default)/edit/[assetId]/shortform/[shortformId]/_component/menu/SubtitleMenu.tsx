@@ -9,6 +9,8 @@ interface SubtitleMenuProps {
   handleClickAddSubtitle(): void;
   handleClickDeleteSubtitle(): void;
   handleChangeSubtitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void;
+  handleChangeSubtitleStartTime(e: React.ChangeEvent<HTMLInputElement>): void;
+  handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
   handleClickPanel(panel: ActivePanel): void;
 }
@@ -21,6 +23,8 @@ export default function SubtitleMenu({
   handleClickAddSubtitle,
   handleClickDeleteSubtitle,
   handleChangeSubtitle,
+  handleChangeSubtitleStartTime,
+  handleChangeSubtitleEndTime,
   handleClickWorkMenu,
   handleClickPanel,
 }: SubtitleMenuProps) {
@@ -42,6 +46,8 @@ export default function SubtitleMenu({
             disabled={disabled}
             handleClickDeleteSubtitle={handleClickDeleteSubtitle}
             handleChangeSubtitle={handleChangeSubtitle}
+            handleChangeSubtitleStartTime={handleChangeSubtitleStartTime}
+            handleChangeSubtitleEndTime={handleChangeSubtitleEndTime}
           />
         )}
       </div>

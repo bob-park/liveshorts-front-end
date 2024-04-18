@@ -1,9 +1,10 @@
-import TimeInput, { TimeObject } from "@/components/edit/TimeInput";
+import TimeInput from "@/components/edit/TimeInput";
 import { WIDTH_PERCENT_STEP } from "./EditShorts";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { LuArrowLeftToLine } from "react-icons/lu";
 import { RxAlignCenterVertically } from "react-icons/rx";
 import IconButton from "./IconButton";
+import { TimeObject } from "./type";
 
 interface SectionControlBarProps {
   startTimeInput: TimeObject;

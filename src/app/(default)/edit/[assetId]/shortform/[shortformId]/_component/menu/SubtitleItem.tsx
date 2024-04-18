@@ -1,11 +1,14 @@
 import { SubtitleContent } from "../type";
 import { FONT_ARRAY } from "../EditShorts";
+import TimeInput from "@/components/edit/TimeInput";
 
 interface SubtitleItemProps {
   subtitle: SubtitleContent;
   disabled: boolean;
   handleClickDeleteSubtitle: () => void;
   handleChangeSubtitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChangeSubtitleStartTime(e: React.ChangeEvent<HTMLInputElement>): void;
+  handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>): void;
 }
 
 interface LabelInputProps {
@@ -27,8 +30,10 @@ export default function SubtitleItem({
   disabled,
   handleClickDeleteSubtitle,
   handleChangeSubtitle,
+  handleChangeSubtitleStartTime,
+  handleChangeSubtitleEndTime,
 }: SubtitleItemProps) {
-  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = subtitle;
+  const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity, startTime, endTime } = subtitle;
 
   return (
     <div className="flex flex-col gap-2 p-1">
@@ -76,6 +81,14 @@ export default function SubtitleItem({
             handleChangeSubtitle={handleChangeSubtitle}
           />
           <LabelInput label="Opacity" name="bgOpacity" value={bgOpacity} handleChangeSubtitle={handleChangeSubtitle} />
+        </div>
+      </div>
+
+      <div>
+        <span className="text-slate-400 text-xs">Time</span>
+        <div className="flex flex-col gap-2">
+          <TimeInput value={startTime} handleChange={handleChangeSubtitleStartTime} />
+          <TimeInput value={endTime} handleChange={handleChangeSubtitleEndTime} />
         </div>
       </div>
 
