@@ -86,8 +86,8 @@ export default function SubtitleItem({
 
       <div>
         <span className="text-slate-400 text-xs">Time</span>
-        <div className="flex flex-col gap-2">
-          <TimeInput value={startTime} handleChange={handleChangeSubtitleStartTime} />
+        <div className="flex gap-2 items-center justify-between">
+          <TimeInput value={startTime} handleChange={handleChangeSubtitleStartTime} /> /
           <TimeInput value={endTime} handleChange={handleChangeSubtitleEndTime} />
         </div>
       </div>

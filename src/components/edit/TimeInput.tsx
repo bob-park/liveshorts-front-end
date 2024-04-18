@@ -15,9 +15,8 @@ export default function TimeInput({ value, handleChange }: TimeInputProps) {
   return (
     <div
       className={`
-    flex gap-[2px] justify-between px-2 py-1 
-    border rounded-md
-    border-slate-600
+    flex gap-[2px] h-[30px] items-center justify-evenly
+    input-bordered input w-full
     `}
     >
       <IndividualInput name="hour" value={value.hour} handleChange={handleChange} />
