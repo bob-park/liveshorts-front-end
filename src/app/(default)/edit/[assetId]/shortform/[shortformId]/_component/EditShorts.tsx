@@ -648,8 +648,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         maxValue =
           startTimeInput.hour < endTimeInput.hour
             ? 59
-            : // TODO 이부분 점검할 것
-            startTimeInput.sec < endTimeInput.sec
+            : startTimeInput.sec < endTimeInput.sec
             ? Number(endTimeInput.min)
             : Number(endTimeInput.min) - 1;
         break;

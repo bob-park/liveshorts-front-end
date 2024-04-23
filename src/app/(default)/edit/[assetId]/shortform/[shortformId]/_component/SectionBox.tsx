@@ -13,6 +13,15 @@ interface SectionBoxProps {
   handleClickPanel: () => void;
 }
 
+interface SectionBoxPartProps {
+  part: "left" | "middle" | "right";
+  isError: boolean;
+  isActive: boolean;
+  lineType: LineType | null;
+  text?: string;
+  handleMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
 export default function SectionBox({
   sectionBoxRef,
   startX,
@@ -26,6 +35,8 @@ export default function SectionBox({
   handleClickPanel,
 }: SectionBoxProps) {
   const width = startX > endX ? 0 : endX - startX;
+  const isError = startX > endX;
+
   return (
     <div
       ref={sectionBoxRef}
@@ -41,48 +52,44 @@ export default function SectionBox({
         group
                 `}
     >
-      <div
-        onMouseDown={handleMouseDownStartExpand}
-        className={`
-          cursor-w-resize
-          rounded-l-md w-[0px] min-w-[12px]
-          border-t-4 border-b-4 border-l-4
-          ${!isActive && "group-hover:border-opacity-60"}
-          ${isActive ? " border-opacity-100" : "border-opacity-20"}
-          ${lineType === "video" && "border-slate-700 bg-slate-50"}
-          ${lineType === "title" && "border-violet-700 bg-violet-50"}
-          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
-          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
-                `}
-      ></div>
-      <div
-        className={`
-          w-full
-          inset-0 border-t-4 border-b-4 box-content
-          ${!isActive && "group-hover:border-opacity-60"}
-          ${isActive ? " border-opacity-100" : "border-opacity-20"}
-          ${lineType === "video" && "border-slate-700 bg-slate-50"}
-          ${lineType === "title" && "border-violet-700 bg-violet-50"}
-          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
-          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
-                `}
-      >
-        {text}
-      </div>
-      <div
-        onMouseDown={handleMouseDownEndExpand}
-        className={`
-          cursor-e-resize
-          rounded-r-md w-[0px] min-w-[12px]
-          border-t-4 border-b-4 border-r-4
-          ${!isActive && "group-hover:border-opacity-60"}
-          ${isActive ? " border-opacity-100" : "border-opacity-20"}
-          ${lineType === "video" && "border-slate-700 bg-slate-50"}
-          ${lineType === "title" && "border-violet-700 bg-violet-50"}
-          ${lineType === "subtitle" && "border-cyan-700 bg-cyan-50"}
-          ${lineType === "bgm" && "border-pink-700 bg-pink-50"}
-          `}
-      ></div>
+      <SectionBoxPart
+        part="left"
+        isError={isError}
+        isActive={isActive}
+        lineType={lineType}
+        handleMouseDown={handleMouseDownStartExpand}
+      />
+      <SectionBoxPart part="middle" isError={isError} isActive={isActive} lineType={lineType} text={text} />
+      <SectionBoxPart
+        part="right"
+        isError={isError}
+        isActive={isActive}
+        lineType={lineType}
+        handleMouseDown={handleMouseDownEndExpand}
+      />
+    </div>
+  );
+}
+
+function SectionBoxPart({ part, isError, isActive, lineType, text, handleMouseDown }: SectionBoxPartProps) {
+  return (
+    <div
+      onMouseDown={handleMouseDown}
+      className={`
+   w-[0px] min-w-[12px] border-t-4 border-b-4 truncate
+  ${part === "left" && "cursor-w-resize rounded-l-md border-l-4"}
+  ${part === "right" && "cursor-e-resize rounded-r-md border-r-4"}
+  ${part === "middle" && "w-full inset-0 box-content"}
+  ${isError && "border-red-700"}
+  ${!isActive && "group-hover:border-opacity-60"}
+  ${isActive ? " border-opacity-100" : "border-opacity-20"}
+  ${lineType === "video" && "border-slate-700 bg-slate-100"}
+  ${lineType === "title" && "border-violet-700 bg-violet-100"}
+  ${lineType === "subtitle" && "border-cyan-700 bg-cyan-100"}
+  ${lineType === "bgm" && "border-pink-700 bg-pink-100"}
+        `}
+    >
+      <span className="text-sm select-none">{text}</span>
     </div>
   );
 }
