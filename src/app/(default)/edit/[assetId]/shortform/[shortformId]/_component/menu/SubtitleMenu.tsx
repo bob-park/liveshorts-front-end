@@ -13,6 +13,8 @@ interface SubtitleMenuProps {
   handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
   handleClickPanel(panel: ActivePanel): void;
+  correctSubtitleStartTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
+  correctSubtitleEndTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 export default function SubtitleMenu({
@@ -27,6 +29,8 @@ export default function SubtitleMenu({
   handleChangeSubtitleEndTime,
   handleClickWorkMenu,
   handleClickPanel,
+  correctSubtitleStartTimeInput,
+  correctSubtitleEndTimeInput,
 }: SubtitleMenuProps) {
   return (
     <div
@@ -48,6 +52,8 @@ export default function SubtitleMenu({
             handleChangeSubtitle={handleChangeSubtitle}
             handleChangeSubtitleStartTime={handleChangeSubtitleStartTime}
             handleChangeSubtitleEndTime={handleChangeSubtitleEndTime}
+            correctSubtitleStartTimeInput={correctSubtitleStartTimeInput}
+            correctSubtitleEndTimeInput={correctSubtitleEndTimeInput}
           />
         )}
       </div>

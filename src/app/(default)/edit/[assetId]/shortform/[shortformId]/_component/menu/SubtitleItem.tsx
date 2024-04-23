@@ -9,6 +9,8 @@ interface SubtitleItemProps {
   handleChangeSubtitle: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleChangeSubtitleStartTime(e: React.ChangeEvent<HTMLInputElement>): void;
   handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>): void;
+  correctSubtitleStartTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
+  correctSubtitleEndTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 interface LabelInputProps {
@@ -32,6 +34,8 @@ export default function SubtitleItem({
   handleChangeSubtitle,
   handleChangeSubtitleStartTime,
   handleChangeSubtitleEndTime,
+  correctSubtitleStartTimeInput,
+  correctSubtitleEndTimeInput,
 }: SubtitleItemProps) {
   const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity, startTime, endTime } = subtitle;
 
@@ -87,8 +91,17 @@ export default function SubtitleItem({
       <div>
         <span className="text-slate-400 text-xs">Time</span>
         <div className="flex gap-2 items-center justify-between">
-          <TimeInput value={startTime} handleChange={handleChangeSubtitleStartTime} /> /
-          <TimeInput value={endTime} handleChange={handleChangeSubtitleEndTime} />
+          <TimeInput
+            value={startTime}
+            handleChange={handleChangeSubtitleStartTime}
+            correctInput={correctSubtitleStartTimeInput}
+          />
+          /
+          <TimeInput
+            value={endTime}
+            handleChange={handleChangeSubtitleEndTime}
+            correctInput={correctSubtitleEndTimeInput}
+          />
         </div>
       </div>
 

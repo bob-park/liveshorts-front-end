@@ -659,6 +659,78 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }
 
+  function correctSubtitleStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    const selectedSubtitle = subtitleContentArray[selectedSubtitleIndex ?? 0];
+
+    if (value.length === 0) {
+      if (selectedSubtitleIndex !== null) {
+        setSubtitleContentArray((prev) => {
+          const updatedArray = [...prev];
+          updatedArray[selectedSubtitleIndex] = {
+            ...prev[selectedSubtitleIndex],
+            startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: "00" },
+          };
+          return updatedArray;
+        });
+      }
+    }
+
+    const newValue = getCorrectStartTime(selectedSubtitle.startTime, selectedSubtitle.endTime, name, value);
+
+    if (value.length >= 1) {
+      if (selectedSubtitleIndex !== null) {
+        setSubtitleContentArray((prev) => {
+          const updatedArray = [...prev];
+          updatedArray[selectedSubtitleIndex] = {
+            ...prev[selectedSubtitleIndex],
+            startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: newValue },
+          };
+          return updatedArray;
+        });
+      }
+    }
+  }
+
+  function correctSubtitleEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    const selectedSubtitle = subtitleContentArray[selectedSubtitleIndex ?? 0];
+
+    if (value.length === 0) {
+      if (selectedSubtitleIndex !== null) {
+        setSubtitleContentArray((prev) => {
+          const updatedArray = [...prev];
+          updatedArray[selectedSubtitleIndex] = {
+            ...prev[selectedSubtitleIndex],
+            endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: "00" },
+          };
+          return updatedArray;
+        });
+      }
+    }
+
+    const newValue = getCorrectEndTime(
+      selectedSubtitle.startTime,
+      selectedSubtitle.endTime,
+      videoDuration,
+      name,
+      value
+    );
+
+    if (value.length >= 1) {
+      if (selectedSubtitleIndex !== null) {
+        setSubtitleContentArray((prev) => {
+          const updatedArray = [...prev];
+          updatedArray[selectedSubtitleIndex] = {
+            ...prev[selectedSubtitleIndex],
+            endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: newValue },
+          };
+          return updatedArray;
+        });
+      }
+    }
+  }
+
   function handleClickPanel(panel: ActivePanel) {
     setActivePanel(panel);
   }
@@ -895,6 +967,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
               handleChangeSubtitleEndTime={handleChangeSubtitleEndTime}
               handleClickWorkMenu={handleClickWorkMenu}
               handleClickPanel={handleClickPanel}
+              correctSubtitleStartTimeInput={correctSubtitleStartTimeInput}
+              correctSubtitleEndTimeInput={correctSubtitleEndTimeInput}
             />
           )}
           {selectedWorkMenu === "bgm" && (
