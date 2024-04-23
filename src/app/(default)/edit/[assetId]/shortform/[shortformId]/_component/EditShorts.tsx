@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import VideoControlBar from "./VideoControlBar";
 import SectionBox from "./SectionBox";
-import { secondsToTimeObject, timeObjectToSeconds } from "./util";
+import { getCorrectEndTime, getCorrectStartTime, secondsToTimeObject, timeObjectToSeconds } from "./util";
 import TimeLine from "./TimeLine";
 import TabMenu from "./TabMenu";
 import TitleMenu from "./menu/TitleMenu";
@@ -633,77 +633,26 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     setEndTimeInput({ ...endTimeInput, [name]: value });
   }
 
-  function handleBlurStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+  function correctStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (value.length === 0) {
       setStartTimeInput({ ...startTimeInput, [name]: "00" });
     }
 
-    let maxValue = 0;
-    switch (name) {
-      case "hour":
-        maxValue = Number(endTimeInput.hour);
-        break;
-      case "min":
-        maxValue =
-          startTimeInput.hour < endTimeInput.hour
-            ? 59
-            : startTimeInput.sec < endTimeInput.sec
-            ? Number(endTimeInput.min)
-            : Number(endTimeInput.min) - 1;
-        break;
-      case "sec":
-        maxValue = startTimeInput.min < endTimeInput.min ? 59 : Number(endTimeInput.sec) - 1;
-        break;
-      default:
-        break;
-    }
-
-    const newValue = Math.min(Math.max(Number(value), 0), maxValue);
+    const newValue = getCorrectStartTime(startTimeInput, endTimeInput, name, value);
 
     if (value.length >= 1) {
       setStartTimeInput({ ...startTimeInput, [name]: newValue.toString().padStart(2, "0") });
     }
   }
 
-  function handleBlurEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+  function correctEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (value.length === 0) {
       setEndTimeInput({ ...startTimeInput, [name]: "00" });
     }
 
-    let maxValue = 0;
-    const { hour, min, sec } = secondsToTimeObject(videoDuration);
-    switch (name) {
-      case "hour":
-        maxValue = Number(hour);
-        break;
-      case "min":
-        maxValue = endTimeInput.hour < hour ? 59 : Number(min);
-        break;
-      case "sec":
-        maxValue = endTimeInput.min < min ? 59 : Number(sec) - 1;
-        break;
-      default:
-        break;
-    }
-
-    let minValue = 0;
-    switch (name) {
-      case "hour":
-        minValue = Number(startTimeInput.hour);
-        break;
-      case "min":
-        minValue = endTimeInput.hour > startTimeInput.hour ? 0 : Number(startTimeInput.min);
-        break;
-      case "sec":
-        minValue = endTimeInput.min > startTimeInput.min ? 0 : Number(startTimeInput.sec) + 1;
-        break;
-      default:
-        break;
-    }
-
-    const newValue = Math.min(Math.max(Number(value), minValue), maxValue);
+    const newValue = getCorrectEndTime(startTimeInput, endTimeInput, videoDuration, name, value);
 
     if (value.length >= 1) {
       setEndTimeInput({ ...endTimeInput, [name]: newValue.toString().padStart(2, "0") });
@@ -1013,8 +962,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         shrinkProgress={shrinkProgress}
         scrollToProgressBar={scrollToProgressBar}
         moveSectionBoxToProgressBar={moveSectionBoxToProgressBar}
-        handleBlurStartTimeInput={handleBlurStartTimeInput}
-        handleBlurEndTimeInput={handleBlurEndTimeInput}
+        correctStartTimeInput={correctStartTimeInput}
+        correctEndTimeInput={correctEndTimeInput}
       />
 
       <div

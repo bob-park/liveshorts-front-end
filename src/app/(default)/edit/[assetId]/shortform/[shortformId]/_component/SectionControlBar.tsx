@@ -16,8 +16,8 @@ interface SectionControlBarProps {
   shrinkProgress: () => void;
   scrollToProgressBar: () => void;
   moveSectionBoxToProgressBar: () => void;
-  handleBlurStartTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
-  handleBlurEndTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
+  correctStartTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
+  correctEndTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 export default function SectionControlBar({
@@ -30,8 +30,8 @@ export default function SectionControlBar({
   shrinkProgress,
   scrollToProgressBar,
   moveSectionBoxToProgressBar,
-  handleBlurStartTimeInput,
-  handleBlurEndTimeInput,
+  correctStartTimeInput,
+  correctEndTimeInput,
 }: SectionControlBarProps) {
   return (
     <div className="py-2 px-5 flex items-center justify-between">
@@ -48,14 +48,10 @@ export default function SectionControlBar({
         <TimeInput
           value={startTimeInput}
           handleChange={handleChangeStartTimeInput}
-          handleBlurInput={handleBlurStartTimeInput}
+          correctInput={correctStartTimeInput}
         />
         /
-        <TimeInput
-          value={endTimeInput}
-          handleChange={handleChangeEndTimeInput}
-          handleBlurInput={handleBlurEndTimeInput}
-        />
+        <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} correctInput={correctEndTimeInput} />
       </div>
 
       <div className="flex items-center select-none gap-2">

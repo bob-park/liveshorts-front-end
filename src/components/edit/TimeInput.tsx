@@ -3,17 +3,17 @@ import { TimeObject } from "@/app/(default)/edit/[assetId]/shortform/[shortformI
 interface TimeInputProps {
   value: TimeObject;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleBlurInput?(e: React.FocusEvent<HTMLInputElement>): void;
+  correctInput?(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 interface IndividualInputProps {
   name: string;
   value: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleBlurInput?(e: React.FocusEvent<HTMLInputElement>): void;
+  correctInput?(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
-export default function TimeInput({ value, handleChange, handleBlurInput }: TimeInputProps) {
+export default function TimeInput({ value, handleChange, correctInput }: TimeInputProps) {
   return (
     <div
       className={`
@@ -21,16 +21,16 @@ export default function TimeInput({ value, handleChange, handleBlurInput }: Time
     input-bordered input w-full
     `}
     >
-      <IndividualInput name="hour" value={value.hour} handleChange={handleChange} handleBlurInput={handleBlurInput} />
+      <IndividualInput name="hour" value={value.hour} handleChange={handleChange} correctInput={correctInput} />
       <span>:</span>
-      <IndividualInput name="min" value={value.min} handleChange={handleChange} handleBlurInput={handleBlurInput} />
+      <IndividualInput name="min" value={value.min} handleChange={handleChange} correctInput={correctInput} />
       <span>:</span>
-      <IndividualInput name="sec" value={value.sec} handleChange={handleChange} handleBlurInput={handleBlurInput} />
+      <IndividualInput name="sec" value={value.sec} handleChange={handleChange} correctInput={correctInput} />
     </div>
   );
 }
 
-function IndividualInput({ name, value, handleChange, handleBlurInput }: IndividualInputProps) {
+function IndividualInput({ name, value, handleChange, correctInput }: IndividualInputProps) {
   function maxLengthCheck(e: React.FormEvent<HTMLInputElement>) {
     if (e.currentTarget.value.length > e.currentTarget.maxLength) {
       e.currentTarget.value = e.currentTarget.value.slice(0, e.currentTarget.maxLength);
@@ -46,7 +46,12 @@ function IndividualInput({ name, value, handleChange, handleBlurInput }: Individ
       min={0}
       onInput={maxLengthCheck}
       onChange={handleChange}
-      onBlur={handleBlurInput}
+      onBlur={correctInput}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.currentTarget.blur();
+        }
+      }}
       className={`
       timeInput
     w-[20px] bg-[none]

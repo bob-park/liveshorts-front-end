@@ -82,3 +82,72 @@ export function generateTimeArray(startSeconds: number, endSeconds: number, step
   }
   return timeArray;
 }
+
+export function getCorrectStartTime(startTime: TimeObject, endTime: TimeObject, name: string, value: string) {
+  let maxValue = 0;
+
+  switch (name) {
+    case "hour":
+      maxValue = Number(endTime.hour);
+      break;
+    case "min":
+      maxValue =
+        startTime.hour < endTime.hour
+          ? 59
+          : startTime.sec < endTime.sec
+          ? Number(endTime.min)
+          : Number(endTime.min) - 1;
+      break;
+    case "sec":
+      maxValue = startTime.min < endTime.min ? 59 : Number(endTime.sec) - 1;
+      break;
+    default:
+      break;
+  }
+
+  const newValue = Math.min(Math.max(Number(value), 0), maxValue);
+  return newValue;
+}
+
+export function getCorrectEndTime(
+  startTime: TimeObject,
+  endTime: TimeObject,
+  videoDuration: number,
+  name: string,
+  value: string
+) {
+  let maxValue = 0;
+
+  const { hour, min, sec } = secondsToTimeObject(videoDuration);
+  switch (name) {
+    case "hour":
+      maxValue = Number(hour);
+      break;
+    case "min":
+      maxValue = endTime.hour < hour ? 59 : Number(min);
+      break;
+    case "sec":
+      maxValue = endTime.min < min ? 59 : Number(sec) - 1;
+      break;
+    default:
+      break;
+  }
+
+  let minValue = 0;
+  switch (name) {
+    case "hour":
+      minValue = Number(startTime.hour);
+      break;
+    case "min":
+      minValue = endTime.hour > startTime.hour ? 0 : Number(startTime.min);
+      break;
+    case "sec":
+      minValue = endTime.min > startTime.min ? 0 : Number(startTime.sec) + 1;
+      break;
+    default:
+      break;
+  }
+
+  const newValue = Math.min(Math.max(Number(value), minValue), maxValue);
+  return newValue;
+}
