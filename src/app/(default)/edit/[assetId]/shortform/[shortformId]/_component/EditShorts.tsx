@@ -732,44 +732,38 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setSectionInfo({ ...sectionInfo, startTime: { ...sectionInfo.startTime, [name]: value } });
+    const startTime = { ...sectionInfo.startTime, [name]: value };
+    setSectionInfo({ ...sectionInfo, startTime, startX: timeObjectToPx(startTime) });
   }
 
   function handleChangeEndTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setSectionInfo({ ...sectionInfo, endTime: { ...sectionInfo.endTime, [name]: value } });
+    const endTime = { ...sectionInfo.endTime, [name]: value };
+    setSectionInfo({ ...sectionInfo, endTime, endX: timeObjectToPx(endTime) });
   }
 
   function correctStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    if (value.length === 0) {
-      setSectionInfo({ ...sectionInfo, startTime: { ...sectionInfo.startTime, [name]: "00" } });
-    }
-
     const newValue = getCorrectStartTime(sectionInfo.startTime, sectionInfo.endTime, name, value);
 
-    if (value.length >= 1) {
-      setSectionInfo({
-        ...sectionInfo,
-        startTime: { ...sectionInfo.startTime, [name]: newValue.toString().padStart(2, "0") },
-      });
-    }
+    const startTime = { ...sectionInfo.startTime, [name]: newValue.toString().padStart(2, "0") };
+    setSectionInfo({
+      ...sectionInfo,
+      startTime,
+      startX: timeObjectToPx(startTime),
+    });
   }
 
   function correctEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    if (value.length === 0) {
-      setSectionInfo({ ...sectionInfo, endTime: { ...sectionInfo.endTime, [name]: "00" } });
-    }
-
     const newValue = getCorrectEndTime(sectionInfo.startTime, sectionInfo.endTime, videoDuration, name, value);
 
-    if (value.length >= 1) {
-      setSectionInfo({
-        ...sectionInfo,
-        endTime: { ...sectionInfo.endTime, [name]: newValue.toString().padStart(2, "0") },
-      });
-    }
+    const endTime = { ...sectionInfo.endTime, [name]: newValue.toString().padStart(2, "0") };
+    setSectionInfo({
+      ...sectionInfo,
+      endTime,
+      endX: timeObjectToPx(endTime),
+    });
   }
 
   function handleClickPanel(panel: ActivePanel) {
@@ -947,55 +941,33 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }
 
   function correctSubtitleStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    if (selectedSubtitleIndex === null) return;
+
     const { name, value } = e.target;
     const selectedSubtitle = subtitleContentArray[selectedSubtitleIndex ?? 0];
-
-    if (value.length === 0) {
-      if (selectedSubtitleIndex !== null) {
-        setSubtitleContentArray((prev) => {
-          const updatedArray = [...prev];
-          updatedArray[selectedSubtitleIndex] = {
-            ...prev[selectedSubtitleIndex],
-            startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: "00" },
-          };
-          return updatedArray;
-        });
-      }
-    }
-
     const newValue = getCorrectStartTime(selectedSubtitle.startTime, selectedSubtitle.endTime, name, value);
 
-    if (value.length >= 1) {
-      if (selectedSubtitleIndex !== null) {
-        setSubtitleContentArray((prev) => {
-          const updatedArray = [...prev];
-          updatedArray[selectedSubtitleIndex] = {
-            ...prev[selectedSubtitleIndex],
-            startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: newValue },
-          };
-          return updatedArray;
-        });
-      }
-    }
+    const startTime = {
+      ...subtitleContentArray[selectedSubtitleIndex].startTime,
+      [name]: newValue.toString().padStart(2, "0"),
+    };
+
+    setSubtitleContentArray((prev) => {
+      const updatedArray = [...prev];
+      updatedArray[selectedSubtitleIndex] = {
+        ...prev[selectedSubtitleIndex],
+        startTime,
+        startX: timeObjectToPx(startTime),
+      };
+      return updatedArray;
+    });
   }
 
   function correctSubtitleEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
+    if (selectedSubtitleIndex === null) return;
+
     const { name, value } = e.target;
     const selectedSubtitle = subtitleContentArray[selectedSubtitleIndex ?? 0];
-
-    if (value.length === 0) {
-      if (selectedSubtitleIndex !== null) {
-        setSubtitleContentArray((prev) => {
-          const updatedArray = [...prev];
-          updatedArray[selectedSubtitleIndex] = {
-            ...prev[selectedSubtitleIndex],
-            endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: "00" },
-          };
-          return updatedArray;
-        });
-      }
-    }
-
     const newValue = getCorrectEndTime(
       selectedSubtitle.startTime,
       selectedSubtitle.endTime,
@@ -1004,18 +976,20 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       value
     );
 
-    if (value.length >= 1) {
-      if (selectedSubtitleIndex !== null) {
-        setSubtitleContentArray((prev) => {
-          const updatedArray = [...prev];
-          updatedArray[selectedSubtitleIndex] = {
-            ...prev[selectedSubtitleIndex],
-            endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: newValue },
-          };
-          return updatedArray;
-        });
-      }
-    }
+    const endTime = {
+      ...subtitleContentArray[selectedSubtitleIndex].endTime,
+      [name]: newValue.toString().padStart(2, "0"),
+    };
+
+    setSubtitleContentArray((prev) => {
+      const updatedArray = [...prev];
+      updatedArray[selectedSubtitleIndex] = {
+        ...prev[selectedSubtitleIndex],
+        endTime,
+        endX: timeObjectToPx(endTime),
+      };
+      return updatedArray;
+    });
   }
 
   function handleClickTemplate(template?: Template) {
