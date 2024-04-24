@@ -1,16 +1,16 @@
 import { LineType } from "./type";
 
 interface SectionBoxProps {
-  sectionBoxRef: React.RefObject<HTMLDivElement>;
+  sectionBoxRef?: React.RefObject<HTMLDivElement>;
   startX: number;
   endX: number;
   lineType: LineType | null;
   isActive: boolean;
   text?: string;
+  isSelected?: boolean;
   handleMouseDownSectionBox: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownStartExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseDownEndExpand: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleClickPanel: () => void;
 }
 
 interface SectionBoxPartProps {
@@ -19,6 +19,7 @@ interface SectionBoxPartProps {
   isActive: boolean;
   lineType: LineType | null;
   text?: string;
+  isSelected?: boolean;
   handleMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -29,10 +30,10 @@ export default function SectionBox({
   lineType,
   isActive,
   text,
+  isSelected,
   handleMouseDownSectionBox,
   handleMouseDownStartExpand,
   handleMouseDownEndExpand,
-  handleClickPanel,
 }: SectionBoxProps) {
   const width = startX > endX ? 0 : endX - startX;
   const isError = startX > endX;
@@ -45,7 +46,6 @@ export default function SectionBox({
         left: `${startX}px`,
       }}
       onMouseDown={handleMouseDownSectionBox}
-      onClick={handleClickPanel}
       className={`
         absolute top-0 flex justify-between h-full
         cursor-grab
@@ -57,21 +57,30 @@ export default function SectionBox({
         isError={isError}
         isActive={isActive}
         lineType={lineType}
+        isSelected={isSelected}
         handleMouseDown={handleMouseDownStartExpand}
       />
-      <SectionBoxPart part="middle" isError={isError} isActive={isActive} lineType={lineType} text={text} />
+      <SectionBoxPart
+        part="middle"
+        isError={isError}
+        isActive={isActive}
+        lineType={lineType}
+        text={text}
+        isSelected={isSelected}
+      />
       <SectionBoxPart
         part="right"
         isError={isError}
         isActive={isActive}
         lineType={lineType}
+        isSelected={isSelected}
         handleMouseDown={handleMouseDownEndExpand}
       />
     </div>
   );
 }
 
-function SectionBoxPart({ part, isError, isActive, lineType, text, handleMouseDown }: SectionBoxPartProps) {
+function SectionBoxPart({ part, isError, isActive, lineType, text, isSelected, handleMouseDown }: SectionBoxPartProps) {
   return (
     <div
       onMouseDown={handleMouseDown}
@@ -85,7 +94,7 @@ function SectionBoxPart({ part, isError, isActive, lineType, text, handleMouseDo
   ${isActive ? " border-opacity-100" : "border-opacity-20"}
   ${lineType === "video" && "border-slate-700 bg-slate-100"}
   ${lineType === "title" && "border-violet-700 bg-violet-100"}
-  ${lineType === "subtitle" && "border-cyan-700 bg-cyan-100"}
+  ${lineType === "subtitle" && isSelected && "border-cyan-700 bg-cyan-100"}
   ${lineType === "bgm" && "border-pink-700 bg-pink-100"}
         `}
     >

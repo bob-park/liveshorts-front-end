@@ -71,8 +71,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [videoDuration, setVideoDuration] = useState(0);
   const [videoProgress, setVideoProgress] = useState(0);
   const [isPlay, setIsPlay] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [endX, setEndX] = useState(0);
+  const [sectionTime, setSectionTime] = useState<{ startTime: TimeObject; endTime: TimeObject }>({
+    startTime: secondsToTimeObject(0),
+    endTime: secondsToTimeObject(DEFAULT_SECTION_SEC),
+  });
+  // const [startX, setStartX] = useState(0);
+  // const [endX, setEndX] = useState(0);
   const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
@@ -80,11 +84,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     startTime: false,
     endTime: false,
   });
+  const [isSubtitleDragging, setIsSubtitleDragging] = useState(false);
   const [isVideoDragging, setIsVideoDragging] = useState(false);
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
   const [activePanel, setActivePanel] = useState<ActivePanel>("video");
-  const [startTimeInput, setStartTimeInput] = useState<TimeObject>(secondsToTimeObject(0));
-  const [endTimeInput, setEndTimeInput] = useState<TimeObject>(secondsToTimeObject(DEFAULT_SECTION_SEC));
   const [selectedWorkMenu, setSelectedWorkMenu] = useState<WorkMenu>("template");
   const [titleContent, setTitleContent] = useState<TitleContent>(DEFAULT_TITLE_CONTENT);
   const [subtitleContentArray, setSubtitleContentArray] = useState<SubtitleContent[]>([]);
@@ -103,8 +106,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, []);
 
   useEffect(() => {
-    prevEndX.current = timeToPx(DEFAULT_SECTION_SEC);
-    setEndX(prevEndX.current);
+    prevEndX.current = secondsToPx(DEFAULT_SECTION_SEC);
+    setSectionTime({ ...sectionTime, endTime: secondsToTimeObject(prevEndX.current) });
     prevProgressWidth.current = progressRef.current?.scrollWidth ?? 0;
   }, [videoDuration]);
 
@@ -152,7 +155,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const maxX = (videoDuration * progressWidthPercent) / 100;
 
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
-        const time = pxToTime(newStartX);
+        const time = pxToSeconds(newStartX);
 
         videoRef.current.currentTime = time;
         setVideoProgress(time);
@@ -188,15 +191,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
         const newEndX = newStartX + sectionBoxWidth;
 
-        const newStartTime = pxToTime(newStartX);
-        const newEndTime = pxToTime(newEndX);
-        const newStartTimeObject = secondsToTimeObject(newStartTime);
-        const newEndTimeObject = secondsToTimeObject(newEndTime);
+        const newStartTimeObject = pxToTimeObject(newStartX);
+        const newEndTimeObject = pxToTimeObject(newEndX);
 
-        setStartTimeInput(newStartTimeObject);
-        setEndTimeInput(newEndTimeObject);
-        setStartX(newStartX);
-        setEndX(newEndX);
+        setSectionTime({ startTime: newStartTimeObject, endTime: newEndTimeObject });
         prevStartX.current = newStartX;
         prevEndX.current = newEndX;
       }
@@ -220,32 +218,80 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
+      if (
+        isSubtitleDragging &&
+        startXRef.current !== null &&
+        progressRef.current &&
+        selectedSubtitleIndex !== null &&
+        selectedSubtitleIndex >= 0
+      ) {
+        const scrollLeft = progressRef.current.scrollLeft;
+        const selectedSubtitle = subtitleContentArray[selectedSubtitleIndex];
+        const subtitleStartTime = timeObjectToSeconds(selectedSubtitle.startTime);
+        const subtitleEndTime = timeObjectToSeconds(selectedSubtitle.endTime);
+        const sectionBoxWidth = secondsToPx(subtitleEndTime - subtitleStartTime);
+
+        const newDivX = e.clientX + scrollLeft - startXRef.current;
+        const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
+        const newStartX = Math.max(0, Math.min(maxX, newDivX));
+        const newEndX = newStartX + sectionBoxWidth;
+
+        const newStartTimeObject = pxToTimeObject(newStartX);
+        const newEndTimeObject = pxToTimeObject(newEndX);
+
+        setSubtitleContentArray((prev) => {
+          const updatedArray = [...prev];
+          updatedArray[selectedSubtitleIndex] = {
+            ...updatedArray[selectedSubtitleIndex],
+            startTime: newStartTimeObject,
+            endTime: newEndTimeObject,
+          };
+
+          return updatedArray;
+        });
+      }
+    }
+
+    function handleMouseUp() {
+      setIsSubtitleDragging(false);
+      startXRef.current = null;
+    }
+
+    if (isSubtitleDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isSubtitleDragging]);
+
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
       if (progressRef.current && sectionBoxRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
         const progressWidth = progressRef.current.scrollWidth;
         if (isExpandDragging.startTime && startXRef.current !== null) {
           const newDivX = e.clientX + scrollLeft - startXRef.current;
-          const maxX = endX - SECTION_BOX_MINIMUM_WIDTH;
+          const maxX = secondsToPx(timeObjectToSeconds(sectionTime.endTime)) - SECTION_BOX_MINIMUM_WIDTH;
 
           const newX = Math.max(0, Math.min(maxX, newDivX));
-          const newTime = pxToTime(newX);
-          const newTimeObject = secondsToTimeObject(newTime);
+          const newTimeObject = pxToTimeObject(newX);
 
-          setStartTimeInput(newTimeObject);
-          setStartX(newX);
+          setSectionTime({ ...sectionTime, startTime: newTimeObject });
           prevStartX.current = newX;
         }
         if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
           const newDivX = e.clientX + scrollLeft - endXRef.current;
           const maxX = progressWidth;
-          const minX = startX + SECTION_BOX_MINIMUM_WIDTH;
+          const minX = secondsToPx(timeObjectToSeconds(sectionTime.startTime)) + SECTION_BOX_MINIMUM_WIDTH;
 
           const newX = Math.max(minX, Math.min(maxX, newDivX));
-          const newTime = pxToTime(newX);
-          const newTimeObject = secondsToTimeObject(newTime);
+          const newTimeObject = pxToTimeObject(newX);
 
-          setEndTimeInput(newTimeObject);
-          setEndX(newX);
+          setSectionTime({ ...sectionTime, endTime: newTimeObject });
           prevEndX.current = newX;
         }
       }
@@ -327,10 +373,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const newEndX = Math.max(0, Math.min(endMaxX, prevEndX.current * resizeRatio));
         const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
 
-        const time = pxToTime(newProgressBarX);
-
-        setStartX(newStartX);
-        setEndX(newEndX);
+        const time = pxToSeconds(newProgressBarX);
 
         prevStartX.current = newStartX;
         prevEndX.current = newEndX;
@@ -410,18 +453,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   }, [activePanel]);
 
   useEffect(() => {
-    const newStartTime = timeObjectToSeconds(startTimeInput);
-    const newEndTime = timeObjectToSeconds(endTimeInput);
-
-    const newStartX = timeToPx(newStartTime);
-    const newEndX = timeToPx(newEndTime);
-
-    setStartX(newStartX);
-    setEndX(newEndX);
+    const newStartX = timeObjectToPx(sectionTime.startTime);
+    const newEndX = timeObjectToPx(sectionTime.endTime);
 
     prevStartX.current = newStartX;
     prevEndX.current = newEndX;
-  }, [startTimeInput, endTimeInput, videoDuration]);
+  }, [sectionTime.startTime, sectionTime.endTime, videoDuration]);
 
   useEffect(() => {
     function handleTimeUpdate() {
@@ -442,7 +479,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   useEffect(() => {
     if (progressRef.current) {
       const progressWidth = progressRef.current.clientWidth;
-      const progressBarX = timeToPx(videoProgress);
+      const progressBarX = secondsToPx(videoProgress);
       const left = progressBarX - progressWidth / 2;
 
       progressRef.current?.scrollTo({ left, behavior: "smooth" });
@@ -523,7 +560,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       const rect = progressRef.current.getBoundingClientRect();
       const scrollLeft = progressRef.current.scrollLeft;
       const x = e.clientX - rect.left + scrollLeft;
-      const time = pxToTime(x);
+      const time = pxToSeconds(x);
 
       if (x > maxX) return;
 
@@ -541,7 +578,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      progressBarXRef.current = e.clientX - timeToPx(videoProgress) + scrollLeft;
+      progressBarXRef.current = e.clientX - secondsToPx(videoProgress) + scrollLeft;
     }
   }
 
@@ -566,7 +603,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      startXRef.current = e.clientX - startX + scrollLeft;
+      startXRef.current = e.clientX - pxToSeconds(timeObjectToSeconds(sectionTime.startTime)) + scrollLeft;
     }
   }
 
@@ -577,7 +614,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      startXRef.current = e.clientX - startX + scrollLeft;
+      startXRef.current = e.clientX - timeObjectToPx(sectionTime.startTime) + scrollLeft;
     }
   }
 
@@ -588,8 +625,40 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      endXRef.current = e.clientX - endX + scrollLeft;
+      endXRef.current = e.clientX - timeObjectToPx(sectionTime.endTime) + scrollLeft;
     }
+  }
+
+  function handleMouseDownSubtitleSectionBox(e: React.MouseEvent<HTMLDivElement>, index: number) {
+    e.stopPropagation();
+    setIsSubtitleDragging(true);
+    setSelectedSubtitleIndex(index);
+
+    if (progressRef.current && index !== undefined) {
+      const scrollLeft = progressRef.current.scrollLeft;
+      const selectedSubtitle = subtitleContentArray[index];
+      const selectedSubtitleStartX = timeObjectToPx(selectedSubtitle.startTime);
+
+      startXRef.current = e.clientX - selectedSubtitleStartX + scrollLeft;
+    }
+  }
+
+  function handleMouseDownSubtitleStartExpand(e: React.MouseEvent<HTMLDivElement>) {
+    // e.stopPropagation();
+    // setIsExpandDragging({ ...isExpandDragging, startTime: true });
+    // if (progressRef.current) {
+    //   const scrollLeft = progressRef.current.scrollLeft;
+    //   startXRef.current = e.clientX - startX + scrollLeft;
+    // }
+  }
+
+  function handleMouseDownSubtitleEndExpand(e: React.MouseEvent<HTMLDivElement>) {
+    // e.stopPropagation();
+    // setIsExpandDragging({ ...isExpandDragging, endTime: true });
+    // if (progressRef.current) {
+    //   const scrollLeft = progressRef.current.scrollLeft;
+    //   endXRef.current = e.clientX - endX + scrollLeft;
+    // }
   }
 
   function handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>) {
@@ -615,47 +684,61 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     }
   }
 
-  function timeToPx(time: number) {
+  function secondsToPx(time: number) {
     return (time * unitWidth) / SIXTY_SECONDS;
   }
 
-  function pxToTime(px: number) {
+  function pxToSeconds(px: number) {
     return (px / unitWidth) * SIXTY_SECONDS;
+  }
+
+  function timeObjectToPx(time: TimeObject) {
+    return secondsToPx(timeObjectToSeconds(time));
+  }
+
+  function pxToTimeObject(px: number) {
+    return secondsToTimeObject(pxToSeconds(px));
   }
 
   function handleChangeStartTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setStartTimeInput({ ...startTimeInput, [name]: value });
+    setSectionTime({ ...sectionTime, startTime: { ...sectionTime.startTime, [name]: value } });
   }
 
   function handleChangeEndTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setEndTimeInput({ ...endTimeInput, [name]: value });
+    setSectionTime({ ...sectionTime, endTime: { ...sectionTime.endTime, [name]: value } });
   }
 
   function correctStartTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (value.length === 0) {
-      setStartTimeInput({ ...startTimeInput, [name]: "00" });
+      setSectionTime({ ...sectionTime, startTime: { ...sectionTime.startTime, [name]: "00" } });
     }
 
-    const newValue = getCorrectStartTime(startTimeInput, endTimeInput, name, value);
+    const newValue = getCorrectStartTime(sectionTime.startTime, sectionTime.endTime, name, value);
 
     if (value.length >= 1) {
-      setStartTimeInput({ ...startTimeInput, [name]: newValue.toString().padStart(2, "0") });
+      setSectionTime({
+        ...sectionTime,
+        startTime: { ...sectionTime.startTime, [name]: newValue.toString().padStart(2, "0") },
+      });
     }
   }
 
   function correctEndTimeInput(e: React.FocusEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (value.length === 0) {
-      setEndTimeInput({ ...startTimeInput, [name]: "00" });
+      setSectionTime({ ...sectionTime, endTime: { ...sectionTime.endTime, [name]: "00" } });
     }
 
-    const newValue = getCorrectEndTime(startTimeInput, endTimeInput, videoDuration, name, value);
+    const newValue = getCorrectEndTime(sectionTime.startTime, sectionTime.endTime, videoDuration, name, value);
 
     if (value.length >= 1) {
-      setEndTimeInput({ ...endTimeInput, [name]: newValue.toString().padStart(2, "0") });
+      setSectionTime({
+        ...sectionTime,
+        endTime: { ...sectionTime.endTime, [name]: newValue.toString().padStart(2, "0") },
+      });
     }
   }
 
@@ -895,7 +978,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   function scrollToProgressBar() {
     if (progressRef.current) {
       const progressWidth = progressRef.current.clientWidth;
-      const progressBarX = timeToPx(videoProgress);
+      const progressBarX = secondsToPx(videoProgress);
       const left = progressBarX - progressWidth / 2;
 
       progressRef.current?.scrollTo({ left, behavior: "smooth" });
@@ -905,21 +988,17 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   function moveSectionBoxToProgressBar() {
     if (sectionBoxRef.current) {
       const sectionBoxWidth = sectionBoxRef.current.clientWidth;
-      const maxEndX = timeToPx(videoDuration);
-      const newStartX = timeToPx(videoProgress);
+      const maxEndX = secondsToPx(videoDuration);
+      const newStartX = secondsToPx(videoProgress);
       const newEndX = Math.min(newStartX + sectionBoxWidth, maxEndX);
 
-      const newEndTime = pxToTime(newEndX);
+      const newEndTime = pxToSeconds(newEndX);
 
       const newStartTimeObject = secondsToTimeObject(videoProgress);
       const newEndTimeObject = secondsToTimeObject(newEndTime);
 
-      setStartTimeInput(newStartTimeObject);
-      setStartX(newStartX);
+      setSectionTime({ startTime: newStartTimeObject, endTime: newEndTimeObject });
       prevStartX.current = newStartX;
-
-      setEndTimeInput(newEndTimeObject);
-      setEndX(newEndX);
       prevEndX.current = newEndX;
     }
   }
@@ -1027,8 +1106,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       </div>
 
       <SectionControlBar
-        startTimeInput={startTimeInput}
-        endTimeInput={endTimeInput}
+        startTimeInput={sectionTime.startTime}
+        endTimeInput={sectionTime.endTime}
         progressWidthPercent={progressWidthPercent}
         handleChangeStartTimeInput={handleChangeStartTimeInput}
         handleChangeEndTimeInput={handleChangeEndTimeInput}
@@ -1054,16 +1133,16 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           <div className="relative h-1/4 border-b border-slate-300">
             <SectionBox
               sectionBoxRef={sectionBoxRef}
-              startX={startX}
-              endX={endX}
+              startX={timeObjectToPx(sectionTime.startTime)}
+              endX={timeObjectToPx(sectionTime.endTime)}
               lineType="video"
               isActive={activePanel === "video"}
-              handleMouseDownSectionBox={handleMouseDownSectionBox}
-              handleMouseDownStartExpand={handleMouseDownStartExpand}
-              handleMouseDownEndExpand={handleMouseDownEndExpand}
-              handleClickPanel={() => {
+              handleMouseDownSectionBox={(e) => {
+                handleMouseDownSectionBox(e);
                 handleClickPanel("video");
               }}
+              handleMouseDownStartExpand={handleMouseDownStartExpand}
+              handleMouseDownEndExpand={handleMouseDownEndExpand}
             />
           </div>
 
@@ -1072,18 +1151,18 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             {hasTitle && titleContent && (
               <SectionBox
                 sectionBoxRef={sectionBoxRef}
-                startX={startX}
-                endX={endX}
+                startX={timeObjectToPx(sectionTime.startTime)}
+                endX={timeObjectToPx(sectionTime.endTime)}
                 lineType="title"
                 isActive={activePanel === "title"}
                 text={titleContent.text}
-                handleMouseDownSectionBox={handleMouseDownSectionBox}
-                handleMouseDownStartExpand={handleMouseDownStartExpand}
-                handleMouseDownEndExpand={handleMouseDownEndExpand}
-                handleClickPanel={() => {
+                handleMouseDownSectionBox={(e) => {
+                  handleMouseDownSectionBox(e);
                   handleClickPanel("title");
                   handleClickWorkMenu("title");
                 }}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
               />
             )}
           </div>
@@ -1091,21 +1170,22 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           {/* subtitle */}
           <div className="relative h-1/4 border-b border-slate-300">
             {subtitleContentArray.map((v, i) => (
-              <div
+              <SectionBox
                 key={i}
-                onMouseDown={() => {
-                  setSelectedSubtitleIndex(i);
+                startX={timeObjectToPx(v.startTime)}
+                endX={timeObjectToPx(v.endTime)}
+                lineType="subtitle"
+                isActive={activePanel === "subtitle"}
+                text={v.text}
+                isSelected={i === selectedSubtitleIndex}
+                handleMouseDownSectionBox={(e) => {
+                  handleMouseDownSubtitleSectionBox(e, i);
                   handleClickPanel("subtitle");
                   handleClickWorkMenu("subtitle");
                 }}
-                style={{
-                  left: timeToPx(timeObjectToSeconds(v.startTime)),
-                  width: timeToPx(timeObjectToSeconds(v.endTime) - timeObjectToSeconds(v.startTime)),
-                }}
-                className={`${
-                  i === selectedSubtitleIndex ? "border-4 border-slate-900" : "border-2 border-slate-500"
-                } absolute h-full border-slate-900 bg-slate-200`}
-              ></div>
+                handleMouseDownStartExpand={handleMouseDownSubtitleStartExpand}
+                handleMouseDownEndExpand={handleMouseDownSubtitleEndExpand}
+              />
             ))}
           </div>
 
@@ -1114,18 +1194,18 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             {selectedBgm && (
               <SectionBox
                 sectionBoxRef={sectionBoxRef}
-                startX={startX}
-                endX={endX}
+                startX={timeObjectToPx(sectionTime.startTime)}
+                endX={timeObjectToPx(sectionTime.endTime)}
                 lineType="bgm"
                 isActive={activePanel === "bgm"}
                 text={selectedBgm.title}
-                handleMouseDownSectionBox={handleMouseDownSectionBox}
-                handleMouseDownStartExpand={handleMouseDownStartExpand}
-                handleMouseDownEndExpand={handleMouseDownEndExpand}
-                handleClickPanel={() => {
+                handleMouseDownSectionBox={(e) => {
+                  handleMouseDownSectionBox(e);
                   handleClickPanel("bgm");
                   handleClickWorkMenu("bgm");
                 }}
+                handleMouseDownStartExpand={handleMouseDownStartExpand}
+                handleMouseDownEndExpand={handleMouseDownEndExpand}
               />
             )}
           </div>
