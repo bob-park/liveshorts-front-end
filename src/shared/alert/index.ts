@@ -1,23 +1,7 @@
 import { SlicePattern } from 'zustand';
 
 export const createAlertSlice: SlicePattern<AlertState> = (set) => ({
-  alerts: [
-    {
-      id: crypto.randomUUID(),
-      message: 'test - 1',
-      createdDate: new Date(),
-    },
-    {
-      id: crypto.randomUUID(),
-      message: 'test - 2',
-      createdDate: new Date(),
-    },
-    {
-      id: crypto.randomUUID(),
-      message: 'test - 3',
-      createdDate: new Date(),
-    },
-  ],
+  alerts: [],
   addAlert: (message) =>
     set(
       (state) => {
