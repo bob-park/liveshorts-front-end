@@ -1,11 +1,32 @@
 import { SlicePattern } from 'zustand';
 
 export const createAlertSlice: SlicePattern<AlertState> = (set) => ({
-  alerts: [],
+  alerts: [
+    {
+      id: crypto.randomUUID(),
+      message: 'test - 1',
+      createdDate: new Date(),
+    },
+    {
+      id: crypto.randomUUID(),
+      message: 'test - 2',
+      createdDate: new Date(),
+    },
+    {
+      id: crypto.randomUUID(),
+      message: 'test - 3',
+      createdDate: new Date(),
+    },
+  ],
   addAlert: (message) =>
     set(
       (state) => {
         const prevAlerts = state.alerts.slice();
+
+        // 최대 alert 개수가 넘은 경우 처리
+        if (prevAlerts.length >= 3) {
+          prevAlerts.splice(2, prevAlerts.length - 2);
+        }
 
         const createdToast: Toast = {
           id: crypto.randomUUID(),

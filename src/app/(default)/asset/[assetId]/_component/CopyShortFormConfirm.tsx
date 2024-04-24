@@ -6,6 +6,7 @@ import { LuCopyPlus } from 'react-icons/lu';
 import { IoCloseCircleOutline } from 'react-icons/io5';
 import useCopyShortform from '@/hooks/shortform/useCopyShortform';
 import useSearchTask from '@/hooks/shortform/useSearchTask';
+import { useStore } from '@/shared/rootStore';
 
 type CopyShortFormConfirmProps = {
   show: boolean;
@@ -24,8 +25,10 @@ export default function CopyShortFormConfirm({
   onBackdrop,
   onSuccess,
 }: CopyShortFormConfirmProps) {
-  // state
+  // store
+  const addAlert = useStore((state) => state.addAlert);
 
+  // query
   const { tasks } = useSearchTask(assetId);
   const { onCopyShortform, isLoading } = useCopyShortform(
     tasks,
@@ -33,6 +36,7 @@ export default function CopyShortFormConfirm({
     (newShortForm) => {
       onSuccess && onSuccess(newShortForm.id, newShortForm.title + ' - 복사본');
       handleBackdrop();
+      addAlert(`숏폼 "${shortform?.title}"의 복사본이 생성되었습니다.`);
     },
   );
 
@@ -59,7 +63,11 @@ export default function CopyShortFormConfirm({
   };
 
   const handleConfirm = () => {
-    shortform && onCopyShortform(shortform.id);
+    if (!shortform) {
+      return;
+    }
+
+    onCopyShortform(shortform.id);
   };
 
   return (
