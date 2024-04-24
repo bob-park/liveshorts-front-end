@@ -26,7 +26,7 @@ type ReserveItem = {
 };
 
 export default function ReservShortFormView(props: ReservShortFormViewProps) {
-  // props;
+  // props
   const { show, schedule, onBackdrop, onRequest } = props;
 
   // state
