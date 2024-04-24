@@ -87,6 +87,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     startTime: false,
     endTime: false,
   });
+  const [isSubtitleExpandDragging, setIsSubtitleExpandDragging] = useState({ startTime: false, endTime: false });
   const [isSubtitleDragging, setIsSubtitleDragging] = useState(false);
   const [isVideoDragging, setIsVideoDragging] = useState(false);
   const [progressWidthPercent, setProgressWidthPercent] = useState(MIN_PERCENT);
@@ -273,12 +274,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (progressRef.current && sectionBoxRef.current) {
+      if (progressRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
         const progressWidth = progressRef.current.scrollWidth;
         if (isExpandDragging.startTime && initialXRef.current !== null) {
           const newDivX = e.clientX + scrollLeft - initialXRef.current;
-          const maxX = timeObjectToPx(sectionInfo.endTime) - SECTION_BOX_MINIMUM_WIDTH;
+          const maxX = sectionInfo.endX - SECTION_BOX_MINIMUM_WIDTH;
 
           const startX = Math.max(0, Math.min(maxX, newDivX));
           const startTime = pxToTimeObject(startX);
@@ -288,7 +289,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         if (isExpandDragging.endTime && initialXRef.current !== null && progressRef.current) {
           const newDivX = e.clientX + scrollLeft - initialXRef.current;
           const maxX = progressWidth;
-          const minX = timeObjectToPx(sectionInfo.startTime) + SECTION_BOX_MINIMUM_WIDTH;
+          const minX = sectionInfo.startX + SECTION_BOX_MINIMUM_WIDTH;
 
           const endX = Math.max(minX, Math.min(maxX, newDivX));
           const endTime = pxToTimeObject(endX);
@@ -313,6 +314,59 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isExpandDragging]);
+
+  useEffect(() => {
+    function handleMouseMove(e: MouseEvent) {
+      if (selectedSubtitleIndex === null) return;
+
+      if (progressRef.current) {
+        const scrollLeft = progressRef.current.scrollLeft;
+        const progressWidth = progressRef.current.scrollWidth;
+        if (isSubtitleExpandDragging.startTime && initialXRef.current !== null) {
+          const newDivX = e.clientX + scrollLeft - initialXRef.current;
+          const maxX = subtitleContentArray[selectedSubtitleIndex].endX - SECTION_BOX_MINIMUM_WIDTH;
+
+          const startX = Math.max(0, Math.min(maxX, newDivX));
+          const startTime = pxToTimeObject(startX);
+
+          setSubtitleContentArray((prev) => {
+            const updatedArray = [...prev];
+            updatedArray[selectedSubtitleIndex] = { ...updatedArray[selectedSubtitleIndex], startTime, startX };
+            return updatedArray;
+          });
+        }
+        if (isSubtitleExpandDragging.endTime && initialXRef.current !== null) {
+          const newDivX = e.clientX + scrollLeft - initialXRef.current;
+          const maxX = progressWidth;
+          const minX = subtitleContentArray[selectedSubtitleIndex].startX + SECTION_BOX_MINIMUM_WIDTH;
+
+          const endX = Math.max(minX, Math.min(maxX, newDivX));
+          const endTime = pxToTimeObject(endX);
+
+          setSubtitleContentArray((prev) => {
+            const updatedArray = [...prev];
+            updatedArray[selectedSubtitleIndex] = { ...updatedArray[selectedSubtitleIndex], endTime, endX };
+            return updatedArray;
+          });
+        }
+      }
+    }
+
+    function handleMouseUp() {
+      setIsSubtitleExpandDragging({ startTime: false, endTime: false });
+      initialXRef.current = null;
+    }
+
+    if (isSubtitleExpandDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isSubtitleExpandDragging]);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
@@ -633,7 +687,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
+      initialXRef.current = e.clientX - sectionInfo.startX + scrollLeft;
     }
   }
 
@@ -644,7 +698,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
+      initialXRef.current = e.clientX - sectionInfo.startX + scrollLeft;
     }
   }
 
@@ -655,7 +709,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.endTime) + scrollLeft;
+      initialXRef.current = e.clientX - sectionInfo.endX + scrollLeft;
     }
   }
 
@@ -666,29 +720,30 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
     if (progressRef.current && index !== undefined) {
       const scrollLeft = progressRef.current.scrollLeft;
-      const selectedSubtitle = subtitleContentArray[index];
-      const selectedSubtitleStartX = timeObjectToPx(selectedSubtitle.startTime);
-
-      initialXRef.current = e.clientX - selectedSubtitleStartX + scrollLeft;
+      initialXRef.current = e.clientX - subtitleContentArray[index].startX + scrollLeft;
     }
   }
 
-  function handleMouseDownSubtitleStartExpand(e: React.MouseEvent<HTMLDivElement>) {
-    // e.stopPropagation();
-    // setIsExpandDragging({ ...isExpandDragging, startTime: true });
-    // if (progressRef.current) {
-    //   const scrollLeft = progressRef.current.scrollLeft;
-    //   initialXRef.current = e.clientX - startX + scrollLeft;
-    // }
+  function handleMouseDownSubtitleStartExpand(e: React.MouseEvent<HTMLDivElement>, index: number) {
+    e.stopPropagation();
+    setIsSubtitleExpandDragging({ ...isSubtitleExpandDragging, startTime: true });
+    setSelectedSubtitleIndex(index);
+
+    if (progressRef.current && selectedSubtitleIndex !== null) {
+      const scrollLeft = progressRef.current.scrollLeft;
+      initialXRef.current = e.clientX - subtitleContentArray[index].startX + scrollLeft;
+    }
   }
 
-  function handleMouseDownSubtitleEndExpand(e: React.MouseEvent<HTMLDivElement>) {
-    // e.stopPropagation();
-    // setIsExpandDragging({ ...isExpandDragging, endTime: true });
-    // if (progressRef.current) {
-    //   const scrollLeft = progressRef.current.scrollLeft;
-    //   initialXRef.current = e.clientX - endX + scrollLeft;
-    // }
+  function handleMouseDownSubtitleEndExpand(e: React.MouseEvent<HTMLDivElement>, index: number) {
+    e.stopPropagation();
+    setIsSubtitleExpandDragging({ ...isSubtitleExpandDragging, endTime: true });
+    setSelectedSubtitleIndex(index);
+
+    if (progressRef.current && selectedSubtitleIndex !== null) {
+      const scrollLeft = progressRef.current.scrollLeft;
+      initialXRef.current = e.clientX - subtitleContentArray[index].endX + scrollLeft;
+    }
   }
 
   function handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>) {
@@ -1198,8 +1253,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
                   handleClickPanel("subtitle");
                   handleClickWorkMenu("subtitle");
                 }}
-                handleMouseDownStartExpand={handleMouseDownSubtitleStartExpand}
-                handleMouseDownEndExpand={handleMouseDownSubtitleEndExpand}
+                handleMouseDownStartExpand={(e) => {
+                  handleMouseDownSubtitleStartExpand(e, i);
+                }}
+                handleMouseDownEndExpand={(e) => {
+                  handleMouseDownSubtitleEndExpand(e, i);
+                }}
               />
             ))}
           </div>
