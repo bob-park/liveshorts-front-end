@@ -236,18 +236,20 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
         const newDivX = e.clientX + scrollLeft - initialXRef.current;
         const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
-        const newStartX = Math.max(0, Math.min(maxX, newDivX));
-        const newEndX = newStartX + sectionBoxWidth;
 
-        const newStartTimeObject = pxToTimeObject(newStartX);
-        const newEndTimeObject = pxToTimeObject(newEndX);
+        const startX = Math.max(0, Math.min(maxX, newDivX));
+        const endX = startX + sectionBoxWidth;
+        const startTime = pxToTimeObject(startX);
+        const endTime = pxToTimeObject(endX);
 
         setSubtitleContentArray((prev) => {
           const updatedArray = [...prev];
           updatedArray[selectedSubtitleIndex] = {
             ...updatedArray[selectedSubtitleIndex],
-            startTime: newStartTimeObject,
-            endTime: newEndTimeObject,
+            startX,
+            endX,
+            startTime,
+            endTime,
           };
 
           return updatedArray;
@@ -784,6 +786,11 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
     if (index !== -1) return;
 
+    const startTime = secondsToTimeObject(videoProgress);
+    const endTime = secondsToTimeObject(videoProgress + DEFAULT_SUBTITLE_SEC);
+    const startX = secondsToPx(videoProgress);
+    const endX = secondsToPx(videoProgress + DEFAULT_SUBTITLE_SEC);
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
         selectedTemplate.options.subtitle;
@@ -801,8 +808,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           background,
           textOpacity,
           bgOpacity,
-          startTime: secondsToTimeObject(videoProgress),
-          endTime: secondsToTimeObject(videoProgress + DEFAULT_SUBTITLE_SEC),
+          startX,
+          endX,
+          startTime,
+          endTime,
         },
       ]);
     } else {
@@ -820,8 +829,10 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           background: "#000000",
           textOpacity: 1,
           bgOpacity: 0,
-          startTime: secondsToTimeObject(videoProgress),
-          endTime: secondsToTimeObject(videoProgress + DEFAULT_SUBTITLE_SEC),
+          startX,
+          endX,
+          startTime,
+          endTime,
         },
       ]);
     }
@@ -1169,8 +1180,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
             {subtitleContentArray.map((v, i) => (
               <SectionBox
                 key={i}
-                startX={timeObjectToPx(v.startTime)}
-                endX={timeObjectToPx(v.endTime)}
+                startX={v.startX}
+                endX={v.endX}
                 lineType="subtitle"
                 isActive={activePanel === "subtitle"}
                 text={v.text}

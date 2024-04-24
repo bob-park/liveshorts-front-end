@@ -13,6 +13,8 @@ export interface TitleContent {
 }
 
 export interface SubtitleContent extends TitleContent {
+  startX: number;
+  endX: number;
   startTime: TimeObject;
   endTime: TimeObject;
 }
