@@ -127,7 +127,7 @@ export default function BroadcastScheduleContent(
       );
 
       reservationItem &&
-        addAlert(`"${reservationItem.title}" 이(가) 숏폼 생성 예약되었습니다.`);
+        addAlert(`"${reservationItem.title}" 이(가) 숏폼 예약되었습니다.`);
     });
   };
 
