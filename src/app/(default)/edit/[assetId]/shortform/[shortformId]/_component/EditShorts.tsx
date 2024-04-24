@@ -75,8 +75,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     startTime: secondsToTimeObject(0),
     endTime: secondsToTimeObject(DEFAULT_SECTION_SEC),
   });
-  // const [startX, setStartX] = useState(0);
-  // const [endX, setEndX] = useState(0);
   const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
@@ -107,7 +105,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   useEffect(() => {
     prevEndX.current = secondsToPx(DEFAULT_SECTION_SEC);
-    setSectionTime({ ...sectionTime, endTime: secondsToTimeObject(prevEndX.current) });
+    setSectionTime({ ...sectionTime, endTime: pxToTimeObject(prevEndX.current) });
     prevProgressWidth.current = progressRef.current?.scrollWidth ?? 0;
   }, [videoDuration]);
 
