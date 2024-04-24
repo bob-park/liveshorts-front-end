@@ -51,6 +51,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const progressRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const sectionBoxRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
   const progressBarXRef = useRef<number | null>(null);
   const initialXRef = useRef<number | null>(null);
   const videoXRef = useRef<number | null>(null);
@@ -379,6 +380,46 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         setVideoProgress(time);
         progressBarRef.current.style.left = `${newProgressBarX}px`;
         prevProgressBarX.current = newProgressBarX;
+      }
+    }
+
+    handleChangeWitdhPercent();
+
+    return () => {
+      handleChangeWitdhPercent();
+    };
+  }, [progressWidthPercent]);
+
+  useEffect(() => {
+    function handleChangeWitdhPercent() {
+      if (!subtitleRef.current) return;
+
+      for (let i = 0; i < subtitleRef.current.children.length; i++) {
+        if (
+          progressRef.current &&
+          progressBarRef.current &&
+          prevProgressWidthPercent.current &&
+          videoRef.current &&
+          subtitleContentArray[i]
+        ) {
+          const v = subtitleRef.current.children[i];
+          const progressWidth = progressRef.current.scrollWidth;
+          const sectionBoxWidth = v.clientWidth;
+
+          const resizeRatio = progressWidthPercent / prevProgressWidthPercent.current;
+          const startMaxX = progressWidth - sectionBoxWidth;
+          const endMaxX = progressWidth;
+
+          const startX = Math.max(0, Math.min(startMaxX, subtitleContentArray[i].startX * resizeRatio));
+          const endX = Math.max(0, Math.min(endMaxX, subtitleContentArray[i].endX * resizeRatio));
+
+          setSubtitleContentArray((prev) => {
+            const updatedArray = [...prev];
+            updatedArray[i] = { ...updatedArray[i], startX, endX };
+
+            return updatedArray;
+          });
+        }
       }
     }
 
@@ -872,6 +913,14 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         };
         return updatedArray;
       });
+      setSubtitleContentArray((prev) => {
+        const updatedArray = [...prev];
+        updatedArray[selectedSubtitleIndex] = {
+          ...prev[selectedSubtitleIndex],
+          startX: timeObjectToPx(prev[selectedSubtitleIndex].startTime),
+        };
+        return updatedArray;
+      });
     }
   }
 
@@ -883,6 +932,14 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         updatedArray[selectedSubtitleIndex] = {
           ...prev[selectedSubtitleIndex],
           endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: value },
+        };
+        return updatedArray;
+      });
+      setSubtitleContentArray((prev) => {
+        const updatedArray = [...prev];
+        updatedArray[selectedSubtitleIndex] = {
+          ...prev[selectedSubtitleIndex],
+          endX: timeObjectToPx(prev[selectedSubtitleIndex].endTime),
         };
         return updatedArray;
       });
@@ -1162,7 +1219,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           </div>
 
           {/* subtitle */}
-          <div className="relative h-1/4 border-b border-slate-300">
+          <div ref={subtitleRef} className="relative h-1/4 border-b border-slate-300">
             {subtitleContentArray.map((v, i) => (
               <SectionBox
                 key={i}
