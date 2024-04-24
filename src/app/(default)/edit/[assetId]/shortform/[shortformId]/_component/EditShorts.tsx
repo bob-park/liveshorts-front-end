@@ -899,19 +899,14 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   function handleChangeSubtitleStartTime(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (selectedSubtitleIndex !== null) {
+      const startTime = { ...subtitleContentArray[selectedSubtitleIndex].startTime, [name]: value };
+
       setSubtitleContentArray((prev) => {
         const updatedArray = [...prev];
         updatedArray[selectedSubtitleIndex] = {
           ...prev[selectedSubtitleIndex],
-          startTime: { ...prev[selectedSubtitleIndex].startTime, [name]: value },
-        };
-        return updatedArray;
-      });
-      setSubtitleContentArray((prev) => {
-        const updatedArray = [...prev];
-        updatedArray[selectedSubtitleIndex] = {
-          ...prev[selectedSubtitleIndex],
-          startX: timeObjectToPx(prev[selectedSubtitleIndex].startTime),
+          startTime,
+          startX: timeObjectToPx(startTime),
         };
         return updatedArray;
       });
@@ -921,19 +916,14 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   function handleChangeSubtitleEndTime(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (selectedSubtitleIndex !== null) {
+      const endTime = { ...subtitleContentArray[selectedSubtitleIndex].endTime, [name]: value };
+
       setSubtitleContentArray((prev) => {
         const updatedArray = [...prev];
         updatedArray[selectedSubtitleIndex] = {
           ...prev[selectedSubtitleIndex],
-          endTime: { ...prev[selectedSubtitleIndex].endTime, [name]: value },
-        };
-        return updatedArray;
-      });
-      setSubtitleContentArray((prev) => {
-        const updatedArray = [...prev];
-        updatedArray[selectedSubtitleIndex] = {
-          ...prev[selectedSubtitleIndex],
-          endX: timeObjectToPx(prev[selectedSubtitleIndex].endTime),
+          endTime,
+          endX: timeObjectToPx(endTime),
         };
         return updatedArray;
       });
