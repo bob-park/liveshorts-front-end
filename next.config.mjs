@@ -1,15 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    outputStandalone: true,
-  },
+  output: 'standalone',
   reactStrictMode: false,
-  headers: [
-    {
-      key: 'Access-Control-Allow-Origin',
-      value: process.env.NEXT_PUBLIC_APP_URL,
-    },
-  ],
+  async headers() {
+    return [
+      {
+        source: '/:path',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.NEXT_PUBLIC_APP_URL || '',
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
