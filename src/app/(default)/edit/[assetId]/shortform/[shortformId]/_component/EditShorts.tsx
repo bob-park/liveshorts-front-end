@@ -55,7 +55,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const initialXRef = useRef<number | null>(null);
   const videoXRef = useRef<number | null>(null);
   const prevProgressBarX = useRef<number>(0);
-  const prevSectionX = useRef<{ startX: number; endX: number }>({ startX: 0, endX: 0 });
   const prevVideoX = useRef<number>(0);
   const prevProgressWidth = useRef<number>(0);
   const prevProgressWidthPercent = useRef<number>(0);
@@ -110,7 +109,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   useEffect(() => {
     const px = secondsToPx(DEFAULT_SECTION_SEC);
-    prevSectionX.current.endX = px;
     prevProgressWidth.current = progressRef.current?.scrollWidth ?? 0;
     setSectionInfo({ ...sectionInfo, endX: px });
   }, [videoDuration]);
@@ -198,7 +196,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const startTime = pxToTimeObject(startX);
         const endTime = pxToTimeObject(endX);
 
-        prevSectionX.current = { startX, endX };
         setSectionInfo({ startX, endX, startTime, endTime });
       }
     }
@@ -285,7 +282,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           const startX = Math.max(0, Math.min(maxX, newDivX));
           const startTime = pxToTimeObject(startX);
 
-          prevSectionX.current.startX = startX;
           setSectionInfo({ ...sectionInfo, startTime, startX });
         }
         if (isExpandDragging.endTime && initialXRef.current !== null && progressRef.current) {
@@ -296,7 +292,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           const endX = Math.max(minX, Math.min(maxX, newDivX));
           const endTime = pxToTimeObject(endX);
 
-          prevSectionX.current.endX = endX;
           setSectionInfo({ ...sectionInfo, endX, endTime });
         }
       }
@@ -373,13 +368,12 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const endMaxX = progressWidth;
         const progressBarMaxX = progressWidth - preogressBarWidth;
 
-        const startX = Math.max(0, Math.min(startMaxX, prevSectionX.current.startX * resizeRatio));
-        const endX = Math.max(0, Math.min(endMaxX, prevSectionX.current.endX * resizeRatio));
+        const startX = Math.max(0, Math.min(startMaxX, sectionInfo.startX * resizeRatio));
+        const endX = Math.max(0, Math.min(endMaxX, sectionInfo.endX * resizeRatio));
         const newProgressBarX = Math.max(0, Math.min(progressBarMaxX, prevProgressBarX.current * resizeRatio));
 
         const time = pxToSeconds(newProgressBarX);
 
-        prevSectionX.current = { startX, endX };
         setSectionInfo({ ...sectionInfo, startX, endX });
         videoRef.current.currentTime = time;
         setVideoProgress(time);
@@ -454,13 +448,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       window.removeEventListener("keydown", handlePlayerKeyDown);
     };
   }, [activePanel]);
-
-  useEffect(() => {
-    const newStartX = timeObjectToPx(sectionInfo.startTime);
-    const newEndX = timeObjectToPx(sectionInfo.endTime);
-
-    prevSectionX.current = { startX: newStartX, endX: newEndX };
-  }, [sectionInfo.startTime, sectionInfo.endTime, videoDuration]);
 
   useEffect(() => {
     function handleTimeUpdate() {
@@ -1006,7 +993,6 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       const startTime = secondsToTimeObject(videoProgress);
       const endTime = pxToTimeObject(startX);
 
-      prevSectionX.current = { startX, endX };
       setSectionInfo({ startX, endX, startTime, endTime });
     }
   }
