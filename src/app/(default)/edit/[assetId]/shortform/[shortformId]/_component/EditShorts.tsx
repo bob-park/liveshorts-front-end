@@ -52,8 +52,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const progressBarRef = useRef<HTMLDivElement>(null);
   const sectionBoxRef = useRef<HTMLDivElement>(null);
   const progressBarXRef = useRef<number | null>(null);
-  const startXRef = useRef<number | null>(null);
-  const endXRef = useRef<number | null>(null);
+  const initialXRef = useRef<number | null>(null);
   const videoXRef = useRef<number | null>(null);
   const prevProgressBarX = useRef<number>(0);
   const prevSectionX = useRef<{ startX: number; endX: number }>({ startX: 0, endX: 0 });
@@ -187,11 +186,11 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
-      if (isSectionBoxDragging && startXRef.current !== null && progressRef.current && sectionBoxRef.current) {
+      if (isSectionBoxDragging && initialXRef.current !== null && progressRef.current && sectionBoxRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
         const sectionBoxWidth = sectionBoxRef.current.clientWidth;
 
-        const newDivX = e.clientX + scrollLeft - startXRef.current;
+        const newDivX = e.clientX + scrollLeft - initialXRef.current;
         const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
 
         const startX = Math.max(0, Math.min(maxX, newDivX));
@@ -206,7 +205,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
     function handleMouseUp() {
       setIsSectionBoxDragging(false);
-      startXRef.current = null;
+      initialXRef.current = null;
     }
 
     if (isSectionBoxDragging) {
@@ -224,7 +223,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     function handleMouseMove(e: MouseEvent) {
       if (
         isSubtitleDragging &&
-        startXRef.current !== null &&
+        initialXRef.current !== null &&
         progressRef.current &&
         selectedSubtitleIndex !== null &&
         selectedSubtitleIndex >= 0
@@ -235,7 +234,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
         const subtitleEndTime = timeObjectToSeconds(selectedSubtitle.endTime);
         const sectionBoxWidth = secondsToPx(subtitleEndTime - subtitleStartTime);
 
-        const newDivX = e.clientX + scrollLeft - startXRef.current;
+        const newDivX = e.clientX + scrollLeft - initialXRef.current;
         const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
         const newStartX = Math.max(0, Math.min(maxX, newDivX));
         const newEndX = newStartX + sectionBoxWidth;
@@ -258,7 +257,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
     function handleMouseUp() {
       setIsSubtitleDragging(false);
-      startXRef.current = null;
+      initialXRef.current = null;
     }
 
     if (isSubtitleDragging) {
@@ -277,8 +276,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       if (progressRef.current && sectionBoxRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
         const progressWidth = progressRef.current.scrollWidth;
-        if (isExpandDragging.startTime && startXRef.current !== null) {
-          const newDivX = e.clientX + scrollLeft - startXRef.current;
+        if (isExpandDragging.startTime && initialXRef.current !== null) {
+          const newDivX = e.clientX + scrollLeft - initialXRef.current;
           const maxX = timeObjectToPx(sectionInfo.endTime) - SECTION_BOX_MINIMUM_WIDTH;
 
           const startX = Math.max(0, Math.min(maxX, newDivX));
@@ -287,8 +286,8 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
           prevSectionX.current.startX = startX;
           setSectionInfo({ ...sectionInfo, startTime, startX });
         }
-        if (isExpandDragging.endTime && endXRef.current !== null && progressRef.current) {
-          const newDivX = e.clientX + scrollLeft - endXRef.current;
+        if (isExpandDragging.endTime && initialXRef.current !== null && progressRef.current) {
+          const newDivX = e.clientX + scrollLeft - initialXRef.current;
           const maxX = progressWidth;
           const minX = timeObjectToPx(sectionInfo.startTime) + SECTION_BOX_MINIMUM_WIDTH;
 
@@ -303,8 +302,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
 
     function handleMouseUp() {
       setIsExpandDragging({ startTime: false, endTime: false });
-      startXRef.current = null;
-      endXRef.current = null;
+      initialXRef.current = null;
     }
 
     if (isExpandDragging) {
@@ -605,7 +603,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      startXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
+      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
     }
   }
 
@@ -616,7 +614,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      startXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
+      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.startTime) + scrollLeft;
     }
   }
 
@@ -627,7 +625,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     if (progressRef.current) {
       const scrollLeft = progressRef.current.scrollLeft;
 
-      endXRef.current = e.clientX - timeObjectToPx(sectionInfo.endTime) + scrollLeft;
+      initialXRef.current = e.clientX - timeObjectToPx(sectionInfo.endTime) + scrollLeft;
     }
   }
 
@@ -641,7 +639,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
       const selectedSubtitle = subtitleContentArray[index];
       const selectedSubtitleStartX = timeObjectToPx(selectedSubtitle.startTime);
 
-      startXRef.current = e.clientX - selectedSubtitleStartX + scrollLeft;
+      initialXRef.current = e.clientX - selectedSubtitleStartX + scrollLeft;
     }
   }
 
@@ -650,7 +648,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     // setIsExpandDragging({ ...isExpandDragging, startTime: true });
     // if (progressRef.current) {
     //   const scrollLeft = progressRef.current.scrollLeft;
-    //   startXRef.current = e.clientX - startX + scrollLeft;
+    //   initialXRef.current = e.clientX - startX + scrollLeft;
     // }
   }
 
@@ -659,7 +657,7 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
     // setIsExpandDragging({ ...isExpandDragging, endTime: true });
     // if (progressRef.current) {
     //   const scrollLeft = progressRef.current.scrollLeft;
-    //   endXRef.current = e.clientX - endX + scrollLeft;
+    //   initialXRef.current = e.clientX - endX + scrollLeft;
     // }
   }
 
