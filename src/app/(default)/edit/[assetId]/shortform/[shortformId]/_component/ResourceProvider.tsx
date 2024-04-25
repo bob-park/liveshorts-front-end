@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 const MAM_API_HOST = process.env.MAM_API_HOST;
 const API_PREFIX = "/api";
 
-export default async function ResourceProvider({ assetId }: { assetId: number }) {
+export default async function ResourceProvider({ assetId, shortformId }: { assetId: number; shortformId: string }) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
   const headers = new Headers();
@@ -18,5 +18,7 @@ export default async function ResourceProvider({ assetId }: { assetId: number })
   const bgmResult = await fetch(`${MAM_API_HOST}${API_PREFIX}/v1/shorts/bgm/list`, { headers });
   const bgmList = await bgmResult.json();
 
-  return <EditShorts videoSrc={videoSrc} templateList={templateList.result} bgmList={bgmList} />;
+  return (
+    <EditShorts shortformId={shortformId} videoSrc={videoSrc} templateList={templateList.result} bgmList={bgmList} />
+  );
 }
