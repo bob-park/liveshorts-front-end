@@ -116,12 +116,18 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   const { onRequest, isLoading } = useRequest(shortformId);
 
   useEffect(() => {
-    onRequest({
-      type: "TITLE",
-      content: titleContent.text,
-      startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
-      endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
-    });
+    const timer = setTimeout(() => {
+      onRequest({
+        type: "TITLE",
+        content: titleContent.text,
+        startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+        endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+      });
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [titleContent]);
 
   // useEffect
