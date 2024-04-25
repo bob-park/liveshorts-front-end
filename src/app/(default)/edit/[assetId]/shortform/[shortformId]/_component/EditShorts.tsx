@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import VideoControlBar from "./VideoControlBar";
 import SectionBox from "./SectionBox";
-import { getCorrectEndTime, getCorrectStartTime, secondsToTimeObject, timeObjectToSeconds } from "./util";
+import {
+  getCorrectEndTime,
+  getCorrectStartTime,
+  secondsToHhmmss,
+  secondsToTimeObject,
+  timeObjectToSeconds,
+} from "./util";
 import TimeLine from "./TimeLine";
 import TabMenu from "./TabMenu";
 import TitleMenu from "./menu/TitleMenu";
@@ -13,8 +19,10 @@ import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent, TimeObject } from "./type";
 import SectionControlBar from "./SectionControlBar";
 import VideoArea from "./VideoArea";
+import useRequest from "@/hooks/stream/useRequest";
 
 interface EditShortsProps {
+  shortformId: string;
   videoSrc: string;
   templateList: Template[];
   bgmList: Bgm[];
@@ -45,7 +53,7 @@ const DEFAULT_TITLE_CONTENT = {
 };
 const SECTION_BOX_MINIMUM_WIDTH = 24;
 
-export default function EditShorts({ videoSrc, templateList, bgmList }: EditShortsProps) {
+export default function EditShorts({ shortformId, videoSrc, templateList, bgmList }: EditShortsProps) {
   // useRef
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -103,6 +111,18 @@ export default function EditShorts({ videoSrc, templateList, bgmList }: EditShor
   const [templateImageSize, setTemplateImageSize] = useState({ width: 0, height: 0 });
 
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
+
+  // request stream
+  const { onRequest, isLoading } = useRequest(shortformId);
+
+  useEffect(() => {
+    onRequest({
+      type: "TITLE",
+      content: titleContent.text,
+      startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+      endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+    });
+  }, [titleContent]);
 
   // useEffect
   useEffect(() => {
