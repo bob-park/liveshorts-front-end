@@ -35,7 +35,7 @@ async function callApi(
 
   apiHeaders.append('Authorization', `Bearer ${accessToken}`);
   apiHeaders.append('User-Agent', headers.get('User-Agent') || '');
-  apiHeaders.append('Content-Type', 'application/json');
+  apiHeaders.append('Content-Type', headers.get('Content-Type') || '');
   apiHeaders.append(
     'X-Forwarded-For',
     headers.get('X-Forwarded-For')?.split(',')[0] || '',
