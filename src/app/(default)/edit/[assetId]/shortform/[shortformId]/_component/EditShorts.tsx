@@ -76,7 +76,9 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   const [loaded, setLoaded] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
   const [videoProgress, setVideoProgress] = useState(0);
+  const [videoVolume, setVideoVolume] = useState(100);
   const [isPlay, setIsPlay] = useState(false);
+  const [isMute, setIsMute] = useState(false);
   const [sectionInfo, setSectionInfo] = useState<{
     startX: number;
     endX: number;
@@ -663,6 +665,24 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     setVideoProgress(time);
   }
 
+  function handleChangeVolume(e: React.ChangeEvent<HTMLInputElement>) {
+    const volume = Number(e.target.value);
+
+    setVideoVolume(volume);
+
+    if (videoRef.current) {
+      videoRef.current.volume = volume / 100;
+    }
+  }
+
+  function handleMute(isMute: boolean) {
+    setIsMute(isMute);
+
+    if (videoRef.current) {
+      videoRef.current.muted = isMute;
+    }
+  }
+
   function handleMouseDownProgress(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (progressRef.current && progressBarRef.current && videoRef.current) {
       const maxX = (videoDuration * progressWidthPercent) / 100;
@@ -1193,10 +1213,14 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
           <VideoControlBar
             videoProgress={videoProgress}
             videoDuration={videoDuration}
+            videoVolume={videoVolume}
             isPlay={isPlay}
+            isMute={isMute}
             handleBack={handleBack}
             handleFoward={handleFoward}
             handlePlay={handlePlay}
+            handleChangeVolume={handleChangeVolume}
+            handleMute={handleMute}
           />
         </div>
       </div>
