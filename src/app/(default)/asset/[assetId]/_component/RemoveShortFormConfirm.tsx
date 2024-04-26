@@ -6,6 +6,7 @@ import { FaTrashAlt } from 'react-icons/fa';
 import { IoCloseCircleOutline } from 'react-icons/io5';
 import useRemoveShortform from '@/hooks/shortform/useDeleteShortform';
 import useSearchTask from '@/hooks/shortform/useSearchTask';
+import { useStore } from '@/shared/rootStore';
 
 type RemoveShortFormConfirmProps = {
   show: boolean;
@@ -22,12 +23,19 @@ export default function RemoveShortFormConfirm({
   shortform,
   onBackdrop,
 }: RemoveShortFormConfirmProps) {
+  // store
+  const addAlert = useStore((state) => state.addAlert);
+
+  // query
   const { tasks } = useSearchTask(assetId);
   const { onDeleteShortform, isLoading } = useRemoveShortform(
     tasks,
     assetId,
     shortform?.id,
-    () => handleBackdrop(),
+    () => {
+      handleBackdrop();
+      addAlert(`숏폼 "${shortform?.title}" 이(가) 삭제되었습니다.`);
+    },
   );
 
   // useEffect

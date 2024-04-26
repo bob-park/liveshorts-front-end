@@ -18,6 +18,7 @@ import ReservShortFormView from '@/components/schedule/ReserveShortFormView';
 import MoveOnTop from '@/components/common/MoveOnTop';
 import useGetSchedules from '@/hooks/schedule/useGetSchedules';
 import useReservationShortform from '@/hooks/schedule/useReservationShortform';
+import { useStore } from '@/shared/rootStore';
 
 type BroadcastScheduleContentProps = {
   channels: RecordChannel[];
@@ -38,6 +39,9 @@ export default function BroadcastScheduleContent(
   // nextjs
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // store
+  const addAlert = useStore((state) => state.addAlert);
 
   // state
   const [selectChannelId, setSelectChannelId] = useState<number>(prevChannelId);
@@ -115,6 +119,15 @@ export default function BroadcastScheduleContent(
           },
         })),
       },
+    });
+
+    items.forEach((item) => {
+      const reservationItem = reserveRecordSchedule.options?.shopItems?.find(
+        (shopItem) => shopItem.itemId === item.itemId,
+      );
+
+      reservationItem &&
+        addAlert(`"${reservationItem.title}" 이(가) 숏폼 예약되었습니다.`);
     });
   };
 

@@ -12,6 +12,7 @@ import {
   QueryClient,
   dehydrate,
 } from '@tanstack/react-query';
+import ToastProvider from './_component/ToastProvider';
 
 const MAM_API_HOST = process.env.MAM_API_HOST;
 
@@ -56,7 +57,8 @@ export default async function DefaultLayout({
     <div className="w-full h-full min-w-[900px]">
       <HydrationBoundary state={dehydratedState}>
         <NavbarMenu />
-        <div className="p-2 ">
+        <ToastProvider />
+        <div className="p-2 relative h-full">
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </div>
       </HydrationBoundary>

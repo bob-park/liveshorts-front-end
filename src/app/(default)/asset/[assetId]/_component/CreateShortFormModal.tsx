@@ -2,6 +2,7 @@
 
 // react
 import useCreateShortform from '@/hooks/shortform/useCreateShortform';
+import { useStore } from '@/shared/rootStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -23,13 +24,18 @@ export default function CreateShortFormModal({
   assetId,
   onBackdrop,
 }: CreateShortFormModalProps) {
+  // router
   const router = useRouter();
+
+  // store
+  const addAlert = useStore((state) => state.addAlert);
 
   // state
   const [title, setTitle] = useState<string>('');
 
   const { onCreateShortform, isLoading } = useCreateShortform((shortformId) => {
     router.push(`/edit/${assetId}/shortform/${shortformId}`);
+    addAlert(`숏폼 "${title}" 이(가) 생성되었습니다.`);
   });
 
   // useEffect
