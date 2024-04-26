@@ -1,4 +1,4 @@
-import { Bgm, WorkMenu } from "../type";
+import { ActivePanel, Bgm, WorkMenu } from "../type";
 import SimpleAudioPlayer from "./SimpleAudioPlayer";
 import { bgmListDummy } from "./dummy";
 
@@ -7,13 +7,21 @@ interface BgmMenuProps {
   selectedBgmId: string;
   handleClickBgm(bgm?: Bgm): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
+  handleClickPanel(panel: ActivePanel): void;
 }
 
-export default function BgmMenu({ bgmList, selectedBgmId, handleClickBgm, handleClickWorkMenu }: BgmMenuProps) {
+export default function BgmMenu({
+  bgmList,
+  selectedBgmId,
+  handleClickBgm,
+  handleClickWorkMenu,
+  handleClickPanel,
+}: BgmMenuProps) {
   return (
     <div
       onClick={() => {
         handleClickWorkMenu("bgm");
+        handleClickPanel("bgm");
       }}
       className="p-2 flex flex-col gap-2"
     >

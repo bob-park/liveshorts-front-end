@@ -1,18 +1,25 @@
-import { Template } from "../type";
+import { ActivePanel, Template } from "../type";
 import TemplateMenuImage from "./TemplateMenuImage";
 
 interface TemplateMenuProps {
   templateList: Template[];
   selectedTemplateId: string;
   handleClickTemplate(template?: Template): void;
+  handleClickPanel(panel: ActivePanel): void;
 }
 
-export default function TemplateMenu({ templateList, selectedTemplateId, handleClickTemplate }: TemplateMenuProps) {
+export default function TemplateMenu({
+  templateList,
+  selectedTemplateId,
+  handleClickTemplate,
+  handleClickPanel,
+}: TemplateMenuProps) {
   return (
     <div className="p-2 flex flex-col gap-2">
       <button
         onClick={() => {
           handleClickTemplate();
+          handleClickPanel("video");
         }}
         className="btn w-full"
       >

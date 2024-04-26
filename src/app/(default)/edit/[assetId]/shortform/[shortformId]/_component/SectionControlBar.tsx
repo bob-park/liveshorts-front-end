@@ -1,9 +1,10 @@
-import TimeInput, { TimeObject } from "@/components/edit/TimeInput";
+import TimeInput from "@/components/edit/TimeInput";
 import { WIDTH_PERCENT_STEP } from "./EditShorts";
 import { FaMagnifyingGlassPlus, FaMagnifyingGlassMinus } from "react-icons/fa6";
 import { LuArrowLeftToLine } from "react-icons/lu";
 import { RxAlignCenterVertically } from "react-icons/rx";
 import IconButton from "./IconButton";
+import { TimeObject } from "./type";
 
 interface SectionControlBarProps {
   startTimeInput: TimeObject;
@@ -15,6 +16,8 @@ interface SectionControlBarProps {
   shrinkProgress: () => void;
   scrollToProgressBar: () => void;
   moveSectionBoxToProgressBar: () => void;
+  correctStartTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
+  correctEndTimeInput(e: React.FocusEvent<HTMLInputElement>): void;
 }
 
 export default function SectionControlBar({
@@ -27,6 +30,8 @@ export default function SectionControlBar({
   shrinkProgress,
   scrollToProgressBar,
   moveSectionBoxToProgressBar,
+  correctStartTimeInput,
+  correctEndTimeInput,
 }: SectionControlBarProps) {
   return (
     <div className="py-2 px-5 flex items-center justify-between">
@@ -40,8 +45,13 @@ export default function SectionControlBar({
       </div>
 
       <div className="flex gap-3 items-center">
-        <TimeInput value={startTimeInput} handleChange={handleChangeStartTimeInput} /> /
-        <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} />
+        <TimeInput
+          value={startTimeInput}
+          handleChange={handleChangeStartTimeInput}
+          correctInput={correctStartTimeInput}
+        />
+        /
+        <TimeInput value={endTimeInput} handleChange={handleChangeEndTimeInput} correctInput={correctEndTimeInput} />
       </div>
 
       <div className="flex items-center select-none gap-2">

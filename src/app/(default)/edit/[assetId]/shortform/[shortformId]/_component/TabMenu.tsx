@@ -1,8 +1,9 @@
-import { WorkMenu } from "./type";
+import { ActivePanel, WorkMenu } from "./type";
 
 interface TabMenuProps {
   selectedWorkMenu: WorkMenu;
   handleClickWorkMenu(workMenu: WorkMenu): void;
+  handleClickPanel(panel: ActivePanel): void;
 }
 
 interface TabMenuItemProps {
@@ -11,7 +12,7 @@ interface TabMenuItemProps {
   handleClickWorkMenu(): void;
 }
 
-export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMenuProps) {
+export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu, handleClickPanel }: TabMenuProps) {
   return (
     <div role="tablist" className="w-full tab tabs-boxed p-0 border-slate-700">
       <TabMenuItem
@@ -19,6 +20,7 @@ export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMe
         isSelected={selectedWorkMenu === "template"}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("template");
+          handleClickPanel("video");
         }}
       />
       <TabMenuItem
@@ -26,6 +28,7 @@ export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMe
         isSelected={selectedWorkMenu === "title"}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("title");
+          handleClickPanel("title");
         }}
       />
       <TabMenuItem
@@ -33,6 +36,7 @@ export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMe
         isSelected={selectedWorkMenu === "subtitle"}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("subtitle");
+          handleClickPanel("subtitle");
         }}
       />
       <TabMenuItem
@@ -40,6 +44,7 @@ export default function TabMenu({ selectedWorkMenu, handleClickWorkMenu }: TabMe
         isSelected={selectedWorkMenu === "bgm"}
         handleClickWorkMenu={() => {
           handleClickWorkMenu("bgm");
+          handleClickPanel("bgm");
         }}
       />
     </div>

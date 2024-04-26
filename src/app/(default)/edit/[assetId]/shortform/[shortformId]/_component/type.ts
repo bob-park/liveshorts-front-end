@@ -12,6 +12,13 @@ export interface TitleContent {
   bgOpacity: number;
 }
 
+export interface SubtitleContent extends TitleContent {
+  startX: number;
+  endX: number;
+  startTime: TimeObject;
+  endTime: TimeObject;
+}
+
 export interface Template {
   templateId: string;
   title: string;
@@ -40,6 +47,12 @@ export interface Bgm {
   createdBy: string;
   lastModifiedDate: string;
   lastModifiedBy: string;
+}
+
+export interface TimeObject {
+  hour: string;
+  min: string;
+  sec: string;
 }
 
 export type ActivePanel = "video" | "template" | "title" | "subtitle" | "bgm";

@@ -1,40 +1,36 @@
-'use client';
+"use client";
 
 // react
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect } from "react";
 
-import cx from 'classnames';
+import cx from "classnames";
 
 // next
-import { useRouter, useSelectedLayoutSegments } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useRouter, useSelectedLayoutSegments } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 // react-icon
-import { LuLogOut } from 'react-icons/lu';
-import { AiOutlineSetting } from 'react-icons/ai';
-import { CgProfile } from 'react-icons/cg';
+import { LuLogOut } from "react-icons/lu";
+import { AiOutlineSetting } from "react-icons/ai";
+import { CgProfile } from "react-icons/cg";
 
 // daisyui
-import { Navbar, Dropdown, Avatar, Menu } from 'react-daisyui';
+import { Navbar, Dropdown, Avatar, Menu } from "react-daisyui";
 
-import routes from '../routes';
-import { getRoleType } from '@/utils/parseUtils';
+import routes from "../routes";
+import { getRoleType } from "@/utils/parseUtils";
 
-import useSessionTouch from '@/hooks/user/useSessionTouch';
-import useGetUserDetail from '@/hooks/user/useGetUserDetail';
-import useLogout from '@/hooks/user/useLogout';
+import useSessionTouch from "@/hooks/user/useSessionTouch";
+import useGetUserDetail from "@/hooks/user/useGetUserDetail";
+import useLogout from "@/hooks/user/useLogout";
 
 const activeMenuItem = (segments: string[], menuPaths: string[]) => {
-  if (
-    menuPaths.every((menuPath) =>
-      segments.some((segment) => segment === menuPath),
-    )
-  ) {
-    return 'active';
+  if (menuPaths.every((menuPath) => segments.some((segment) => segment === menuPath))) {
+    return "active";
   }
 
-  return '';
+  return "";
 };
 
 export default function NavbarMenu() {
@@ -44,14 +40,14 @@ export default function NavbarMenu() {
 
   const { me } = useSessionTouch();
   const { onGetUserDetail } = useGetUserDetail();
-  const { onLogout } = useLogout(() => router.push('/login'));
+  const { onLogout } = useLogout(() => router.push("/login"));
 
   // useEffect
   useLayoutEffect(() => {
     if (me) {
       !me.department && onGetUserDetail(me.id);
     }
-  }, [me]);
+  }, [me?.id]);
 
   return (
     <>
@@ -59,28 +55,14 @@ export default function NavbarMenu() {
         <Navbar className="">
           <Navbar.Start className="flex-none">
             <div className="px-2 mx-2 text-2xl font-bold">
-              <Link
-                className="btn btn-ghost normal-case px-2 mx-2 text-2xl font-bold"
-                href="/"
-              >
-                <Image
-                  alt="logo"
-                  src="/logo.png"
-                  width={150}
-                  height={50}
-                  priority
-                />
+              <Link className="btn btn-ghost normal-case px-2 mx-2 text-2xl font-bold" href="/">
+                <Image alt="logo" src="/logo.png" width={150} height={50} priority />
               </Link>
             </div>
             <Menu horizontal className="px-1 text-lg">
               {routes.map((route) => (
                 <Menu.Item key={`route-menu-item-${route.id}`}>
-                  <Link
-                    className={cx(
-                      activeMenuItem(segments, ['broadcast', 'schedule']),
-                    )}
-                    href={route.route}
-                  >
+                  <Link className={cx(activeMenuItem(segments, ["broadcast", "schedule"]))} href={route.route}>
                     {route.name}
                   </Link>
                 </Menu.Item>
@@ -92,38 +74,26 @@ export default function NavbarMenu() {
             <div className="mr-7">
               {me && (
                 <p className="align-middle">
-                  <strong className="text-xl">{me.name}</strong> (
-                  <span>@{me.userId}</span>)
+                  <strong className="text-xl">{me.name}</strong> (<span>@{me.userId}</span>)
                 </p>
               )}
             </div>
             <Dropdown className="mr-10" end>
               <div className="" tabIndex={0}>
                 <Avatar
-                  src={
-                    me
-                      ? `/api/user/${me.id}/avatar`
-                      : '/default_user_avatar.webp'
-                  }
+                  src={me ? `/api/user/${me.id}/avatar` : "/default_user_avatar.webp"}
                   size="sm"
                   shape="circle"
                   border
                 />
               </div>
 
-              <Dropdown.Menu
-                className="bg-base-100 shadow-xl w-[250px]"
-                tabIndex={0}
-              >
+              <Dropdown.Menu className="bg-base-100 shadow-xl w-[250px]" tabIndex={0}>
                 <li className="disabled ">
                   <div className="flex gap-3 py-2 items-start">
                     <div className="flex-none pt-3">
                       <Avatar
-                        src={
-                          me
-                            ? `/api/user/${me.id}/avatar`
-                            : '/default_user_avatar.webp'
-                        }
+                        src={me ? `/api/user/${me.id}/avatar` : "/default_user_avatar.webp"}
                         size="xs"
                         shape="circle"
                         border
@@ -133,25 +103,17 @@ export default function NavbarMenu() {
                       <div className="flex flex-col gap-1 text-black text-base ">
                         <div>
                           <p>
-                            <span className="font-bold tex-sm text-gray-500">
-                              {me?.department}
-                            </span>
+                            <span className="font-bold tex-sm text-gray-500">{me?.department}</span>
                           </p>
                           <p>
-                            <span className="font-bold text-lg">
-                              {me?.name}
-                            </span>
+                            <span className="font-bold text-lg">{me?.name}</span>
                           </p>
                           <p>
-                            <span className="tex-sm text-gray-500">
-                              @{me?.userId}
-                            </span>
+                            <span className="tex-sm text-gray-500">@{me?.userId}</span>
                           </p>
                         </div>
 
-                        <h3 className="py-2">
-                          {me && <strong>{getRoleType(me.role).name}</strong>}
-                        </h3>
+                        <h3 className="py-2">{me && <strong>{getRoleType(me.role).name}</strong>}</h3>
                       </div>
                     </div>
                   </div>
