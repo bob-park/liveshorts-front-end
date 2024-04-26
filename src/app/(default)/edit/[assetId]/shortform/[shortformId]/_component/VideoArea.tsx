@@ -17,8 +17,8 @@ interface VideoAreaProps {
   videoSrc: string;
   videoX: number;
   videoProgress: number;
-  handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void;
-  handleChangeSubtitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void;
+  handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void;
+  handleChangeSubtitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
   handleMouseDownVideo(e: React.MouseEvent<HTMLVideoElement>): void;
   handleLoadedMetadata(e: React.SyntheticEvent<HTMLVideoElement>): void;

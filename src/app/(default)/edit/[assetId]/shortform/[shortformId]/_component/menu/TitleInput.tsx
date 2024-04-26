@@ -1,11 +1,14 @@
+"use client";
+
 import { TitleContent, WorkMenu } from "../type";
 import { hexToRgba } from "../util";
 import { SHORTS_WIDTH } from "../EditShorts";
+import { useEffect, useRef } from "react";
 
 interface TitleInputProps {
   title: TitleContent;
   templateWidth: number;
-  handleChangeTitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChangeTitle: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleClickPanel(): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
 }
@@ -17,6 +20,26 @@ export default function TitleInput({
   handleClickPanel,
   handleClickWorkMenu,
 }: TitleInputProps) {
+  // useRef
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // useEffect
+  useEffect(() => {
+    const handleEnterKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+      }
+    };
+
+    if (textAreaRef.current && textAreaRef.current.scrollHeight > textAreaRef.current.clientHeight) {
+      window.addEventListener("keydown", handleEnterKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEnterKeyDown);
+    };
+  }, [textAreaRef.current?.scrollHeight]);
+
   const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = title;
 
   return (
@@ -35,9 +58,9 @@ export default function TitleInput({
       }}
       className="absolute z-40 flex justify-center"
     >
-      <input
+      <textarea
+        ref={textAreaRef}
         name="text"
-        type="text"
         autoFocus
         value={text}
         style={{
@@ -48,7 +71,7 @@ export default function TitleInput({
         }}
         onChange={handleChangeTitle}
         className={`
-        z-50 focus:outline-none text-center h-fit
+        z-50 focus:outline-none text-center h-full w-full resize-none overflow-hidden
         `}
       />
     </div>

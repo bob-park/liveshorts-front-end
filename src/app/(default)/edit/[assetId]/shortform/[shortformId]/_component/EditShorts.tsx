@@ -979,7 +979,7 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     }
   }
 
-  function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
     if (titleContent) {
       setTitleContent({ ...titleContent, [name]: value });

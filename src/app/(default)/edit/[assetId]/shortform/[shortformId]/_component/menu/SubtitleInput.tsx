@@ -1,11 +1,14 @@
+"use client";
+
 import { SubtitleContent, WorkMenu } from "../type";
 import { hexToRgba } from "../util";
 import { SHORTS_WIDTH } from "../EditShorts";
+import { useEffect, useRef } from "react";
 
 interface SubtitleInputProps {
   subtitle: SubtitleContent;
   templateWidth: number;
-  handleChangeSubtitle: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChangeSubtitle: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleClickPanel(): void;
   handleClickWorkMenu(workMenu: WorkMenu): void;
   handleClickSubtitleInput(): void;
@@ -19,6 +22,26 @@ export default function SubtitleInput({
   handleClickWorkMenu,
   handleClickSubtitleInput,
 }: SubtitleInputProps) {
+  // useRef
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // useEffect
+  useEffect(() => {
+    const handleEnterKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+      }
+    };
+
+    if (textAreaRef.current && textAreaRef.current.scrollHeight > textAreaRef.current.clientHeight) {
+      window.addEventListener("keydown", handleEnterKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEnterKeyDown);
+    };
+  }, [textAreaRef.current?.scrollHeight]);
+
   const { text, x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = subtitle;
 
   return (
@@ -38,9 +61,9 @@ export default function SubtitleInput({
       }}
       className={`flex absolute z-40 justify-center`}
     >
-      <input
+      <textarea
+        ref={textAreaRef}
         name="text"
-        type="text"
         autoFocus
         value={text}
         style={{
@@ -51,7 +74,7 @@ export default function SubtitleInput({
         }}
         onChange={handleChangeSubtitle}
         className={`
-        z-50 focus:outline-none text-center h-fit
+        z-50 focus:outline-none text-center h-full w-full resize-none overflow-hidden
         `}
       />
     </div>
