@@ -132,6 +132,21 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     };
   }, [titleContent]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onRequest({
+        type: "BGM",
+        ref: selectedBgm?.bgmId,
+        startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+        endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+      });
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [selectedBgm]);
+
   // useEffect
   useEffect(() => {
     videoRef.current?.load();

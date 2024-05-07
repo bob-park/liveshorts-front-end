@@ -2,12 +2,13 @@ import delay from "@/utils/delay";
 
 export async function requestStream(
   taskId: string,
-  body: { type: string; content: string; startTime: string; endTime: string }
+  body: { type: string; content?: string; ref?: string; startTime: string; endTime: string }
 ) {
-  const { type, content, startTime, endTime } = body;
+  const { type, content, ref, startTime, endTime } = body;
   const formData = new FormData();
   formData.append("type", type);
-  formData.append("content", content);
+  content && formData.append("content", content);
+  ref && formData.append("ref", ref);
   formData.append("startTime", startTime);
   formData.append("endTime", endTime);
 
