@@ -32,7 +32,8 @@ export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
 export const FORWARD_BACKWARD_STEP_SECONDS = 10;
 export const FONT_ARRAY = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
-export const SHORTS_WIDTH = 720;
+export const SHORTS_WIDTH = 1080;
+const SHORTS_HEIGHT = 1920;
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
@@ -116,6 +117,45 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
 
   // request stream
   const { onRequest, isLoading } = useRequest(shortformId);
+
+  const imgElement = templateImageRef.current?.querySelector("img");
+  const imgHeight = imgElement?.naturalHeight ?? 0;
+  const videoWidth = videoRef.current?.videoWidth ?? 0;
+  const videoHeight = videoRef.current?.videoHeight ?? 0;
+  const videoClientWidth = videoRef.current?.clientWidth ?? 0;
+
+  const heightRatio = selectedTemplate
+    ? (imgHeight * (selectedTemplate.videoPosition.y2 - selectedTemplate.videoPosition.y1)) / videoHeight
+    : SHORTS_HEIGHT / videoHeight;
+  const widthRatio = videoClientWidth / videoWidth;
+
+  useEffect(() => {
+    if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+      const videoAreaWidth = videoAreaRef.current.clientWidth;
+      const videoWidth = videoRef.current.videoWidth;
+      const videoHeight = videoRef.current.videoHeight;
+      const templateImageWidth = templateImageRef.current.clientWidth;
+
+      const x = (videoAreaWidth / 2 - templateImageWidth / 2 - videoX) / widthRatio;
+      const y = selectedTemplate ? selectedTemplate.videoPosition.y1 * imgHeight : 0;
+
+      const width = videoWidth / heightRatio;
+      const height = videoHeight;
+
+      const timer = setTimeout(() => {
+        onRequest({
+          type: "VIDEO",
+          startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+          endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+          options: { x, y, width, height },
+        });
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [sectionInfo, videoX, selectedTemplate, heightRatio, widthRatio, imgHeight]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

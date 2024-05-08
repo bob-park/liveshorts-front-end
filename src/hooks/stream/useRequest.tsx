@@ -6,8 +6,14 @@ export default function useRequest(taskId: string, onSuccess?: () => void) {
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["shorts", "task", taskId, "stream"],
-    mutationFn: (body: { type: string; content?: string; ref?: string; startTime: string; endTime: string }) =>
-      requestStream(taskId, body),
+    mutationFn: (body: {
+      type: string;
+      startTime: string;
+      endTime: string;
+      content?: string;
+      ref?: string;
+      options?: any;
+    }) => requestStream(taskId, body),
     onSuccess: (data) => {
       //   queryClient.setQueryData(["shortforms", "detail", data.id], data);
 
