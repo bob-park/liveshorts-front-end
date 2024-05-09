@@ -1,19 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { requestStream } from "@/entries/stream/requestStream";
+import { requestUpdateStream } from "@/entries/stream/api/requestStream";
 
-export default function useRequest(taskId: string, onSuccess?: () => void) {
+export default function useRequestUpdate(taskId: string, onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["shorts", "task", taskId, "stream"],
     mutationFn: (body: {
+      streamId: string;
       type: string;
-      startTime: string;
-      endTime: string;
+      startTime?: string;
+      endTime?: string;
       content?: string;
       ref?: string;
-      options?: any;
-    }) => requestStream(taskId, body),
+      options?: { x?: number; y?: number; width?: number; height?: number };
+    }) => requestUpdateStream(taskId, body),
     onSuccess: (data) => {
       //   queryClient.setQueryData(["shortforms", "detail", data.id], data);
 
@@ -22,7 +23,7 @@ export default function useRequest(taskId: string, onSuccess?: () => void) {
   });
 
   return {
-    onRequest: mutate,
-    isLoading: isPending,
+    onRequestUpdate: mutate,
+    isLoadingUpdate: isPending,
   };
 }

@@ -19,7 +19,9 @@ import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent, TimeObject } from "./type";
 import SectionControlBar from "./SectionControlBar";
 import VideoArea from "./VideoArea";
-import useRequest from "@/hooks/stream/useRequest";
+import useRequestUpdate from "@/hooks/stream/useRequestUpdate";
+import useRequestDelete from "@/hooks/stream/useRequestDelete";
+import { requestCreateStream } from "@/entries/stream/api/requestStream";
 
 interface EditShortsProps {
   shortformId: string;
@@ -40,6 +42,7 @@ const DEFAULT_SECTION_SEC = 600;
 const SIXTY_SECONDS = 60;
 const DEFAULT_SUBTITLE_SEC = 10;
 const DEFAULT_TITLE_CONTENT = {
+  streamId: "",
   text: "제목을 입력하세요.",
   x1: 0,
   y1: 0,
@@ -91,6 +94,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     startTime: secondsToTimeObject(0),
     endTime: secondsToTimeObject(DEFAULT_SECTION_SEC),
   });
+  const [videoStreamId, setVideoStreamId] = useState("");
+  const [bgmStreamId, setBgmStreamId] = useState("");
   const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
@@ -116,7 +121,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
   // request stream
-  const { onRequest, isLoading } = useRequest(shortformId);
+  const { onRequestUpdate, isLoadingUpdate } = useRequestUpdate(shortformId);
+  const { onRequestDelete, isLoadingDelete } = useRequestDelete(shortformId);
 
   const imgElement = templateImageRef.current?.querySelector("img");
   const imgHeight = imgElement?.naturalHeight ?? 0;
@@ -142,8 +148,44 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
       const width = videoWidth / heightRatio;
       const height = videoHeight;
 
+      const createStream = async () => {
+        try {
+          const response = await requestCreateStream(shortformId, {
+            type: "VIDEO",
+            startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+            endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+            options: { x, y, width, height },
+          });
+          setVideoStreamId(response.streamId);
+        } catch (error) {}
+      };
+
       const timer = setTimeout(() => {
-        onRequest({
+        createStream();
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [videoDuration, sectionInfo, videoX, selectedTemplate, heightRatio, widthRatio, imgHeight]);
+
+  useEffect(() => {
+    if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+      const videoAreaWidth = videoAreaRef.current.clientWidth;
+      const videoWidth = videoRef.current.videoWidth;
+      const videoHeight = videoRef.current.videoHeight;
+      const templateImageWidth = templateImageRef.current.clientWidth;
+
+      const x = (videoAreaWidth / 2 - templateImageWidth / 2 - videoX) / widthRatio;
+      const y = selectedTemplate ? selectedTemplate.videoPosition.y1 * imgHeight : 0;
+
+      const width = videoWidth / heightRatio;
+      const height = videoHeight;
+
+      const timer = setTimeout(() => {
+        onRequestUpdate({
+          streamId: videoStreamId,
           type: "VIDEO",
           startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
           endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
@@ -159,7 +201,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      onRequest({
+      onRequestUpdate({
+        streamId: titleContent.streamId,
         type: "TITLE",
         content: titleContent.text,
         startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
@@ -173,18 +216,39 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   }, [titleContent]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onRequest({
-        type: "BGM",
-        ref: selectedBgm?.bgmId,
-        startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
-        endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
-      });
-    }, 300);
+    if (selectedSubtitleIndex !== null && selectedSubtitleIndex >= 0) {
+      const timer = setTimeout(() => {
+        onRequestUpdate({
+          streamId: subtitleContentArray[selectedSubtitleIndex].streamId,
+          type: "SUBTITLE",
+          content: subtitleContentArray[selectedSubtitleIndex].text,
+          startTime: secondsToHhmmss(pxToSeconds(subtitleContentArray[selectedSubtitleIndex].startX)),
+          endTime: secondsToHhmmss(pxToSeconds(subtitleContentArray[selectedSubtitleIndex].endX)),
+        });
+      }, 300);
 
-    return () => {
-      clearTimeout(timer);
-    };
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [subtitleContentArray]);
+
+  useEffect(() => {
+    if (bgmStreamId) {
+      const timer = setTimeout(() => {
+        onRequestUpdate({
+          streamId: bgmStreamId,
+          type: "BGM",
+          ref: selectedBgm?.bgmId,
+          startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+          endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+        });
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
   }, [selectedBgm]);
 
   // useEffect
@@ -930,14 +994,22 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     setSelectedWorkMenu(workMenu);
   }
 
-  function handleClickAddTitle() {
+  async function handleClickAddTitle() {
     if (selectedTemplate && selectedTemplate.options.title.none) return;
 
     setHasTitle(true);
 
+    const response = await requestCreateStream(shortformId, {
+      type: "TITLE",
+      content: titleContent.text,
+      startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+      endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+    });
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
+        streamId: response.streamId,
         text: "제목을 입력하세요.",
         x1,
         y1,
@@ -950,10 +1022,12 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
         textOpacity,
         bgOpacity,
       });
+    } else {
+      setTitleContent({ ...titleContent, streamId: response.streamId });
     }
   }
 
-  function handleClickAddSubtitle() {
+  async function handleClickAddSubtitle() {
     if (selectedTemplate && selectedTemplate.options.title.none) return;
 
     const index = subtitleContentArray.findIndex((v) => {
@@ -969,13 +1043,23 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     const startX = secondsToPx(videoProgress);
     const endX = secondsToPx(videoProgress + DEFAULT_SUBTITLE_SEC);
 
+    const defaultSubtitle = "자막을 입력하세요.";
+
+    const response = await requestCreateStream(shortformId, {
+      type: "SUBTITLE",
+      content: defaultSubtitle,
+      startTime: secondsToHhmmss(pxToSeconds(startX)),
+      endTime: secondsToHhmmss(pxToSeconds(endX)),
+    });
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
         selectedTemplate.options.subtitle;
       setSubtitleContentArray([
         ...subtitleContentArray,
         {
-          text: "자막을 입력하세요.",
+          streamId: response.streamId,
+          text: defaultSubtitle,
           x1,
           y1,
           x2,
@@ -996,7 +1080,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
       setSubtitleContentArray([
         ...subtitleContentArray,
         {
-          text: "자막을 입력하세요.",
+          streamId: response.streamId,
+          text: defaultSubtitle,
           x1: 0,
           y1: 0.8,
           x2: 1,
@@ -1019,6 +1104,7 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   }
 
   function handleClickDeleteTitle() {
+    onRequestDelete({ streamId: titleContent.streamId, type: "TITLE" });
     setHasTitle(false);
   }
 
@@ -1028,6 +1114,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
         const updatedArray = prev.filter((v, i) => i !== selectedSubtitleIndex);
         return updatedArray;
       });
+
+      onRequestDelete({ streamId: subtitleContentArray[selectedSubtitleIndex].streamId, type: "SUBTITLE" });
 
       setSelectedSubtitleIndex(null);
       setCurrentSubtitleIndex(null);
@@ -1142,7 +1230,25 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     setSelectedTemplate(template ?? null);
   }
 
-  function handleClickBgm(bgm?: Bgm) {
+  async function handleClickBgm(bgm?: Bgm) {
+    if (bgm) {
+      try {
+        const response = await requestCreateStream(shortformId, {
+          type: "BGM",
+          ref: selectedBgm?.bgmId,
+          startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+          endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+        });
+
+        setBgmStreamId(response.streamId);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      onRequestDelete({ streamId: bgmStreamId, type: "BGM" });
+      setBgmStreamId("");
+    }
+
     setSelectedBgm(bgm ?? null);
   }
 

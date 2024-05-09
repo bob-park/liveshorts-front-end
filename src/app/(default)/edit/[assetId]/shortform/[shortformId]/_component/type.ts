@@ -1,4 +1,5 @@
 export interface TitleContent {
+  streamId: string;
   text: string;
   x1: number;
   y1: number;
