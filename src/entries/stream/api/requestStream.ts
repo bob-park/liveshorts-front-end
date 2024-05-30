@@ -4,8 +4,8 @@ export async function requestCreateStream(
   taskId: string,
   body: {
     type: string;
-    startTime: string;
-    endTime: string;
+    startTime?: string;
+    endTime?: string;
     content?: string;
     ref?: string;
     options?: { x?: number; y?: number; width?: number; height?: number };
@@ -14,8 +14,8 @@ export async function requestCreateStream(
   const { type, content, ref, startTime, endTime, options } = body;
   const formData = new FormData();
   formData.append("type", type);
-  formData.append("startTime", startTime);
-  formData.append("endTime", endTime);
+  startTime && formData.append("startTime", startTime);
+  endTime && formData.append("endTime", endTime);
 
   const optionsString = JSON.stringify(options);
   const optionsBlob = new Blob([optionsString], { type: "application/json" });

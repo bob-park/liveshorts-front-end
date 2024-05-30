@@ -1,20 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { requestUpdateStream } from "@/entries/stream/api/requestStream";
+import { requestCreateStream } from "@/entries/stream/api/requestStream";
 
-export default function useRequestUpdate(type: string, taskId: string, onSuccess?: () => void) {
+export default function useRequestCreate(type: string, taskId: string, onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["shortforms", "detail", taskId],
     mutationFn: (body: {
-      streamId: string;
       type: string;
       startTime?: string;
       endTime?: string;
       content?: string;
       ref?: string;
       options?: { x?: number; y?: number; width?: number; height?: number };
-    }) => requestUpdateStream(taskId, body),
+    }) => requestCreateStream(taskId, body),
     onSuccess: (data) => {
       const shortform: ShortFormTask | undefined = queryClient.getQueryData(["shortforms", "detail", taskId]);
 
@@ -46,7 +45,7 @@ export default function useRequestUpdate(type: string, taskId: string, onSuccess
   });
 
   return {
-    onRequestUpdate: mutate,
-    isLoadingUpdate: isPending,
+    onRequestCreate: mutate,
+    isLoadingCreate: isPending,
   };
 }
