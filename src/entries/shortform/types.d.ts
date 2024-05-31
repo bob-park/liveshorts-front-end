@@ -10,6 +10,21 @@ interface ShortFormTask {
   overlayTasks?: ShortFormOverlayTask[];
   createdDate: Date;
   createdBy: string;
+  streams: { bgm: any[]; overlay: any[]; subtitle: TextStream[]; title: TextStream[]; video: VideoStream[] };
+}
+
+interface TextStream {
+  streamId: stirng;
+  content: string;
+  time: { startTime: string; endTime: string };
+  options?: any;
+}
+
+interface VideoStream {
+  streamId: stirng;
+  ref: number;
+  time: { startTime: string; endTime: string };
+  options?: { x?: number; y?: number; width?: number; height?: number };
 }
 
 interface ShortFormTemplate {
@@ -25,7 +40,7 @@ interface ShortFormTemplate {
   options: any;
 }
 
-type TaskStatus = 'WAITING' | 'PROCEEDING' | 'SUCCESS' | 'FAILURE';
+type TaskStatus = "WAITING" | "PROCEEDING" | "SUCCESS" | "FAILURE";
 
 interface ShortFormUploadInstance {
   id: string;

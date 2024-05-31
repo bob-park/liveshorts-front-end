@@ -12,6 +12,13 @@ export function secondsToHhmmss(seconds: number) {
   return `${HH}:${MM}:${SS}`;
 }
 
+export function hhmmssToSeconds(hhmmss: string) {
+  const [hours, minutes, seconds] = hhmmss.split(":").map(Number);
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+  return totalSeconds;
+}
+
 export function secondsToMmss(seconds: number) {
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);

@@ -6,6 +6,7 @@ import SectionBox from "./SectionBox";
 import {
   getCorrectEndTime,
   getCorrectStartTime,
+  hhmmssToSeconds,
   secondsToHhmmss,
   secondsToTimeObject,
   timeObjectToSeconds,
@@ -19,7 +20,11 @@ import TemplateMenu from "./menu/TemplateMenu";
 import { TitleContent, ActivePanel, WorkMenu, Template, Bgm, SubtitleContent, TimeObject } from "./type";
 import SectionControlBar from "./SectionControlBar";
 import VideoArea from "./VideoArea";
-import useRequest from "@/hooks/stream/useRequest";
+import useRequestUpdate from "@/hooks/stream/useRequestUpdate";
+import useRequestDelete from "@/hooks/stream/useRequestDelete";
+import { requestCreateStream } from "@/entries/stream/api/requestStream";
+import useGetShortform from "@/hooks/shortform/useGetShortform";
+import useRequestCreate from "@/hooks/stream/useRequestCreate";
 
 interface EditShortsProps {
   shortformId: string;
@@ -32,13 +37,15 @@ export const WIDTH_PERCENT_STEP = 25;
 export const MINIMUM_UNIT_WIDTH = 60;
 export const FORWARD_BACKWARD_STEP_SECONDS = 10;
 export const FONT_ARRAY = ["SpoqaHanSansNeo-Thin", "SpoqaHanSansNeo-Regular", "SpoqaHanSansNeo-Bold"];
-export const SHORTS_WIDTH = 720;
+export const SHORTS_WIDTH = 1080;
+const SHORTS_HEIGHT = 1920;
 const MAX_PERCENT = 400;
 const MIN_PERCENT = 100;
 const DEFAULT_SECTION_SEC = 600;
 const SIXTY_SECONDS = 60;
 const DEFAULT_SUBTITLE_SEC = 10;
 const DEFAULT_TITLE_CONTENT = {
+  streamId: "",
   text: "제목을 입력하세요.",
   x1: 0,
   y1: 0,
@@ -90,6 +97,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     startTime: secondsToTimeObject(0),
     endTime: secondsToTimeObject(DEFAULT_SECTION_SEC),
   });
+  const [videoStreamId, setVideoStreamId] = useState("");
+  const [bgmStreamId, setBgmStreamId] = useState("");
   const [videoX, setVideoX] = useState(0);
   const [isProgressBarDragging, setIsProgressBarDragging] = useState(false);
   const [isSectionBoxDragging, setIsSectionBoxDragging] = useState(false);
@@ -114,23 +123,195 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
 
   const unitWidth = (progressWidthPercent / 100) * MINIMUM_UNIT_WIDTH;
 
+  // get short-form
+  const { shortform, onGetShortform } = useGetShortform(shortformId);
+
+  // useEffect(() => {
+  //   const videoStream = shortform?.streams.video[shortform?.streams.video.length - 1];
+
+  //   setVideoStreamId(videoStream?.streamId);
+
+  //   setSectionInfo(() => {
+  //     const startSeconds = hhmmssToSeconds(videoStream?.time.startTime ?? "");
+  //     const endSeconds = hhmmssToSeconds(videoStream?.time.endTime ?? "");
+  //     const startX = secondsToPx(startSeconds);
+  //     const endX = secondsToPx(endSeconds);
+  //     const startTime = secondsToTimeObject(startSeconds);
+  //     const endTime = secondsToTimeObject(endSeconds);
+
+  //     return {
+  //       startX,
+  //       endX,
+  //       startTime,
+  //       endTime,
+  //     };
+  //   });
+  // }, []);
+
+  // useEffect(() => {
+  //   const titleStream = shortform?.streams.title[shortform?.streams.title.length - 1];
+
+  //   setTitleContent({
+  //     ...titleContent,
+  //     streamId: titleStream?.streamId,
+  //     text: titleStream?.content ?? "",
+  //   });
+  // }, []);
+
   // request stream
-  const { onRequest, isLoading } = useRequest(shortformId);
+  const { onRequestCreate: onRequestCreateVideo } = useRequestCreate("video", shortformId);
+  const { onRequestCreate: onRequestCreateTitle } = useRequestCreate("title", shortformId);
+  const { onRequestCreate: onRequestCreateSubtitle } = useRequestCreate("subtitle", shortformId);
+  const { onRequestUpdate: onRequestUpdateVideo } = useRequestUpdate("video", shortformId);
+  const { onRequestUpdate: onRequestUpdateTitle } = useRequestUpdate("title", shortformId);
+  const { onRequestUpdate: onRequestUpdateSubtitle } = useRequestUpdate("subtitle", shortformId);
+  const { onRequestDelete, isLoadingDelete } = useRequestDelete(shortformId);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onRequest({
-        type: "TITLE",
-        content: titleContent.text,
-        startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
-        endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
-      });
-    }, 300);
+    if (!shortform || typeof shortform?.streams.video.length === "undefined") {
+      return;
+    }
 
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [titleContent]);
+    if (shortform?.streams.video.length === 0) {
+      if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+        const imgElement = templateImageRef.current.querySelector("img");
+        const imgHeight = imgElement?.naturalHeight ?? 0;
+        const videoWidth = videoRef.current.videoWidth;
+        const videoHeight = videoRef.current.videoHeight;
+        const videoClientWidth = videoRef.current.clientWidth;
+
+        const heightRatio = selectedTemplate
+          ? (imgHeight * (selectedTemplate.videoPosition.y2 - selectedTemplate.videoPosition.y1)) / videoHeight
+          : SHORTS_HEIGHT / videoHeight;
+        const widthRatio = videoClientWidth / videoWidth;
+
+        const videoAreaWidth = videoAreaRef.current.clientWidth;
+        const templateImageWidth = templateImageRef.current.clientWidth;
+
+        const x = (videoAreaWidth / 2 - templateImageWidth / 2 - videoX) / widthRatio;
+        const y = selectedTemplate ? selectedTemplate.videoPosition.y1 * imgHeight : 0;
+
+        const width = videoWidth / heightRatio;
+        const height = videoHeight;
+
+        onRequestCreateVideo({
+          type: "VIDEO",
+          startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+          endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+          options: { x, y, width, height },
+        });
+      }
+    } else if (shortform?.streams.video.length > 0) {
+      const startX = secondsToPx(hhmmssToSeconds(shortform.streams.video[0].time.startTime));
+      const endX = secondsToPx(hhmmssToSeconds(shortform.streams.video[0].time.endTime));
+      const startTime = pxToTimeObject(startX);
+      const endTime = pxToTimeObject(endX);
+
+      setSectionInfo({ startX, endX, startTime, endTime });
+
+      setSelectedTemplate(() => {
+        const shortformTemplate = shortform.template as Template;
+        if (templateList.find((v) => v.templateId === shortformTemplate.templateId)) {
+          return shortformTemplate;
+        }
+        return null;
+      });
+
+      // TODO - setVideoX()
+    }
+  }, [shortform]);
+
+  // useEffect(() => {
+  //   if (videoAreaRef.current && videoRef.current && templateImageRef.current) {
+  //     const imgElement = templateImageRef.current.querySelector("img");
+  //     const imgHeight = imgElement?.naturalHeight ?? 0;
+  //     const videoWidth = videoRef.current.videoWidth;
+  //     const videoHeight = videoRef.current.videoHeight;
+  //     const videoClientWidth = videoRef.current?.clientWidth;
+
+  //     const heightRatio = selectedTemplate
+  //       ? (imgHeight * (selectedTemplate.videoPosition.y2 - selectedTemplate.videoPosition.y1)) / videoHeight
+  //       : SHORTS_HEIGHT / videoHeight;
+  //     const widthRatio = videoClientWidth / videoWidth;
+
+  //     const videoAreaWidth = videoAreaRef.current.clientWidth;
+  //     // const videoWidth = videoRef.current.videoWidth;
+  //     // const videoHeight = videoRef.current.videoHeight;
+  //     const templateImageWidth = templateImageRef.current.clientWidth;
+
+  //     const x = (videoAreaWidth / 2 - templateImageWidth / 2 - videoX) / widthRatio;
+  //     const y = selectedTemplate ? selectedTemplate.videoPosition.y1 * imgHeight : 0;
+
+  //     const width = videoWidth / heightRatio;
+  //     const height = videoHeight;
+
+  //     const timer = setTimeout(() => {
+  //       onRequestUpdate({
+  //         streamId: videoStreamId,
+  //         type: "VIDEO",
+  //         startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+  //         endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+  //         options: { x, y, width, height },
+  //       });
+  //     }, 300);
+
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   }
+  // }, [sectionInfo, videoX, selectedTemplate]);
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     onRequestUpdate({
+  //       streamId: titleContent.streamId,
+  //       type: "TITLE",
+  //       content: titleContent.text,
+  //       startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+  //       endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+  //     });
+  //   }, 300);
+
+  //   return () => {
+  //     clearTimeout(timer);
+  //   };
+  // }, [titleContent]);
+
+  // useEffect(() => {
+  //   if (selectedSubtitleIndex !== null && selectedSubtitleIndex >= 0) {
+  //     const timer = setTimeout(() => {
+  //       onRequestUpdate({
+  //         streamId: subtitleContentArray[selectedSubtitleIndex].streamId,
+  //         type: "SUBTITLE",
+  //         content: subtitleContentArray[selectedSubtitleIndex].text,
+  //         startTime: secondsToHhmmss(pxToSeconds(subtitleContentArray[selectedSubtitleIndex].startX)),
+  //         endTime: secondsToHhmmss(pxToSeconds(subtitleContentArray[selectedSubtitleIndex].endX)),
+  //       });
+  //     }, 300);
+
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   }
+  // }, [subtitleContentArray]);
+
+  // useEffect(() => {
+  //   if (bgmStreamId) {
+  //     const timer = setTimeout(() => {
+  //       onRequestUpdate({
+  //         streamId: bgmStreamId,
+  //         type: "BGM",
+  //         ref: selectedBgm?.bgmId,
+  //         startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+  //         endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+  //       });
+  //     }, 300);
+
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   }
+  // }, [selectedBgm]);
 
   // useEffect
   useEffect(() => {
@@ -213,6 +394,17 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   }, [isProgressBarDragging]);
 
   useEffect(() => {
+    const shortformStreamVideo = shortform?.streams.video[shortform?.streams.video.length - 1];
+    const shortformStreamTitle = shortform?.streams.title[shortform?.streams.title.length - 1];
+
+    const startSec = hhmmssToSeconds(shortformStreamVideo?.time.startTime ?? "");
+    const endSec = hhmmssToSeconds(shortformStreamVideo?.time.endTime ?? "");
+
+    let startX = secondsToPx(startSec);
+    let endX = secondsToPx(endSec);
+    let startTime = secondsToTimeObject(startSec);
+    let endTime = secondsToTimeObject(endSec);
+
     function handleMouseMove(e: MouseEvent) {
       if (isSectionBoxDragging && initialXRef.current !== null && progressRef.current && sectionBoxRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
@@ -221,10 +413,10 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
         const newDivX = e.clientX + scrollLeft - initialXRef.current;
         const maxX = (videoDuration * progressWidthPercent) / 100 - sectionBoxWidth;
 
-        const startX = Math.max(0, Math.min(maxX, newDivX));
-        const endX = startX + sectionBoxWidth;
-        const startTime = pxToTimeObject(startX);
-        const endTime = pxToTimeObject(endX);
+        startX = Math.max(0, Math.min(maxX, newDivX));
+        endX = startX + sectionBoxWidth;
+        startTime = pxToTimeObject(startX);
+        endTime = pxToTimeObject(endX);
 
         setSectionInfo({ startX, endX, startTime, endTime });
       }
@@ -233,6 +425,35 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     function handleMouseUp() {
       setIsSectionBoxDragging(false);
       initialXRef.current = null;
+
+      if (shortformStreamVideo?.options && shortformStreamTitle?.options) {
+        onRequestUpdateVideo({
+          streamId: shortformStreamVideo.streamId,
+          type: "VIDEO",
+          startTime: secondsToHhmmss(timeObjectToSeconds(startTime)),
+          endTime: secondsToHhmmss(timeObjectToSeconds(endTime)),
+          options: {
+            x: shortformStreamVideo.options.x,
+            y: shortformStreamVideo.options.y,
+            width: shortformStreamVideo.options.width,
+            height: shortformStreamVideo.options.height,
+          },
+        });
+
+        onRequestUpdateTitle({
+          streamId: shortformStreamTitle.streamId,
+          type: "TITLE",
+          startTime: secondsToHhmmss(timeObjectToSeconds(startTime)),
+          endTime: secondsToHhmmss(timeObjectToSeconds(endTime)),
+          content: shortformStreamTitle.content,
+          options: {
+            x: shortformStreamTitle.options.x,
+            y: shortformStreamTitle.options.y,
+            width: shortformStreamTitle.options.width,
+            height: shortformStreamTitle.options.height,
+          },
+        });
+      }
     }
 
     if (isSectionBoxDragging) {
@@ -301,6 +522,17 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   }, [isSubtitleDragging]);
 
   useEffect(() => {
+    const shortformStreamVideo = shortform?.streams.video[shortform?.streams.video.length - 1];
+    const shortformStreamTitle = shortform?.streams.title[shortform?.streams.title.length - 1];
+
+    const startSec = hhmmssToSeconds(shortformStreamVideo?.time.startTime ?? "");
+    const endSec = hhmmssToSeconds(shortformStreamVideo?.time.endTime ?? "");
+
+    let startX = secondsToPx(startSec);
+    let endX = secondsToPx(endSec);
+    let startTime = secondsToTimeObject(startSec);
+    let endTime = secondsToTimeObject(endSec);
+
     function handleMouseMove(e: MouseEvent) {
       if (progressRef.current) {
         const scrollLeft = progressRef.current.scrollLeft;
@@ -309,8 +541,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
           const newDivX = e.clientX + scrollLeft - initialXRef.current;
           const maxX = sectionInfo.endX - SECTION_BOX_MINIMUM_WIDTH;
 
-          const startX = Math.max(0, Math.min(maxX, newDivX));
-          const startTime = pxToTimeObject(startX);
+          startX = Math.max(0, Math.min(maxX, newDivX));
+          startTime = pxToTimeObject(startX);
 
           setSectionInfo({ ...sectionInfo, startTime, startX });
         }
@@ -319,8 +551,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
           const maxX = progressWidth;
           const minX = sectionInfo.startX + SECTION_BOX_MINIMUM_WIDTH;
 
-          const endX = Math.max(minX, Math.min(maxX, newDivX));
-          const endTime = pxToTimeObject(endX);
+          endX = Math.max(minX, Math.min(maxX, newDivX));
+          endTime = pxToTimeObject(endX);
 
           setSectionInfo({ ...sectionInfo, endX, endTime });
         }
@@ -330,6 +562,36 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     function handleMouseUp() {
       setIsExpandDragging({ startTime: false, endTime: false });
       initialXRef.current = null;
+      console.log(2);
+
+      if (shortformStreamVideo?.options && shortformStreamTitle?.options) {
+        onRequestUpdateVideo({
+          streamId: shortformStreamVideo.streamId,
+          type: "VIDEO",
+          startTime: secondsToHhmmss(timeObjectToSeconds(startTime)),
+          endTime: secondsToHhmmss(timeObjectToSeconds(endTime)),
+          options: {
+            x: shortformStreamVideo.options.x,
+            y: shortformStreamVideo.options.y,
+            width: shortformStreamVideo.options.width,
+            height: shortformStreamVideo.options.height,
+          },
+        });
+
+        onRequestUpdateTitle({
+          streamId: shortformStreamTitle.streamId,
+          type: "TITLE",
+          startTime: secondsToHhmmss(timeObjectToSeconds(startTime)),
+          endTime: secondsToHhmmss(timeObjectToSeconds(endTime)),
+          content: shortformStreamTitle.content,
+          options: {
+            x: shortformStreamTitle.options.x,
+            y: shortformStreamTitle.options.y,
+            width: shortformStreamTitle.options.width,
+            height: shortformStreamTitle.options.height,
+          },
+        });
+      }
     }
 
     if (isExpandDragging) {
@@ -875,14 +1137,22 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     setSelectedWorkMenu(workMenu);
   }
 
-  function handleClickAddTitle() {
+  async function handleClickAddTitle() {
     if (selectedTemplate && selectedTemplate.options.title.none) return;
 
     setHasTitle(true);
 
+    onRequestCreateTitle({
+      type: "TITLE",
+      content: titleContent.text,
+      startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+      endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+    });
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } = selectedTemplate.options.title;
       setTitleContent({
+        streamId: "",
         text: "제목을 입력하세요.",
         x1,
         y1,
@@ -898,7 +1168,7 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     }
   }
 
-  function handleClickAddSubtitle() {
+  async function handleClickAddSubtitle() {
     if (selectedTemplate && selectedTemplate.options.title.none) return;
 
     const index = subtitleContentArray.findIndex((v) => {
@@ -914,13 +1184,23 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     const startX = secondsToPx(videoProgress);
     const endX = secondsToPx(videoProgress + DEFAULT_SUBTITLE_SEC);
 
+    const defaultSubtitle = "자막을 입력하세요.";
+
+    onRequestCreateSubtitle({
+      type: "SUBTITLE",
+      content: defaultSubtitle,
+      startTime: secondsToHhmmss(pxToSeconds(startX)),
+      endTime: secondsToHhmmss(pxToSeconds(endX)),
+    });
+
     if (selectedTemplate) {
       const { x1, y1, x2, y2, font, size, color, background, textOpacity, bgOpacity } =
         selectedTemplate.options.subtitle;
       setSubtitleContentArray([
         ...subtitleContentArray,
         {
-          text: "자막을 입력하세요.",
+          streamId: "",
+          text: defaultSubtitle,
           x1,
           y1,
           x2,
@@ -941,7 +1221,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
       setSubtitleContentArray([
         ...subtitleContentArray,
         {
-          text: "자막을 입력하세요.",
+          streamId: "",
+          text: defaultSubtitle,
           x1: 0,
           y1: 0.8,
           x2: 1,
@@ -964,6 +1245,7 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
   }
 
   function handleClickDeleteTitle() {
+    onRequestDelete({ streamId: titleContent.streamId, type: "TITLE" });
     setHasTitle(false);
   }
 
@@ -973,6 +1255,8 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
         const updatedArray = prev.filter((v, i) => i !== selectedSubtitleIndex);
         return updatedArray;
       });
+
+      onRequestDelete({ streamId: subtitleContentArray[selectedSubtitleIndex].streamId, type: "SUBTITLE" });
 
       setSelectedSubtitleIndex(null);
       setCurrentSubtitleIndex(null);
@@ -1087,7 +1371,25 @@ export default function EditShorts({ shortformId, videoSrc, templateList, bgmLis
     setSelectedTemplate(template ?? null);
   }
 
-  function handleClickBgm(bgm?: Bgm) {
+  async function handleClickBgm(bgm?: Bgm) {
+    if (bgm) {
+      try {
+        const response = await requestCreateStream(shortformId, {
+          type: "BGM",
+          ref: selectedBgm?.bgmId,
+          startTime: secondsToHhmmss(pxToSeconds(sectionInfo.startX)),
+          endTime: secondsToHhmmss(pxToSeconds(sectionInfo.endX)),
+        });
+
+        setBgmStreamId(response.streamId);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      onRequestDelete({ streamId: bgmStreamId, type: "BGM" });
+      setBgmStreamId("");
+    }
+
     setSelectedBgm(bgm ?? null);
   }
 
