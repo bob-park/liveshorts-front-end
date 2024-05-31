@@ -7,8 +7,8 @@ import RQProvider from './_component/RQProvivder';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'BobShorts',
-  description: 'BobShorts',
+  title: 'ShortBob',
+  description: 'ShortBob',
 };
 
 export default async function RootLayout({

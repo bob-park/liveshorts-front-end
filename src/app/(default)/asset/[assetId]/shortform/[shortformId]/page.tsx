@@ -32,7 +32,7 @@ export async function generateMetadata(
     .then((res) => res.result);
 
   return {
-    title: `LiveShorts - ${shortform.title}`,
+    title: `ShortBob - ${shortform.title}`,
   };
 }
 
