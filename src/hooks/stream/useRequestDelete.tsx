@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { requestStream } from "@/entries/stream/requestStream";
+import { requestDeleteStream } from "@/entries/stream/api/requestStream";
 
-export default function useRequest(taskId: string, onSuccess?: () => void) {
+export default function useRequestDelete(taskId: string, onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["shorts", "task", taskId, "stream"],
-    mutationFn: (body: { type: string; content: string; startTime: string; endTime: string }) =>
-      requestStream(taskId, body),
+    mutationFn: (body: { streamId: string; type: string }) => requestDeleteStream(taskId, body),
     onSuccess: (data) => {
       //   queryClient.setQueryData(["shortforms", "detail", data.id], data);
 
@@ -16,7 +15,7 @@ export default function useRequest(taskId: string, onSuccess?: () => void) {
   });
 
   return {
-    onRequest: mutate,
-    isLoading: isPending,
+    onRequestDelete: mutate,
+    isLoadingDelete: isPending,
   };
 }
