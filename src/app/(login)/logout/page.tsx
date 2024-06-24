@@ -1,6 +1,6 @@
 // nextjs
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import LogoutContents from './_component/LogoutContents';
 
 const apiHost = process.env.MAM_API_HOST;
 const COOKIE_NAME = 'accessToken';
@@ -18,8 +18,7 @@ export default async function LogoutPage() {
 
   return (
     <div className="flex gap-x-2 justify-center items-center w-screen h-screen">
-      <span className="loading loading-infinity loading-lg" />
-      <h4 className="font-bold text-xl">loading...</h4>
+      <LogoutContents />
     </div>
   );
 }

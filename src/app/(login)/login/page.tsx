@@ -1,7 +1,7 @@
 'use client';
 
 // react
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // nextjs
 import LoginForm from '@/components/user/LoginForm';
@@ -19,6 +19,7 @@ export default function LoginPage() {
 
   // store
   const updateMe = useStore((state) => state.updateMe);
+  const initAssetPage = useStore((state) => state.initAssetPage);
 
   // state
   const [errMessage, setErrMessage] = useState<string>();
@@ -41,6 +42,14 @@ export default function LoginPage() {
       setErrMessage('아이디 또는 패스워드가 올바르지 않습니다.');
     },
   });
+
+  //useEffect
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: ['assets', 'search'] });
+    initAssetPage();
+
+    console.log('init assets.');
+  }, []);
 
   // handler
   const handleLogin = async (userId: string, password: string) => {
