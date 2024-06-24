@@ -47,8 +47,6 @@ export default function LoginPage() {
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ['assets', 'search'] });
     initAssetPage();
-
-    console.log('init assets.');
   }, []);
 
   // handler

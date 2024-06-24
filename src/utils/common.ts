@@ -125,8 +125,6 @@ export function parseShortFormTaskStatus(
         break;
     }
 
-    console.log(overlayTask.status);
-
     result = {
       id: 'PROCEEDING',
       name: overlayStatusName,
