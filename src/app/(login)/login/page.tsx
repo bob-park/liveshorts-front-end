@@ -27,7 +27,7 @@ export default function LoginPage() {
   // query client
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isSuccess } = useMutation({
     mutationKey: ['user', 'accessToken'],
     mutationFn: login,
     onSuccess: (data) => {
@@ -63,7 +63,7 @@ export default function LoginPage() {
       </div>
       <LoginForm
         isLoggingIn={isPending}
-        isLoggedIn={false}
+        isLoggedIn={isSuccess}
         msg={errMessage}
         onLogin={handleLogin}
       />
