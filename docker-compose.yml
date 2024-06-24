@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   liveshorts-front-end:
     container_name: liveshorts-front-end
