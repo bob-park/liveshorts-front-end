@@ -70,12 +70,12 @@ export default function AssetViewItem(props: AssetItemProps) {
         <div className="card-actions justify-between items-center">
           <div className="flex gap-1 justify-end items-center">
             {asset.recordSchedule && (
-              <div className="badge badge-outline badge-lg font-semibold text-sm">
+              <div className="badge badge-outline badge-lg font-semibold text-xs">
                 {asset.recordSchedule.channel.channelName}
               </div>
             )}
             {asset.category && (
-              <div className="badge badge-outline badge-lg font-semibold text-sm">
+              <div className="badge badge-outline badge-lg font-semibold text-xs">
                 {asset.category.name}
               </div>
             )}
