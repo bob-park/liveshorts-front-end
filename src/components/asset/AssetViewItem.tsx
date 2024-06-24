@@ -86,11 +86,11 @@ export default function AssetViewItem(props: AssetItemProps) {
                 <p className="items-center">
                   <IoTimeOutline className="inline mr-1" />
                   <span className="text-base font-bold">
-                    {dayjs(asset.recordSchedule.startDateTime).format('HH:MM')}
+                    {dayjs(asset.recordSchedule.startDateTime).format('HH:mm')}
                   </span>
                   <span> ~ </span>
                   <span className="text-base font-bold">
-                    {dayjs(asset.recordSchedule.endDateTime).format('HH:MM')}
+                    {dayjs(asset.recordSchedule.endDateTime).format('HH:mm')}
                   </span>
                 </p>
               </div>
